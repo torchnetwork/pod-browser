@@ -1,0 +1,56 @@
+{
+  "name": "pod-manager",
+  "version": "0.0.1",
+  "description": "Pod Manager",
+  "main": "index.js",
+  "scripts": {
+    "build": "next build",
+    "dev": "next",
+    "lint": "eslint pages components",
+    "start": "next start",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/inrupt/pod-manager.git"
+  },
+  "author": "Inrupt <engineering@inrupt.com>",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/inrupt/pod-manager/issues"
+  },
+  "homepage": "https://github.com/inrupt/pod-manager#readme",
+  "dependencies": {
+    "@material-ui/core": "^4.9.13",
+    "next": "^9.3.6",
+    "prop-types": "^15.7.2",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-jss": "^10.1.1",
+    "react-transition-group": "~4.3.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@types/enzyme": "^3.10.5",
+    "@types/enzyme-adapter-react-16": "^1.0.6",
+    "@types/jest": "^25.2.1",
+    "@types/react": "^16.9.34",
+    "@zeit/next-typescript": "^1.1.1",
+    "babel-eslint": "^10.1.0",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.2",
+    "enzyme-to-json": "^3.4.4",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.1.0",
+    "eslint-plugin-babel": "^5.3.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-jest": "^23.8.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.19.0",
+    "eslint-plugin-react-hooks": "^3.0.0",
+    "jest": "^25.5.3",
+    "prettier": "^2.0.5",
+    "typescript": "^3.8.3"
+  }
+}
