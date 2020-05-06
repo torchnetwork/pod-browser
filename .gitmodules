@@ -1,0 +1,9 @@
+[submodule "lib/prism"]
+	path = lib/prism
+	url = git@github.com:inrupt/prism.git
+[submodule "lib/solid-auth-fetcher"]
+	path = lib/solid-auth-fetcher
+	url = git@github.com:inrupt/solid-auth-fetcher.git
+[submodule "lib/lit-solid-core"]
+	path = lib/lit-solid-core
+	url = git@github.com:inrupt/lit-solid-core.git
