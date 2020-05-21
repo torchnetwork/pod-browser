@@ -3,6 +3,7 @@
 exports[`Logout button Renders a logout button 1`] = `
 <WithStyles(ForwardRef(Button))
   onClick={[Function]}
+  variant="contained"
 >
   Log out
 </WithStyles(ForwardRef(Button))>

@@ -27,6 +27,7 @@ exports[`ProviderLogin form Renders a webid login form, with button bound to log
       mt={2}
     >
       <WithStyles(ForwardRef(Button))
+        color="primary"
         type="submit"
         variant="contained"
       >
