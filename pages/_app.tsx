@@ -1,13 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/head';
 import { ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
+import { ILoggedInSolidSession } from '../lib/solid-auth-fetcher/dist/solidSession/ISolidSession';
+import { getSession } from '../lib/solid-auth-fetcher/dist';
+
 // import Header from '../components/header';
 import theme from '../src/theme';
-import UserContext from '../src/contexts/UserContext';
-import { getSession } from '../lib/solid-auth-fetcher/dist';
+import UserContextProvider, { UserContext } from '../src/contexts/UserContext';
+import PodManagerHeader from '../components/header';
+
 
 interface AppProps {
   Component: React.ComponentType;
@@ -15,15 +19,16 @@ interface AppProps {
 }
 
 export default function App(props: AppProps) {
-  const [isLoadingSession, setIsLoadingSession] = useState(true);
-  const [session, setSession] = useState(null);
+  const { setSession, setIsLoadingSession } = useContext(UserContext);
   const { Component, pageProps } = props;
 
   useEffect(() => {
     // Remove the server-side injected CSS.
     const jssStyles = document.querySelector('#jss-server-side');
+
     async function fetchSession() {
       const sessionStorage = await getSession();
+
       if (sessionStorage && sessionStorage.webId) {
         setSession(sessionStorage);
         setIsLoadingSession(false);
@@ -33,7 +38,7 @@ export default function App(props: AppProps) {
       jssStyles.parentElement.removeChild(jssStyles);
     }
     fetchSession();
-  }, []);
+  }, [setSession, setIsLoadingSession]);
 
   return (
     <>
@@ -46,11 +51,12 @@ export default function App(props: AppProps) {
       </Head>
 
       <ThemeProvider theme={theme}>
-        <UserContext.Provider value={{ session, isLoadingSession }}>
+        <UserContextProvider>
           <CssBaseline />
           {/* eslint react/jsx-props-no-spreading: 0 */}
+          <PodManagerHeader />
           <Component {...pageProps} />
-        </UserContext.Provider>
+        </UserContextProvider>
       </ThemeProvider>
     </>
   );
