@@ -1,23 +1,19 @@
-import React, { useState } from 'react';
-import Link from 'next/link';
-import {
-  Container,
-  Box,
-  Button,
-  Typography,
-} from '@material-ui/core';
+import React, { ReactElement, useState } from "react";
+import Link from "next/link";
+import { Container, Box, Button, Typography } from "@material-ui/core";
 
-import WebIdLogin from './webid';
-import ProviderLogin from './provider';
-
+import WebIdLogin from "./webid";
+import ProviderLogin from "./provider";
 
 export const LOGIN_TYPES = {
-  WEB_ID: 'WebID',
-  PROVIDER: 'Identity Provider',
+  WEB_ID: "WebID",
+  PROVIDER: "Identity Provider",
 };
 
-
-export function swapLoginType(currentLoginType: string, setFn: Function) {
+export function swapLoginType(
+  currentLoginType: string,
+  setFn: (type: string) => void
+): void {
   if (currentLoginType === LOGIN_TYPES.WEB_ID) {
     return setFn(LOGIN_TYPES.PROVIDER);
   }
@@ -25,8 +21,7 @@ export function swapLoginType(currentLoginType: string, setFn: Function) {
   return setFn(LOGIN_TYPES.WEB_ID);
 }
 
-
-export default function Login() {
+export default function Login(): ReactElement {
   const [loginType, setLoginType] = useState(LOGIN_TYPES.PROVIDER);
 
   const onSwapTypeClick = (e: React.SyntheticEvent<EventTarget>) => {
@@ -41,9 +36,7 @@ export default function Login() {
 
         <Box my={4}>
           <Link href="/register">
-            <a>
-              Register for a Solid Identity
-            </a>
+            <a>Register for a Solid Identity</a>
           </Link>
 
           <p>
@@ -52,11 +45,9 @@ export default function Login() {
             </a>
           </p>
 
-          <Typography variant="h5">
-            Log In
-          </Typography>
+          <Typography variant="h5">Log In</Typography>
 
-          { loginType === LOGIN_TYPES.WEB_ID ? (
+          {loginType === LOGIN_TYPES.WEB_ID ? (
             <WebIdLogin />
           ) : (
             <ProviderLogin />
@@ -64,8 +55,10 @@ export default function Login() {
 
           {/* TODO: replace this with a real URL that stores current provider choice in state */}
           <Button onClick={onSwapTypeClick} className="button--login">
-            {'Log In with '}
-            { loginType === LOGIN_TYPES.WEB_ID ? LOGIN_TYPES.PROVIDER : LOGIN_TYPES.WEB_ID }
+            {"Log In with "}
+            {loginType === LOGIN_TYPES.WEB_ID
+              ? LOGIN_TYPES.PROVIDER
+              : LOGIN_TYPES.WEB_ID}
           </Button>
         </Box>
       </Typography>

@@ -1,17 +1,12 @@
-import React from 'react';
-import { ServerStyleSheets } from '@material-ui/core/styles';
-import Document, {
-  Html,
-  Head,
-  Main,
-  NextScript,
-} from 'next/document';
+import { Children, ReactElement } from "react";
+import { ServerStyleSheets } from "@material-ui/core/styles";
+import Document, { Html, Head, Main, NextScript } from "next/document";
 
-import theme from '../src/theme';
-
+import theme from "../src/theme";
 
 export default class MyDocument extends Document {
-  render() {
+  /* eslint class-methods-use-this: 0 */
+  render(): ReactElement {
     return (
       <Html lang="en">
         <Head>
@@ -39,15 +34,19 @@ MyDocument.getInitialProps = async (ctx) => {
   const originalRenderPage = ctx.renderPage;
 
   /* eslint react/jsx-props-no-spreading: 0 */
-  ctx.renderPage = () => originalRenderPage({
-    enhanceApp: (App) => (props) => sheets.collect(<App {...props} />),
-  });
+  ctx.renderPage = () =>
+    originalRenderPage({
+      enhanceApp: (App) => (props) => sheets.collect(<App {...props} />),
+    });
 
   const initialProps = await Document.getInitialProps(ctx);
 
   return {
     ...initialProps,
     // Styles fragment is rendered after the app and page rendering finish.
-    styles: [...React.Children.toArray(initialProps.styles), sheets.getStyleElement()],
+    styles: [
+      ...Children.toArray(initialProps.styles),
+      sheets.getStyleElement(),
+    ],
   };
 };
