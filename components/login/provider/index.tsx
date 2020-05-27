@@ -1,23 +1,16 @@
-import React, { useState } from 'react';
-import {
-  Button,
-  Select,
-  MenuItem,
-  Box,
-  TextField,
-} from '@material-ui/core';
+import React, { ChangeEvent, useState, ReactElement } from "react";
+import { Button, Select, MenuItem, Box, TextField } from "@material-ui/core";
 
-import { login } from '../../../lib/solid-auth-fetcher/dist';
+import { login } from "../../../lib/solid-auth-fetcher/dist";
 
-import getProviders from '../../../constants/provider';
-import getConfig from '../../../constants/config';
-
+import getProviders from "../../../constants/provider";
+import getConfig from "../../../constants/config";
 
 const PROVIDERS = getProviders();
 const CONFIG = getConfig();
-const CUSTOM_PROVIDER = 'other';
+const CUSTOM_PROVIDER = "other";
 
-export const loginWithProvider = async (provider: string) => {
+export const loginWithProvider = (provider: string): void => {
   login({
     oidcIssuer: provider,
     clientId: CONFIG.idpClientId,
@@ -25,23 +18,25 @@ export const loginWithProvider = async (provider: string) => {
   });
 };
 
-export default function Provider() {
+export default function Provider(): ReactElement {
   const [provider, setProvider] = useState(PROVIDERS[0].value);
-  const [customProvider, setCustomProvider] = useState('');
+  const [customProvider, setCustomProvider] = useState("");
 
   const handleFormSubmit = async (e: React.SyntheticEvent<EventTarget>) => {
     e.preventDefault();
     loginWithProvider(customProvider || provider);
   };
 
+  // any is used on the select onchange due to ongoing debates about how to handle the event
+  /* eslint @typescript-eslint/no-explicit-any: 0 */
+
   return (
     <form onSubmit={handleFormSubmit}>
       <Box my={2}>
-        {/* any is used here due to ongoing debates about how to handle select onChange */}
         <Select
           value={provider}
           onChange={(e: any) => {
-            setCustomProvider('');
+            setCustomProvider("");
             setProvider(e.target.value);
           }}
         >
@@ -51,9 +46,7 @@ export default function Provider() {
             </MenuItem>
           ))}
 
-          <MenuItem value={CUSTOM_PROVIDER}>
-            Other
-          </MenuItem>
+          <MenuItem value={CUSTOM_PROVIDER}>Other</MenuItem>
         </Select>
 
         {provider === CUSTOM_PROVIDER ? (
@@ -63,7 +56,7 @@ export default function Provider() {
               id="customProvider"
               placeholder="Provider IRI"
               value={customProvider}
-              onChange={(e: any) => {
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 setCustomProvider(e.target.value);
               }}
             />

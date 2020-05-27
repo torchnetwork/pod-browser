@@ -1,18 +1,19 @@
-import React from 'react';
-import Router from 'next/router';
-import { Button } from '@material-ui/core';
+import { ReactElement, SyntheticEvent } from "react";
+import Router from "next/router";
+import { Button } from "@material-ui/core";
 
-import { logout } from '../../lib/solid-auth-fetcher/dist';
+import { logout } from "../../lib/solid-auth-fetcher/dist";
 
-
-export function onLogOutClick(e: React.SyntheticEvent<EventTarget>) {
+export function onLogOutClick(e: SyntheticEvent<EventTarget>): void {
   e.preventDefault();
   logout();
-  Router.push('/login');
+  Router.push("/login");
 }
 
-export default function LogOut() {
+export default function LogOut(): ReactElement {
   return (
-    <Button onClick={onLogOutClick} variant="contained">Log out</Button>
+    <Button onClick={onLogOutClick} variant="contained">
+      Log out
+    </Button>
   );
 }

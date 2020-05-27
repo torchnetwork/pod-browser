@@ -1,10 +1,10 @@
-import React from 'react';
-import { Container } from '@material-ui/core';
+import React, { ReactElement } from "react";
+import { Container } from "@material-ui/core";
 
-import { useRedirectIfLoggedOut } from '../../src/effects/auth';
-import ContainerView from '../../components/containerView';
+import { useRedirectIfLoggedOut } from "../../src/effects/auth";
+import ContainerView from "../../components/containerView";
 
-export default function Home() {
+export default function Home(): ReactElement {
   useRedirectIfLoggedOut();
 
   // TODO move Loading indicator into separate component

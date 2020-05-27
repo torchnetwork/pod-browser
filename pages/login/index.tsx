@@ -1,10 +1,9 @@
-import { useRedirectIfLoggedIn } from '../../src/effects/auth';
-import LoginForm from '../../components/login';
+import { ReactElement } from "react";
+import { useRedirectIfLoggedIn } from "../../src/effects/auth";
+import LoginForm from "../../components/login";
 
-export default function Login() {
+export default function Login(): ReactElement {
   useRedirectIfLoggedIn();
 
-  return (
-    <LoginForm />
-  );
+  return <LoginForm />;
 }

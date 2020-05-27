@@ -1,16 +1,19 @@
-import React from 'react';
-import { Link } from '@material-ui/core';
-import LogOutButton from '../logout';
-// import { images, mainNav } from '../../lib/prism/packages/prism-patterns';
+import React, { useContext, ReactElement } from "react";
+import { Link } from "@material-ui/core";
+import LogOutButton from "../logout";
+import UserContext from "../../src/contexts/UserContext";
 
-export default function Header() {
+export default function Header(): ReactElement {
+  const { session } = useContext(UserContext);
+
   return (
     <nav>
       <Link>Inrupt</Link>
       <Link>
         <i className="prism-icon-add" />
       </Link>
-      <LogOutButton />
+
+      {session ? <LogOutButton /> : null}
     </nav>
   );
 }

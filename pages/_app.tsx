@@ -1,44 +1,52 @@
-import React, { useEffect, useState, useContext } from 'react';
-import PropTypes from 'prop-types';
-import Head from 'next/head';
-import { ThemeProvider } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
+import React, { ComponentType, useEffect, useState, ReactElement } from "react";
 
-import { ILoggedInSolidSession } from '../lib/solid-auth-fetcher/dist/solidSession/ISolidSession';
-import { getSession } from '../lib/solid-auth-fetcher/dist';
+import PropTypes from "prop-types";
+import Head from "next/head";
+import { ThemeProvider } from "@material-ui/core/styles";
+import CssBaseline from "@material-ui/core/CssBaseline";
+
+import ISolidSession from "../lib/solid-auth-fetcher/dist/solidSession/ISolidSession";
+import { getSession } from "../lib/solid-auth-fetcher/dist";
 
 // import Header from '../components/header';
-import theme from '../src/theme';
-import UserContextProvider, { UserContext } from '../src/contexts/UserContext';
-import PodManagerHeader from '../components/header';
+import theme from "../src/theme";
+import UserContext from "../src/contexts/UserContext";
+import PodManagerHeader from "../components/header";
 
-
+/* eslint @typescript-eslint/no-explicit-any: 0 */
 interface AppProps {
-  Component: React.ComponentType;
+  Component: ComponentType;
   pageProps: any;
 }
 
-export default function App(props: AppProps) {
-  const { setSession, setIsLoadingSession } = useContext(UserContext);
+export default function App(props: AppProps): ReactElement {
   const { Component, pageProps } = props;
 
+  const [session, setSession] = useState<ISolidSession | undefined>();
+  const [isLoadingSession, setIsLoadingSession] = useState(true);
+
+  // Remove injected serverside JSS
   useEffect(() => {
-    // Remove the server-side injected CSS.
-    const jssStyles = document.querySelector('#jss-server-side');
+    const jssStyles = document.querySelector("#jss-server-side");
 
-    async function fetchSession() {
-      const sessionStorage = await getSession();
-
-      if (sessionStorage && sessionStorage.webId) {
-        setSession(sessionStorage);
-        setIsLoadingSession(false);
-      }
-    }
     if (jssStyles && jssStyles.parentElement) {
       jssStyles.parentElement.removeChild(jssStyles);
     }
+  }, []);
+
+  // Update the session when a page is loaded
+  useEffect(() => {
+    setIsLoadingSession(true);
+
+    // Remove the server-side injected CSS.
+    async function fetchSession() {
+      const sessionStorage = (await getSession()) as ISolidSession;
+      setSession(sessionStorage);
+      setIsLoadingSession(false);
+    }
+
     fetchSession();
-  }, [setSession, setIsLoadingSession]);
+  }, [Component, pageProps, setSession, setIsLoadingSession]);
 
   return (
     <>
@@ -51,12 +59,12 @@ export default function App(props: AppProps) {
       </Head>
 
       <ThemeProvider theme={theme}>
-        <UserContextProvider>
+        <UserContext.Provider value={{ session, isLoadingSession }}>
           <CssBaseline />
           {/* eslint react/jsx-props-no-spreading: 0 */}
           <PodManagerHeader />
           <Component {...pageProps} />
-        </UserContextProvider>
+        </UserContext.Provider>
       </ThemeProvider>
     </>
   );

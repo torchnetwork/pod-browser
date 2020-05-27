@@ -1,6 +1,11 @@
-import { useEffect, useState, useContext } from 'react';
-import { fetchLitDataset, getOneThing, getAllIris } from '@inrupt/lit-solid-core';
-import { ldp } from 'rdf-namespaces';
+import { ReactElement, useEffect, useState, useContext } from "react";
+import { ldp } from "rdf-namespaces";
+
+import {
+  fetchLitDataset,
+  getOneThing,
+  getAllIris,
+} from "@inrupt/lit-solid-core";
 
 import {
   Table,
@@ -8,26 +13,40 @@ import {
   TableCell,
   TableHead,
   TableRow,
-} from '@material-ui/core';
+} from "@material-ui/core";
 
-import { UserContext } from '../../src/contexts/UserContext';
-import { ILoggedInSolidSession } from '../../lib/solid-auth-fetcher/dist/solidSession/ISolidSession';
-import { fetch } from '../../lib/solid-auth-fetcher/dist';
-import { useRedirectIfLoggedOut } from '../../src/effects/auth';
-import Spinner from '../spinner';
-
+import UserContext from "../../src/contexts/UserContext";
+import { ILoggedInSolidSession } from "../../lib/solid-auth-fetcher/dist/solidSession/ISolidSession";
+import { fetch } from "../../lib/solid-auth-fetcher/dist";
+import { useRedirectIfLoggedOut } from "../../src/effects/auth";
+import Spinner from "../spinner";
 
 // TODO move this to a shims file
 if (!global.setImmediate) {
   global.setImmediate = (fn, ...args): any => global.setTimeout(fn, 0, ...args);
 }
 
-export async function getContainerResourceIrisFromSession(session: ILoggedInSolidSession) {
+type IContainerResourceIris = {
+  containerIri: string;
+  resources: Array<string>;
+};
+
+export async function getContainerResourceIrisFromSession(
+  session: ILoggedInSolidSession | undefined
+): Promise<IContainerResourceIris> {
+  // TODO learn how to typescript. Don't use `any`. Needs to check if it's an ILoggedinSession.
+  if (!session || !session.webId) {
+    return { containerIri: "", resources: [] };
+  }
+
   const { webId } = session;
 
   // TODO the typescript error for `fetch` is a known issue: SDK-995
   const profile = await fetchLitDataset(webId, { fetch });
-  const containerIris = getAllIris(profile, 'http://www.w3.org/ns/pim/space#storage');
+  const containerIris = getAllIris(
+    profile,
+    "http://www.w3.org/ns/pim/space#storage"
+  );
 
   // TODO work with multiple top-level containers (to be implemented in a later user story.)
   const containerIri = containerIris[0];
@@ -47,25 +66,28 @@ export async function getContainerResourceIrisFromSession(session: ILoggedInSoli
   };
 }
 
-
-export default function Home() {
+export default function Home(): ReactElement {
   useRedirectIfLoggedOut();
 
   const defaultResources: string[] | null = [];
   const { session, isLoadingSession } = useContext(UserContext);
 
   const [resources, setResources] = useState(defaultResources);
-  const [containerIri, setContainerIri] = useState('');
+  const [containerIri, setContainerIri] = useState("");
   const [isLoading, setIsLoading] = useState(isLoadingSession);
 
   useEffect(() => {
-    async function fetchContainerData() {
-      if (typeof session === 'undefined') { return; }
+    if (isLoadingSession || !session) {
+      return;
+    }
 
+    async function fetchContainerData() {
       const {
         containerIri: loadedContainerIri,
         resources: loadedResources,
-      } = await getContainerResourceIrisFromSession(session);
+      } = await getContainerResourceIrisFromSession(
+        session as ILoggedInSolidSession
+      );
 
       setContainerIri(loadedContainerIri);
       setResources(loadedResources);
@@ -73,15 +95,15 @@ export default function Home() {
     }
 
     fetchContainerData();
-  }, [session]);
+  }, [session, isLoadingSession]);
 
   if (isLoading || !resources) {
-    return (<Spinner />);
+    return <Spinner />;
   }
 
   return (
     <>
-      { resources.length ? (
+      {resources.length ? (
         <Table>
           <TableHead>
             <TableRow>
@@ -97,7 +119,7 @@ export default function Home() {
               <TableRow key={iri}>
                 <TableCell>
                   <a href={`/resource/${iri}`}>
-                    {iri.replace(containerIri, '')}
+                    {iri.replace(containerIri, "")}
                   </a>
                 </TableCell>
                 <TableCell>Folder</TableCell>

@@ -1,8 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Index page Renders a logout button 1`] = `
-<Fragment>
-  <LogOut />
+<WithStyles(ForwardRef(Container))>
   <Home />
-</Fragment>
+</WithStyles(ForwardRef(Container))>
 `;
