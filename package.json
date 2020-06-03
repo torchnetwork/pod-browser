@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/inrupt/pod-manager#readme",
   "dependencies": {
-    "@inrupt/lit-solid-core": "0.0.2-master-101394499-263.0",
+    "lit-solid": "master",
     "@material-ui/core": "^4.9.14",
     "@material-ui/icons": "^4.9.1",
     "encoding": "^0.1.12",
