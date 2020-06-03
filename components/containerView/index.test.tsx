@@ -2,13 +2,13 @@ import { shallow } from "enzyme";
 import { shallowToJson } from "enzyme-to-json";
 import { mock } from "jest-mock-extended";
 
-import { getAllIris } from "@inrupt/lit-solid-core";
+import { getIriAll } from "lit-solid";
 import { getSession } from "../../lib/solid-auth-fetcher/dist";
 import ContainerView, { getContainerResourceIrisFromSession } from "./index";
 import { ILoggedInSolidSession } from "../../lib/solid-auth-fetcher/dist/solidSession/ISolidSession";
 
 jest.mock("../../lib/solid-auth-fetcher/dist");
-jest.mock("@inrupt/lit-solid-core");
+jest.mock("lit-solid");
 
 describe("Container view", () => {
   test("Renders a container view", () => {
@@ -44,8 +44,8 @@ describe("Loading container resource iri list", () => {
       })
     );
 
-    (getAllIris as any).mockImplementationOnce(() => [containerIri]);
-    (getAllIris as any).mockImplementationOnce(() => resources);
+    (getIriAll as any).mockImplementationOnce(() => [containerIri]);
+    (getIriAll as any).mockImplementationOnce(() => resources);
 
     expect(await getContainerResourceIrisFromSession(session)).toEqual({
       containerIri,

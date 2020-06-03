@@ -3,9 +3,9 @@ import { ldp } from "rdf-namespaces";
 
 import {
   fetchLitDataset,
-  getOneThing,
-  getAllIris,
-} from "@inrupt/lit-solid-core";
+  getThingOne,
+  getIriAll,
+} from "lit-solid";
 
 import {
   Table,
@@ -42,8 +42,9 @@ export async function getContainerResourceIrisFromSession(
   const { webId } = session;
 
   // TODO the typescript error for `fetch` is a known issue: SDK-995
-  const profile = await fetchLitDataset(webId, { fetch });
-  const containerIris = getAllIris(
+  const profileDoc = await fetchLitDataset(webId, { fetch });
+  const profile = getThingOne(profileDoc, webId);
+  const containerIris = getIriAll(
     profile,
     "http://www.w3.org/ns/pim/space#storage"
   );
@@ -56,9 +57,9 @@ export async function getContainerResourceIrisFromSession(
   // a submodule.
   const litDataset = await fetchLitDataset(containerIri, { fetch });
 
-  const container = getOneThing(litDataset, containerIri);
+  const container = getThingOne(litDataset, containerIri);
 
-  const resourceIris = getAllIris(container, ldp.contains);
+  const resourceIris = getIriAll(container, ldp.contains);
 
   return {
     containerIri,
