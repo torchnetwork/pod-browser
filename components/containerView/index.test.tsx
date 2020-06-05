@@ -33,9 +33,6 @@ describe("Loading container resource iri list", () => {
       "https://myaccount.mypodserver.com/note.txt",
     ];
 
-    // Disable this rule to allow mocks. Not sure of a better way.
-    /* eslint @typescript-eslint/no-explicit-any: 0 */
-
     const { getSession }: { getSession: jest.Mock } = jest.requireMock(
       "@inrupt/solid-auth-fetcher/dist"
     );
