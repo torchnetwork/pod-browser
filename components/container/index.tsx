@@ -15,11 +15,6 @@ import UserContext from "../../src/contexts/UserContext";
 import { useRedirectIfLoggedOut } from "../../src/effects/auth";
 import Spinner from "../spinner";
 
-// TODO move this to a shims file
-if (!global.setImmediate) {
-  global.setImmediate = (fn, ...args): any => global.setTimeout(fn, 0, ...args);
-}
-
 export async function getContainerResourceIrisFromContainerIri(
   containerIri: string
 ): Promise<string[]> {
