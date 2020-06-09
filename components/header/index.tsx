@@ -8,7 +8,8 @@ export default function Header(): ReactElement {
 
   return (
     <nav>
-      <Link>Inrupt</Link>
+      <Link href="/">Home</Link>
+
       <Link>
         <i className="prism-icon-add" />
       </Link>

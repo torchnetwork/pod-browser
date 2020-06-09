@@ -2,8 +2,8 @@
 
 exports[`Index page Renders a logout button 1`] = `
 <WithStyles(ForwardRef(Container))>
-  <PodList
-    podIris={Array []}
+  <Container
+    iri="https://mypod.myhost.com"
   />
 </WithStyles(ForwardRef(Container))>
 `;

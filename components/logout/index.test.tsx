@@ -16,6 +16,7 @@ describe("Logout button", () => {
 
   test("Calls logout and redirects on click", () => {
     (logout as jest.Mock).mockResolvedValue(null);
+    (Router.push as jest.Mock).mockResolvedValue(null);
 
     const tree = shallow(<LogOutButton />);
     tree.simulate("click", { preventDefault: () => {} });

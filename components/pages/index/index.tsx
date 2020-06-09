@@ -1,19 +1,46 @@
-import React, { ReactElement } from "react";
+import React, { ReactElement, useEffect, useContext, useState } from "react";
 import { Container } from "@material-ui/core";
+import { fetchLitDataset, getThingOne, getIriAll } from "lit-solid";
+import { space } from "rdf-namespaces";
+import { ILoggedInSolidSession } from "@inrupt/solid-auth-fetcher/dist/solidSession/ISolidSession";
 
+import UserContext from "../../../src/contexts/UserContext";
 import { useRedirectIfLoggedOut } from "../../../src/effects/auth";
-import ContainerView from "../../containerView";
+import PodList from "../../podList";
+
+export async function getPodIrisFromWebId(webId: string): Promise<string[]> {
+  const profileDoc = await fetchLitDataset(webId);
+  const profile = getThingOne(profileDoc, webId);
+
+  return getIriAll(profile, space.storage);
+}
 
 export default function Home(): ReactElement {
   useRedirectIfLoggedOut();
 
-  // TODO move Loading indicator into separate component
-  // TODO above todo was done but thinking we should
-  // move header and isloading.. spinner into one as well so that it's a different
-  // header if logged in etc...
+  const defaultPodIris: string[] | null = [];
+  const { session, isLoadingSession } = useContext(UserContext);
+  const [podIris, setPodIris] = useState(defaultPodIris);
+
+  // If there's a session, use it to load all of the iris exposed by the user profile,
+  // and build a list of pods for the user to select.
+  useEffect(() => {
+    if (isLoadingSession || !session) {
+      return;
+    }
+
+    const { webId } = session as ILoggedInSolidSession;
+
+    getPodIrisFromWebId(webId)
+      .then(setPodIris)
+      .catch((e) => {
+        throw e;
+      });
+  }, [session, isLoadingSession, setPodIris]);
+
   return (
     <Container>
-      <ContainerView />
+      <PodList podIris={podIris} />
     </Container>
   );
 }

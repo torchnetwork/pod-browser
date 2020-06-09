@@ -2,8 +2,10 @@
 
 exports[`Header with user logged in renders with a logout button 1`] = `
 <nav>
-  <WithStyles(ForwardRef(Link))>
-    Inrupt
+  <WithStyles(ForwardRef(Link))
+    href="/"
+  >
+    Home
   </WithStyles(ForwardRef(Link))>
   <WithStyles(ForwardRef(Link))>
     <i
@@ -16,8 +18,10 @@ exports[`Header with user logged in renders with a logout button 1`] = `
 
 exports[`Header with user logged out renders without a logout button 1`] = `
 <nav>
-  <WithStyles(ForwardRef(Link))>
-    Inrupt
+  <WithStyles(ForwardRef(Link))
+    href="/"
+  >
+    Home
   </WithStyles(ForwardRef(Link))>
   <WithStyles(ForwardRef(Link))>
     <i
