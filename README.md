@@ -10,7 +10,7 @@ that data.
 1. `cd lib/prism && npm i && npm run build` to install and build prism
 1. `cd lib/solid-auth-fetcher && npm i && npm run build` to install and build
   solid-auth-fetcher
-1. Copy `.env-example` into `.env` and update any variables you need.
+1. Copy `.env-example` into `.env.local` and update any variables you need.
 1. `npm run dev` to run a dev server, or `npm run build` to compile static html
   and other assets.
 

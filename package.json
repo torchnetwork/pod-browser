@@ -4,7 +4,7 @@
   "description": "Pod Manager",
   "main": "index.js",
   "scripts": {
-    "build": "next build",
+    "build": "next build && next export",
     "ci": "npm run lint && npm run test && npm run build",
     "dev": "node server.js",
     "lint": "eslint pages components constants src --ext .ts,.tsx,.js",
@@ -28,7 +28,6 @@
     "encoding": "^0.1.12",
     "lit-solid": "0.0.2-master-124600945-506.0",
     "next": "^9.4.4",
-    "next-runtime-dotenv": "^1.2.0",
     "prop-types": "^15.7.2",
     "rdf-namespaces": "^1.8.0",
     "react": "^16.13.1",
