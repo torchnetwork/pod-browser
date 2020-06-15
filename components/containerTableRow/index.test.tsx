@@ -1,13 +1,13 @@
+/* eslint-disable camelcase */
 import React from "react";
 import { shallow } from "enzyme";
 import { shallowToJson } from "enzyme-to-json";
-import { LitDataset, fetchLitDataset } from "lit-solid";
-import ContainerTableRow, {
-  fetchContainerDetails,
-  getIriPath,
-  handleTableRowClick,
-  resourceLink,
-} from "./index";
+import {
+  LitDataset,
+  unstable_fetchLitDatasetWithAcl,
+  unstable_getAgentAccessModesAll,
+} from "lit-solid";
+import ContainerTableRow, { handleTableRowClick, resourceHref } from "./index";
 
 jest.mock("lit-solid");
 
@@ -67,39 +67,34 @@ describe("ContainerTableRow", () => {
   });
 });
 
-describe("fetchContainerDetails", () => {
-  test("it returns a normalized dataset", async () => {
-    (fetchLitDataset as jest.Mock).mockImplementationOnce(async () => {
-      return Promise.resolve(createContainer());
-    });
-
-    const expectedIri = "https://user.dev.inrupt.net/public/";
-    const { name, iri } = await fetchContainerDetails(expectedIri);
-
-    expect(name).toEqual("/public");
-    expect(iri).toEqual(expectedIri);
-    expect(fetchLitDataset).toHaveBeenCalled();
-  });
-});
-
-describe("resourceLink", () => {
+describe("resourceHref", () => {
   test("it generates a resource link", () => {
-    const link = resourceLink("https://example.com/example.ttl");
+    const link = resourceHref("https://example.com/example.ttl");
     expect(link).toEqual("/resource/https%3A%2F%2Fexample.com%2Fexample.ttl");
-  });
-});
-
-describe("getIriPath", () => {
-  test("it formats the iri for display", () => {
-    expect(getIriPath("https://example.com/example")).toEqual("/example");
   });
 });
 
 describe("handleTableRowClick", () => {
   test("it opens the drawer and sets the menu contents", async () => {
-    (fetchLitDataset as jest.Mock).mockImplementationOnce(async () => {
-      return Promise.resolve(createContainer());
-    });
+    (unstable_fetchLitDatasetWithAcl as jest.Mock).mockImplementationOnce(
+      async () => {
+        return Promise.resolve(createContainer());
+      }
+    );
+
+    (unstable_getAgentAccessModesAll as jest.Mock).mockImplementationOnce(
+      async () => {
+        return Promise.resolve({
+          owner: { read: true, write: true, append: true, control: true },
+          collaborator: {
+            read: true,
+            write: false,
+            append: true,
+            control: false,
+          },
+        });
+      }
+    );
 
     const setMenuOpen = jest.fn();
     const setMenuContents = jest.fn();
@@ -118,6 +113,25 @@ describe("handleTableRowClick", () => {
 
     expect(setMenuOpen).toHaveBeenCalledWith(true);
     expect(setMenuContents).toHaveBeenCalled();
-    expect(setMenuContents.mock.calls[0][0]).toBeInstanceOf(Object);
+  });
+
+  test("it commits no operation when the click target is an anchor", async () => {
+    const setMenuOpen = jest.fn();
+    const setMenuContents = jest.fn();
+    const iri = "https://user.dev.inrupt.net/public/";
+    const handler = handleTableRowClick({
+      classes: {},
+      iri,
+      setMenuOpen,
+      setMenuContents,
+    });
+
+    const evnt = { target: document.createElement("a") } as Partial<
+      React.MouseEvent<HTMLInputElement>
+    >;
+    await handler(evnt);
+
+    expect(setMenuOpen).not.toHaveBeenCalled();
+    expect(setMenuContents).not.toHaveBeenCalled();
   });
 });
