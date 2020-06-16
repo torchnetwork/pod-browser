@@ -159,6 +159,20 @@ export interface NormalizedResource {
 }
 
 export const PERMISSIONS: string[] = ["read", "write", "append", "control"];
+export const PUBLIC_PERMISSIONS: NormalizedPermission[] = [
+  {
+    webId: "user",
+    alias: "Full Control",
+    acl: { read: true, write: true, append: true, control: true },
+    profile: { webId: "user" },
+  },
+  {
+    webId: "public",
+    alias: "Can Edit",
+    acl: { read: true, write: true, append: true, control: false },
+    profile: { webId: "public" },
+  },
+];
 
 export function parseStringAcl(acl: string): unstable_AccessModes {
   return PERMISSIONS.reduce((acc, key) => {
@@ -230,6 +244,14 @@ export async function fetchResourceWithAcl(
     permissions,
     ...normalizeDataset(thing, iri),
   };
+}
+
+export async function fetchResource(iri: string): Promise<NormalizedResource> {
+  const resource = await fetchLitDataset(iri);
+  const dataset = resource as LitDataset;
+  const thing = dataset as Thing;
+
+  return normalizeDataset(thing, iri);
 }
 
 export function isUserOrMatch(webId: string, id: string): boolean {

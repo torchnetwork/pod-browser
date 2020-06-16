@@ -9,8 +9,6 @@ import ContainerTableRow, {
   fetchResourceDetails,
 } from "./index";
 
-const iri = "https://user.dev.inrupt.net/public/";
-
 describe("ContainerTableRow", () => {
   test("it renders a table row", () => {
     const tree = shallow(<ContainerTableRow iri="iri" />);
@@ -28,6 +26,21 @@ describe("resourceHref", () => {
 
 describe("handleTableRowClick", () => {
   test("it opens the drawer and sets the menu contents", async () => {
+    jest
+      .spyOn(litSolidHelpers, "fetchResource")
+      .mockImplementationOnce(async () => {
+        return Promise.resolve({
+          owner: { read: true, write: true, append: true, control: true },
+          collaborator: {
+            read: true,
+            write: false,
+            append: true,
+            control: false,
+          },
+        });
+      });
+
+    const iri = "https://user.dev.inrupt.net/private/";
     const setMenuOpen = jest.fn();
     const setMenuContents = jest.fn();
     const handler = handleTableRowClick({
@@ -64,8 +77,10 @@ describe("handleTableRowClick", () => {
   });
 
   test("it commits no operation when the click target is an anchor", async () => {
+    const iri = "https://user.dev.inrupt.net/private/";
     const setMenuOpen = jest.fn();
     const setMenuContents = jest.fn();
+
     const handler = handleTableRowClick({
       classes: {},
       iri,
@@ -85,6 +100,8 @@ describe("handleTableRowClick", () => {
 
 describe("fetchResourceDetails", () => {
   test("it fetches the resource with acl, adding the name (shortened iri path)", async () => {
+    const iri = "https://user.dev.inrupt.net/private/";
+
     jest
       .spyOn(litSolidHelpers, "fetchResourceWithAcl")
       .mockImplementationOnce(async () => {
@@ -104,10 +121,31 @@ describe("fetchResourceDetails", () => {
     const { name } = await fetchResourceDetails(iri);
 
     expect(litSolidHelpers.fetchResourceWithAcl).toHaveBeenCalledWith(iri);
+    expect(name).toEqual("/private");
+  });
+
+  test("it fetches the resource with public (hard-coded) acl, and name when the container is public", async () => {
+    const iri = "https://user.dev.inrupt.net/public/";
+    jest
+      .spyOn(litSolidHelpers, "fetchResource")
+      .mockImplementationOnce(async () => {
+        return Promise.resolve({
+          iri,
+          types: ["Resource"],
+        });
+      });
+
+    const { name, permissions } = await fetchResourceDetails(iri);
+    const { PUBLIC_PERMISSIONS } = litSolidHelpers;
+
+    expect(litSolidHelpers.fetchResource).toHaveBeenCalledWith(iri);
     expect(name).toEqual("/public");
+    expect(permissions).toMatchObject(PUBLIC_PERMISSIONS);
   });
 
   test("it fetches a file if the resource fetch fails", async () => {
+    const iri = "https://user.dev.inrupt.net/private/";
+
     jest
       .spyOn(litSolidHelpers, "fetchResourceWithAcl")
       .mockImplementationOnce(() => {
@@ -134,6 +172,6 @@ describe("fetchResourceDetails", () => {
     const { name } = await fetchResourceDetails(iri);
 
     expect(litSolidHelpers.fetchFileWithAcl).toHaveBeenCalledWith(iri);
-    expect(name).toEqual("/public");
+    expect(name).toEqual("/private");
   });
 });

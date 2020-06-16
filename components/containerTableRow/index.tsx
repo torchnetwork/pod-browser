@@ -6,12 +6,18 @@ import Link from "next/link";
 import Details from "../details";
 import DetailsMenuContext from "../../src/contexts/detailsMenuContext";
 import {
-  NormalizedResource,
-  getIriPath,
-  fetchResourceWithAcl,
   fetchFileWithAcl,
+  fetchResource,
+  fetchResourceWithAcl,
+  getIriPath,
+  NormalizedResource,
+  PUBLIC_PERMISSIONS,
 } from "../../src/lit-solid-helpers";
 import styles from "./styles";
+
+export function isPublic(pathname: string): boolean {
+  return !!pathname.match(/^\/public$/);
+}
 
 interface ResourceDetails extends NormalizedResource {
   name: string | undefined;
@@ -23,7 +29,15 @@ export async function fetchResourceDetails(
   const name = getIriPath(iri);
   let resource;
   try {
-    resource = await fetchResourceWithAcl(iri);
+    if (isPublic(name as string)) {
+      const response = await fetchResource(iri);
+      resource = {
+        ...response,
+        permissions: PUBLIC_PERMISSIONS,
+      };
+    } else {
+      resource = await fetchResourceWithAcl(iri);
+    }
   } catch (e) {
     resource = await fetchFileWithAcl(iri);
   }

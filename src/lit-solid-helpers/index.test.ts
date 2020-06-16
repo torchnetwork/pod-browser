@@ -6,6 +6,7 @@ import {
   displayTypes,
   fetchFileWithAcl,
   fetchResourceWithAcl,
+  fetchResource,
   getIriPath,
   getThirdPartyPermissions,
   getTypeName,
@@ -34,45 +35,45 @@ function createResource(
   iri: string,
   type = "http://www.w3.org/ns/ldp#BasicContainer"
 ): litSolidFns.LitDataset {
-  let publicContainer = createThing({ iri });
+  let container = createThing({ iri });
 
-  publicContainer = addIri(
-    publicContainer,
+  container = addIri(
+    container,
     "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
     type
   );
 
-  publicContainer = addIri(
-    publicContainer,
+  container = addIri(
+    container,
     "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
     "http://www.w3.org/ns/ldp#Container"
   );
 
-  publicContainer = setDatetime(
-    publicContainer,
+  container = setDatetime(
+    container,
     "http://purl.org/dc/terms/modified",
     timestamp
   );
 
-  publicContainer = addIri(
-    publicContainer,
+  container = addIri(
+    container,
     "http://www.w3.org/ns/ldp#contains",
     "https://user.dev.inrupt.net/public/games/"
   );
 
-  publicContainer = setDecimal(
-    publicContainer,
+  container = setDecimal(
+    container,
     "http://www.w3.org/ns/posix/stat#mtime",
     1591131561.195
   );
 
-  publicContainer = setInteger(
-    publicContainer,
+  container = setInteger(
+    container,
     "http://www.w3.org/ns/posix/stat#size",
     4096
   );
 
-  return setThing(createLitDataset(), publicContainer);
+  return setThing(createLitDataset(), container);
 }
 
 describe("namespace", () => {
@@ -303,8 +304,7 @@ describe("fetchResourceWithAcl", () => {
       types,
       permissions,
     } = normalizedResource;
-    const ownerPerms = permissions[0];
-    const collaboratorPerms = permissions[1];
+    const [ownerPerms, collaboratorPerms] = permissions;
 
     expect(iri).toEqual(expectedIri);
     expect(contains).toBeInstanceOf(Array);
@@ -521,5 +521,49 @@ describe("fetchFileWithAcl", () => {
     expect(types).toContain("image/vnd.microsoft.icon");
     expect(file).toEqual("file contents");
     expect(permissions).toHaveLength(2);
+  });
+});
+
+describe("fetchResource", () => {
+  test("it returns a normalized dataset, without permissions", async () => {
+    const expectedIri = "https://user.dev.inrupt.net/public/";
+
+    jest
+      .spyOn(litSolidFns, "fetchLitDataset")
+      .mockImplementationOnce(async () => {
+        return Promise.resolve(createResource());
+      });
+
+    const normalizedResource = await fetchResource(expectedIri);
+    const { iri, contains, modified, mtime, size, types } = normalizedResource;
+
+    expect(iri).toEqual(expectedIri);
+    expect(contains).toBeInstanceOf(Array);
+    expect(modified).toEqual(timestamp);
+    expect(mtime).toEqual(1591131561.195);
+    expect(size).toEqual(4096);
+    expect(types).toContain("Container");
+    expect(types).toContain("BasicContainer");
+  });
+
+  test("it returns no permissions when acl is not returned", async () => {
+    jest
+      .spyOn(litSolidFns, "unstable_fetchLitDatasetWithAcl")
+      .mockImplementationOnce(async () => {
+        return Promise.resolve(createResource());
+      });
+
+    jest
+      .spyOn(litSolidFns, "unstable_getAgentAccessModesAll")
+      .mockImplementationOnce(async () => {
+        return Promise.resolve(undefined);
+      });
+
+    const { permissions, acl } = await fetchResourceWithAcl(
+      "https://user.dev.inrupt.net/public/"
+    );
+
+    expect(permissions).toBeUndefined();
+    expect(acl).toBeUndefined();
   });
 });
