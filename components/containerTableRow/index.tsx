@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { ReactElement, useContext } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { CircularProgress, TableCell, TableRow } from "@material-ui/core";
