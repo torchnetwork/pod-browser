@@ -13,12 +13,17 @@ module.exports = {
 
   collectCoverage: true,
 
+  coveragePathIgnorePatterns: [
+    "/node_modules/",
+    "/lib/",
+  ],
+
   coverageThreshold: {
     global: {
-      branches: 66,
-      functions: 57,
-      lines: 73,
-      statements: 73,
+      branches: 77,
+      functions: 80,
+      lines: 88,
+      statements: 89,
     },
   },
 };

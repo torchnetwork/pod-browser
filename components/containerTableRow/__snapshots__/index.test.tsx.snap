@@ -7,21 +7,17 @@ exports[`ContainerTableRow it renders a table row 1`] = `
 >
   <WithStyles(ForwardRef(TableCell))>
     <Link
-      href="/resource/iri"
+      href="/resource/https%3A%2F%2Fexample.com%2Fexample.ttl"
     >
       <a>
-        /iri
+        <Component />
       </a>
     </Link>
   </WithStyles(ForwardRef(TableCell))>
-  <WithStyles(ForwardRef(TableCell))>
-    Folder
-  </WithStyles(ForwardRef(TableCell))>
-  <WithStyles(ForwardRef(TableCell))>
-    Full
-  </WithStyles(ForwardRef(TableCell))>
-  <WithStyles(ForwardRef(TableCell))>
-    Today :)
+  <WithStyles(ForwardRef(TableCell))
+    key="https://example.com/example.ttl-type"
+  >
+    Resource
   </WithStyles(ForwardRef(TableCell))>
 </WithStyles(ForwardRef(TableRow))>
 `;

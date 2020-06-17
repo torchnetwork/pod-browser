@@ -3,32 +3,34 @@ import { shallowToJson } from "enzyme-to-json";
 
 import auth from "solid-auth-client";
 
+import { ThemeProvider } from "@material-ui/core/styles";
 import getProviders from "../../../constants/provider";
 
-import ProviderLogin, { loginWithProvider } from "./index";
+import ProviderLogin, * as ProviderFunctions from "./index";
+import theme from "../../../src/theme";
 
 jest.mock("solid-auth-client");
 
 describe("ProviderLogin form", () => {
   test("Renders a webid login form, with button bound to login", () => {
-    const tree = shallow(<ProviderLogin />);
+    const tree = shallow(
+      <ThemeProvider theme={theme}>
+        <ProviderLogin />
+      </ThemeProvider>
+    );
     expect(shallowToJson(tree)).toMatchSnapshot();
-  });
-
-  test("calls login when the form is submitted", () => {
-    const tree = shallow(<ProviderLogin />);
-    tree.simulate("submit", { preventDefault: () => {} });
-    expect(auth.login).toHaveBeenCalled();
   });
 });
 
 describe("loginWithProvider", () => {
   test("Calls login", async () => {
     const oidcIssuer = getProviders()[0];
-    (auth.login as jest.Mock).mockResolvedValue(null);
+    (auth.popupLogin as jest.Mock).mockResolvedValue(null);
 
-    await loginWithProvider(oidcIssuer);
+    await ProviderFunctions.loginWithProvider(oidcIssuer.value);
 
-    expect(auth.login).toHaveBeenCalledWith(oidcIssuer.value);
+    expect(auth.popupLogin).toHaveBeenCalledWith({
+      popupUri: `${oidcIssuer.value}common/popup.html`,
+    });
   });
 });
