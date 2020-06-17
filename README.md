@@ -19,6 +19,16 @@ that data.
 * Any environment variables you wish to expose must be added to next.config.js.
 
 
+# Deployment
+
+You can use `npm deploy` to deploy a Pod Manager instance to Vercel, if you
+create an account. Alternatively, you can:
+
+* Run `npm run build` and `npm run start` to run the node server;
+* Run `npm run build` and `npm run export` to export static HTML and assets
+  to host on the server of your choice.
+
+
 # Notes
 
 * prism is temporarily a submodule under lib/* until it's published as an npm module.
