@@ -19,26 +19,40 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import * as ReactFns from "react";
-import { shallow } from "enzyme";
-import { shallowToJson } from "enzyme-to-json";
+import { StyleRules } from "@material-ui/styles";
+import { PrismTheme, content } from "@solid/lit-prism-patterns";
 
-import ContainerDetails from "./index";
+const rules = {
+  spinnerContainer: {
+    justifyContent: "center",
+  },
+  centeredSection: {
+    padding: "1rem",
+  },
+  raw: {
+    height: "100%",
+    width: "100%",
+    maxHeight: 200,
+    overflow: "auto",
+  },
+  listItem: {
+    display: "flex",
+    justifyContent: "space-between",
+  },
+  detailText: {
+    fontSize: "0.75rem",
+  },
+  typeValue: {
+    marginLeft: "auto",
+  },
+  avatar: {
+    marginRight: "1rem",
+  },
+};
 
-describe("Container details", () => {
-  test("Renders container details", () => {
-    jest.spyOn(ReactFns, "useContext").mockImplementation(() => ({
-      session: { webId: "webId" },
-    }));
-
-    const tree = shallow(
-      <ContainerDetails
-        name="Container Name"
-        types={["Container"]}
-        iri="iri"
-        classes={{}}
-      />
-    );
-    expect(shallowToJson(tree)).toMatchSnapshot();
-  });
-});
+export default function styles(theme: PrismTheme): StyleRules {
+  return {
+    ...rules,
+    ...content.styles(theme),
+  };
+}

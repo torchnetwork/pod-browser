@@ -19,47 +19,22 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { ReactElement } from "react";
-import { Typography, List, ListItem, Divider } from "@material-ui/core";
+import { mount } from "enzyme";
+import { mountToJson } from "enzyme-to-json";
+import { ThemeProvider } from "@material-ui/core/styles";
+import DetailsLoading from "./index";
+import theme from "../../src/theme";
 
-export interface Props {
-  iri: string;
-  name?: string;
-  types?: string[];
-  classes: Record<string, string>;
-}
+describe("DetailsLoading", () => {
+  test("Renders a details error view", () => {
+    const resource = { iri: "iri", name: "name", types: ["type"] };
 
-export default function ContainerDetails({
-  iri,
-  name,
-  classes,
-}: Props): ReactElement {
-  return (
-    <>
-      <section className={classes.centeredSection}>
-        <Typography variant="h3" title={iri}>
-          {name}
-        </Typography>
-      </section>
+    const tree = mount(
+      <ThemeProvider theme={theme}>
+        <DetailsLoading resource={resource} />
+      </ThemeProvider>
+    );
 
-      <section className={classes.centeredSection}>
-        <Typography variant="h5">Details</Typography>
-      </section>
-
-      <Divider />
-
-      <section className={classes.centeredSection}>
-        <List>
-          <ListItem className={classes.listItem}>
-            <Typography className={classes.detailText}>Thing Type:</Typography>
-            <Typography
-              className={`${classes.typeValue} ${classes.detailText}`}
-            >
-              Container
-            </Typography>
-          </ListItem>
-        </List>
-      </section>
-    </>
-  );
-}
+    expect(mountToJson(tree)).toMatchSnapshot();
+  });
+});

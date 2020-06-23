@@ -20,16 +20,24 @@
  */
 
 import { ReactElement, useContext } from "react";
-import { Typography, List, ListItem, Divider, Avatar } from "@material-ui/core";
+import {
+  Typography,
+  List,
+  ListItem,
+  Divider,
+  Avatar,
+  createStyles,
+} from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import { PrismTheme } from "@solid/lit-prism-patterns";
 import UserContext, { ISession } from "../../src/contexts/userContext";
-
 import styles from "./styles";
 
 import {
   getThirdPartyPermissions,
   getUserPermissions,
   NormalizedPermission,
+  NormalizedResource,
   Profile,
 } from "../../src/lit-solid-helpers";
 
@@ -78,7 +86,7 @@ export function displayThirdPartyPermissions(
   if (items.length === 0) {
     return (
       <section className={classes.centeredSection}>
-        <Typography variant="h5">Sharing</Typography>
+        <h5 className={classes["content-h5"]}>Sharing</h5>
         <List>
           <ListItem className={classes.listItem}>
             <Typography className={classes.detailText}>
@@ -92,7 +100,7 @@ export function displayThirdPartyPermissions(
 
   return (
     <section className={classes.centeredSection}>
-      <Typography variant="h5">Sharing</Typography>
+      <h5 className={classes["content-h5"]}>Sharing</h5>
       <List>{items}</List>
     </section>
   );
@@ -104,27 +112,21 @@ export function displayType(types: string[] | undefined): string {
   return type;
 }
 
-const useStyles = makeStyles(styles);
+const useStyles = makeStyles<PrismTheme>((theme) =>
+  createStyles(styles(theme))
+);
 
-export interface Props {
-  iri: string;
+export interface Props extends NormalizedResource {
   name?: string;
-  permissions?: NormalizedPermission[];
-  classes: Record<string, string>;
-  types?: string[];
 }
 
 export default function ResourceDetails({
   iri,
   name,
   permissions,
-  classes,
   types,
 }: Props): ReactElement {
-  const resourceClasses: Record<string, string> = {
-    ...classes,
-    ...useStyles(),
-  };
+  const classes = useStyles();
   const { session } = useContext(UserContext);
   const { webId } = session as ISession;
   const userPermissions = getUserPermissions(webId, permissions);
@@ -132,35 +134,33 @@ export default function ResourceDetails({
 
   return (
     <>
-      <section className={resourceClasses.centeredSection}>
-        <Typography variant="h3" title={iri}>
+      <section className={classes.centeredSection}>
+        <h3 className={classes["content-h3"]} title={iri}>
           {name}
-        </Typography>
+        </h3>
       </section>
 
-      <section className={resourceClasses.centeredSection}>
-        <Typography variant="h5">Details</Typography>
+      <section className={classes.centeredSection}>
+        <h5 className={classes["content-h5"]}>Details</h5>
       </section>
 
       <Divider />
 
-      <section className={resourceClasses.centeredSection}>
-        <Typography variant="h5">My Access</Typography>
-        <List>{displayPermission(userPermissions, resourceClasses)}</List>
+      <section className={classes.centeredSection}>
+        <h5 className={classes["content-h5"]}>My Access</h5>
+        <List>{displayPermission(userPermissions, classes)}</List>
       </section>
 
-      {displayThirdPartyPermissions(thirdPartyPermissions, resourceClasses)}
+      {displayThirdPartyPermissions(thirdPartyPermissions, classes)}
 
       <Divider />
 
-      <section className={resourceClasses.centeredSection}>
+      <section className={classes.centeredSection}>
         <List>
-          <ListItem className={resourceClasses.listItem}>
-            <Typography className={resourceClasses.detailText}>
-              Thing Type:
-            </Typography>
+          <ListItem className={classes.listItem}>
+            <Typography className={classes.detailText}>Thing Type:</Typography>
             <Typography
-              className={`${resourceClasses.typeValue} ${resourceClasses.detailText}`}
+              className={`${classes.typeValue} ${classes.detailText}`}
             >
               {displayType(types)}
             </Typography>

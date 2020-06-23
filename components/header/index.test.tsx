@@ -21,7 +21,7 @@
 
 import * as ReactFns from "react";
 import { mount } from "enzyme";
-import { shallowToJson } from "enzyme-to-json";
+import { mountToJson } from "enzyme-to-json";
 import { ThemeProvider } from "@material-ui/core/styles";
 
 import Header from "./index";
@@ -39,7 +39,7 @@ describe("Header", () => {
           <Header />
         </ThemeProvider>
       );
-      expect(shallowToJson(tree)).toMatchSnapshot();
+      expect(mountToJson(tree)).toMatchSnapshot();
     });
   });
 
@@ -54,7 +54,7 @@ describe("Header", () => {
           <Header />
         </ThemeProvider>
       );
-      expect(shallowToJson(tree)).toMatchSnapshot();
+      expect(mountToJson(tree)).toMatchSnapshot();
     });
   });
 });
