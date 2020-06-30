@@ -19,10 +19,13 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { shallow } from "enzyme";
+import { mount } from "enzyme";
 import { shallowToJson } from "enzyme-to-json";
-import Container from "./index";
+import { ThemeProvider } from "@material-ui/styles";
+
 import * as litPodHooks from "../../src/hooks/litPod";
+import theme from "../../src/theme";
+import Container from "./index";
 
 jest.mock("solid-auth-client");
 jest.mock("../../src/hooks/litPod");
@@ -35,7 +38,11 @@ describe("Container view", () => {
       data: undefined,
     });
 
-    const tree = shallow(<Container iri={iri} />);
+    const tree = mount(
+      <ThemeProvider theme={theme}>
+        <Container iri={iri} />
+      </ThemeProvider>
+    );
     expect(shallowToJson(tree)).toMatchSnapshot();
   });
 
@@ -44,7 +51,12 @@ describe("Container view", () => {
       data: [],
     });
 
-    const tree = shallow(<Container iri={iri} />);
+    const tree = mount(
+      <ThemeProvider theme={theme}>
+        <Container iri={iri} />
+      </ThemeProvider>
+    );
+
     expect(shallowToJson(tree)).toMatchSnapshot();
   });
 
@@ -59,7 +71,16 @@ describe("Container view", () => {
       data: resources,
     });
 
-    const tree = shallow(<Container iri={iri} />);
+    (litPodHooks.useFetchResourceDetails as jest.Mock).mockReturnValue({
+      data: undefined,
+    });
+
+    const tree = mount(
+      <ThemeProvider theme={theme}>
+        <Container iri={iri} />
+      </ThemeProvider>
+    );
+
     expect(shallowToJson(tree)).toMatchSnapshot();
   });
 });

@@ -19,33 +19,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { mount } from "enzyme";
-import { shallowToJson } from "enzyme-to-json";
+import { createStyles, PrismTheme } from "@solid/lit-prism-patterns";
 
-import { ThemeProvider } from "@material-ui/styles";
-import { useRedirectIfLoggedIn } from "../../../src/effects/auth";
-import LoginPage from "./index";
+const styles = (theme: PrismTheme) =>
+  createStyles(theme, ["icons", "table"], {});
 
-import theme from "../../../src/theme";
-
-jest.mock("../../../src/effects/auth");
-
-describe("Login page", () => {
-  test("Renders a logout button", () => {
-    const tree = mount(
-      <ThemeProvider theme={theme}>
-        <LoginPage />
-      </ThemeProvider>
-    );
-    expect(shallowToJson(tree)).toMatchSnapshot();
-  });
-
-  test("Redirects if the user is logged out", () => {
-    mount(
-      <ThemeProvider theme={theme}>
-        <LoginPage />
-      </ThemeProvider>
-    );
-    expect(useRedirectIfLoggedIn).toHaveBeenCalled();
-  });
-});
+export default styles;

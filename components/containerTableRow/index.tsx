@@ -21,10 +21,12 @@
 
 /* eslint-disable camelcase */
 import { ReactElement, useContext } from "react";
+import { makeStyles, createStyles, StyleRules } from "@material-ui/styles";
 import Skeleton from "@material-ui/lab/Skeleton";
-import { makeStyles } from "@material-ui/core/styles";
-import { TableCell, TableRow } from "@material-ui/core";
+import { PrismTheme, useBem } from "@solid/lit-prism-patterns";
 import Link from "next/link";
+import clsx from "clsx";
+
 import DetailsLoading from "../detailsLoading";
 import Details from "../resourceDetails";
 import { useFetchResourceDetails } from "../../src/hooks/litPod";
@@ -60,12 +62,27 @@ export function handleTableRowClick({
   };
 }
 
-interface IResourceDetailCells {
-  isLoading: boolean;
-  resource: ResourceDetails;
+interface IResourceIcon {
+  types?: string[];
+  bem: any;
 }
 
-const useStyles = makeStyles(styles);
+function ResourceIcon(props: IResourceIcon): ReactElement | null {
+  const { types, bem } = props;
+
+  if (!types) {
+    return null;
+  }
+
+  // keeping it very simple for now (either folder or file), and then we can expand upon it later
+  const icon = types.indexOf("Container") !== -1 ? "icon-folder" : "icon-file";
+
+  return <i className={clsx(bem(icon), bem("resource-icon"))} />;
+}
+
+const useStyles = makeStyles<PrismTheme>((theme) =>
+  createStyles(styles(theme) as StyleRules)
+);
 
 interface Props {
   resource: ResourceDetails;
@@ -75,34 +92,47 @@ export default function ContainerTableRow({ resource }: Props): ReactElement {
   const { setMenuOpen, setMenuContents } = useContext(DetailsMenuContext);
 
   const classes = useStyles();
+  const bem = useBem(classes);
 
   const { name, iri } = resource;
   const { data } = useFetchResourceDetails(iri);
   const isLoading = !data;
   const loadedResource = data || resource;
+
   const onClick = handleTableRowClick({
     setMenuOpen,
     setMenuContents,
     resource: loadedResource,
   });
 
+  const { types } = loadedResource;
+
   return (
-    <TableRow className={classes.tableRow} onClick={onClick}>
-      <TableCell>
+    <tr
+      className={clsx(bem("table__body-row"), bem("tableRow"))}
+      onClick={onClick}
+    >
+      <td className={bem("table__body-cell", "align-center", "width-preview")}>
+        {types && types.length ? (
+          <ResourceIcon types={types} bem={bem} />
+        ) : null}
+      </td>
+
+      <td className={bem("table__body-cell")}>
         <Link href="/resource/[iri]" as={resourceHref(iri)}>
           <a>{name}</a>
         </Link>
-      </TableCell>
+      </td>
 
       {isLoading ? (
-        <TableCell key={iri}>
+        <td key={`${iri}-type`} className={bem("table__body-cell")}>
           <Skeleton variant="text" width={100} />
-        </TableCell>
+        </td>
       ) : (
-        <TableCell key={`${iri}-type`}>
-          {loadedResource.types[0] || "Resource"}
-        </TableCell>
+        <td key={`${iri}-type`} className={bem("table__body-cell")}>
+          {types[0] || "Resource"}
+        </td>
       )}
-    </TableRow>
+    </tr>
   );
 }

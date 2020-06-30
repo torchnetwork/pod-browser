@@ -20,56 +20,83 @@
  */
 
 /* eslint-disable camelcase */
-import { shallow } from "enzyme";
+import { mount } from "enzyme";
 import { shallowToJson } from "enzyme-to-json";
 import { mock } from "jest-mock-extended";
 
+import { ThemeProvider } from "@material-ui/styles";
 import { ResourceDetails } from "../../src/lit-solid-helpers";
 import { useFetchResourceDetails } from "../../src/hooks/litPod";
 
 import ContainerTableRow, { handleTableRowClick, resourceHref } from "./index";
+import theme from "../../src/theme";
 
 jest.mock("@solid/lit-pod");
 jest.mock("../../src/hooks/litPod");
 
 describe("ContainerTableRow", () => {
   test("it renders a table row", () => {
-    const resource = mock<ResourceDetails>({
+    const resource = {
       iri: "https://example.com/example.ttl",
       name: "/example.ttl",
-    });
+      types: [],
+    };
 
     (useFetchResourceDetails as jest.Mock).mockReturnValue({ data: undefined });
 
-    const tree = shallow(<ContainerTableRow resource={resource} />);
+    const tree = mount(
+      <ThemeProvider theme={theme}>
+        <table>
+          <tbody>
+            <ContainerTableRow resource={resource} />
+          </tbody>
+        </table>
+      </ThemeProvider>
+    );
 
     expect(shallowToJson(tree)).toMatchSnapshot();
   });
 
   test("it renders a table row with loaded data", () => {
-    const resource = mock<ResourceDetails>({
+    const resource = {
       iri: "https://example.com/example.ttl",
       name: "/example.ttl",
       types: ["some-type"],
-    });
+    };
 
     (useFetchResourceDetails as jest.Mock).mockReturnValue({ data: resource });
 
-    const tree = shallow(<ContainerTableRow resource={resource} />);
+    const tree = mount(
+      <ThemeProvider theme={theme}>
+        <table>
+          <tbody>
+            <ContainerTableRow resource={resource} />
+          </tbody>
+        </table>
+      </ThemeProvider>
+    );
 
     expect(shallowToJson(tree)).toMatchSnapshot();
   });
 
   test("it renders a table row with loaded data without a type", () => {
-    const resource = mock<ResourceDetails>({
+    const resource = {
       iri: "https://example.com/example.ttl",
       name: "/example.ttl",
       types: [],
-    });
+    };
 
     (useFetchResourceDetails as jest.Mock).mockReturnValue({ data: resource });
 
-    const tree = shallow(<ContainerTableRow resource={resource} />);
+    const tree = mount(
+      <ThemeProvider theme={theme}>
+        <table>
+          <tbody>
+            <ContainerTableRow resource={resource} />
+          </tbody>
+        </table>
+      </ThemeProvider>
+    );
 
     expect(shallowToJson(tree)).toMatchSnapshot();
   });

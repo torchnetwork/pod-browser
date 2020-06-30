@@ -19,33 +19,33 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { mount } from "enzyme";
-import { shallowToJson } from "enzyme-to-json";
+import { renderHook } from "@testing-library/react-hooks";
+import useAuthenticatedProfile from "./index";
+import { fetchProfile } from "../../lit-solid-helpers";
 
-import { ThemeProvider } from "@material-ui/styles";
-import { useRedirectIfLoggedIn } from "../../../src/effects/auth";
-import LoginPage from "./index";
+jest.mock("../../lit-solid-helpers");
 
-import theme from "../../../src/theme";
+const webId = "https://webid.com/#me";
+const profile = { webId };
 
-jest.mock("../../../src/effects/auth");
+describe("useAuthenticatedProfile", () => {
+  test("no profile loaded when no session is given", () => {
+    (fetchProfile as jest.Mock).mockResolvedValue(profile);
 
-describe("Login page", () => {
-  test("Renders a logout button", () => {
-    const tree = mount(
-      <ThemeProvider theme={theme}>
-        <LoginPage />
-      </ThemeProvider>
-    );
-    expect(shallowToJson(tree)).toMatchSnapshot();
+    const { result } = renderHook(() => useAuthenticatedProfile(undefined));
+    expect(result.current).toBeNull();
   });
 
-  test("Redirects if the user is logged out", () => {
-    mount(
-      <ThemeProvider theme={theme}>
-        <LoginPage />
-      </ThemeProvider>
+  test("profile is loaded when session is given", async () => {
+    (fetchProfile as jest.Mock).mockResolvedValue(profile);
+
+    const session = { webId };
+    const { result, waitForNextUpdate } = renderHook(() =>
+      useAuthenticatedProfile(session)
     );
-    expect(useRedirectIfLoggedIn).toHaveBeenCalled();
+
+    await waitForNextUpdate();
+
+    expect(result.current).toBe(profile);
   });
 });

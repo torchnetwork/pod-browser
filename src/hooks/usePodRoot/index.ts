@@ -19,33 +19,31 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { mount } from "enzyme";
-import { shallowToJson } from "enzyme-to-json";
+import { useEffect, useState } from "react";
+import { Profile } from "../../lit-solid-helpers";
 
-import { ThemeProvider } from "@material-ui/styles";
-import { useRedirectIfLoggedIn } from "../../../src/effects/auth";
-import LoginPage from "./index";
+function normalizeBaseUri(baseUri: string): string {
+  return baseUri[baseUri.length - 1] === "/" ? baseUri : `${baseUri}/`;
+}
 
-import theme from "../../../src/theme";
-
-jest.mock("../../../src/effects/auth");
-
-describe("Login page", () => {
-  test("Renders a logout button", () => {
-    const tree = mount(
-      <ThemeProvider theme={theme}>
-        <LoginPage />
-      </ThemeProvider>
+export default function usePodRoot(
+  location: string,
+  profile?: Profile | null
+): string | null {
+  const [rootUri, setRootUri] = useState<string | null>(null);
+  useEffect(() => {
+    if (location === "undefined") {
+      return;
+    }
+    const profilePod = (profile ? profile.pods || [] : []).find((pod) =>
+      location.startsWith(pod)
     );
-    expect(shallowToJson(tree)).toMatchSnapshot();
-  });
-
-  test("Redirects if the user is logged out", () => {
-    mount(
-      <ThemeProvider theme={theme}>
-        <LoginPage />
-      </ThemeProvider>
-    );
-    expect(useRedirectIfLoggedIn).toHaveBeenCalled();
-  });
-});
+    if (profilePod) {
+      setRootUri(normalizeBaseUri(profilePod));
+      return;
+    }
+    const { origin } = new URL(location);
+    setRootUri(normalizeBaseUri(origin));
+  }, [location, profile]);
+  return rootUri;
+}

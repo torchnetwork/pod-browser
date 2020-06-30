@@ -19,33 +19,39 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import * as ReactUtils from "react";
 import { mount } from "enzyme";
-import { shallowToJson } from "enzyme-to-json";
-
+import { mountToJson } from "enzyme-to-json";
 import { ThemeProvider } from "@material-ui/styles";
-import { useRedirectIfLoggedIn } from "../../../src/effects/auth";
-import LoginPage from "./index";
 
-import theme from "../../../src/theme";
+import { PodLocationProvider } from "../../src/contexts/podLocationContext";
+import theme from "../../src/theme";
+import Breadcrumbs from "./index";
 
-jest.mock("../../../src/effects/auth");
+describe("Breadcrumbs view", () => {
+  test("Renders a breadcrumbs view", () => {
+    jest.spyOn(ReactUtils, "useLayoutEffect").mockImplementation(() => {});
 
-describe("Login page", () => {
-  test("Renders a logout button", () => {
     const tree = mount(
       <ThemeProvider theme={theme}>
-        <LoginPage />
+        <PodLocationProvider currentUri="https://www.mypodmanager.com">
+          <Breadcrumbs />
+        </PodLocationProvider>
       </ThemeProvider>
     );
-    expect(shallowToJson(tree)).toMatchSnapshot();
+    expect(mountToJson(tree)).toMatchSnapshot();
   });
 
-  test("Redirects if the user is logged out", () => {
-    mount(
+  test("Renders a breadcrumbs view with breadcrumbs based on url slashes", () => {
+    jest.spyOn(ReactUtils, "useLayoutEffect").mockImplementation(() => {});
+
+    const tree = mount(
       <ThemeProvider theme={theme}>
-        <LoginPage />
+        <PodLocationProvider currentUri="https://www.mypodmanager.com/some/location">
+          <Breadcrumbs />
+        </PodLocationProvider>
       </ThemeProvider>
     );
-    expect(useRedirectIfLoggedIn).toHaveBeenCalled();
+    expect(mountToJson(tree)).toMatchSnapshot();
   });
 });

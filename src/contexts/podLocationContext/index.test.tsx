@@ -20,32 +20,38 @@
  */
 
 import { mount } from "enzyme";
-import { shallowToJson } from "enzyme-to-json";
+import { ReactElement, useContext } from "react";
+import PodLocationContext, { PodLocationProvider } from "./index";
+import usePodRoot from "../../hooks/usePodRoot";
 
-import { ThemeProvider } from "@material-ui/styles";
-import { useRedirectIfLoggedIn } from "../../../src/effects/auth";
-import LoginPage from "./index";
+jest.mock("../../hooks/useAuthenticatedProfile");
+jest.mock("../../hooks/usePodRoot");
 
-import theme from "../../../src/theme";
+function ChildComponent(): ReactElement {
+  const { baseUri, currentUri } = useContext(PodLocationContext);
+  return (
+    <>
+      <div id="BaseUri">{baseUri}</div>
+      <div id="CurrentUri">{currentUri}</div>
+    </>
+  );
+}
 
-jest.mock("../../../src/effects/auth");
+describe("PodLocationContext", () => {
+  test("it provides baseUri based on storages given in profile", () => {
+    const baseUri = "https://foo.test/";
 
-describe("Login page", () => {
-  test("Renders a logout button", () => {
-    const tree = mount(
-      <ThemeProvider theme={theme}>
-        <LoginPage />
-      </ThemeProvider>
+    (usePodRoot as jest.Mock).mockReturnValue(baseUri);
+
+    const component = mount(
+      <PodLocationProvider currentUri="https://foo.test/bar/baz">
+        <ChildComponent />
+      </PodLocationProvider>
     );
-    expect(shallowToJson(tree)).toMatchSnapshot();
-  });
 
-  test("Redirects if the user is logged out", () => {
-    mount(
-      <ThemeProvider theme={theme}>
-        <LoginPage />
-      </ThemeProvider>
+    expect(component.find("#BaseUri").text()).toEqual("https://foo.test/");
+    expect(component.find("#CurrentUri").text()).toEqual(
+      "https://foo.test/bar/baz"
     );
-    expect(useRedirectIfLoggedIn).toHaveBeenCalled();
   });
 });

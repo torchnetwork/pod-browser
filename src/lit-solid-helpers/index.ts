@@ -40,7 +40,7 @@ import {
   unstable_fetchLitDatasetWithAcl,
   unstable_getAgentAccessModesAll,
 } from "@solid/lit-pod";
-import { ldp } from "rdf-namespaces";
+import { ldp, space } from "rdf-namespaces";
 import { parseUrl } from "../stringHelpers";
 
 const ldpWithType: Record<string, string> = ldp;
@@ -105,6 +105,7 @@ export interface Profile {
   avatar?: string | null;
   name?: string | null;
   nickname?: string | null;
+  pods?: string[] | null;
 }
 
 export async function fetchProfile(webId: string): Promise<Profile> {
@@ -113,8 +114,9 @@ export async function fetchProfile(webId: string): Promise<Profile> {
   const nickname = getStringUnlocalizedOne(profile, namespace.nickname);
   const name = getStringUnlocalizedOne(profile, namespace.name);
   const avatar = getIriOne(profile, namespace.hasPhoto);
+  const pods = getIriAll(profile, space.storage);
 
-  return { webId, nickname, name, avatar };
+  return { webId, nickname, name, avatar, pods };
 }
 
 export interface NormalizedPermission {
@@ -125,13 +127,14 @@ export interface NormalizedPermission {
 }
 
 export async function normalizePermissions(
-  permissions: unstable_AgentAccess
+  permissions: unstable_AgentAccess,
+  fetchProfileFn = fetchProfile
 ): Promise<NormalizedPermission[]> {
   return Promise.all(
     Object.keys(permissions).map(
       async (webId: string): Promise<NormalizedPermission> => {
         const acl = permissions[webId];
-        const profile = await fetchProfile(webId);
+        const profile = await fetchProfileFn(webId);
 
         return {
           acl,
@@ -241,13 +244,14 @@ export async function fetchFileWithAcl(iri: string): Promise<NormalizedFile> {
 }
 
 export async function fetchResourceWithAcl(
-  iri: string
+  iri: string,
+  normalizePermissionsFn = normalizePermissions
 ): Promise<NormalizedResource> {
   const resource = await unstable_fetchLitDatasetWithAcl(iri);
   const acl = await unstable_getAgentAccessModesAll(
     resource as LitDataset & DatasetInfo & unstable_Acl
   );
-  const permissions = acl ? await normalizePermissions(acl) : undefined;
+  const permissions = acl ? await normalizePermissionsFn(acl) : undefined;
   const dataset = resource as LitDataset;
   const thing = dataset as Thing;
 
@@ -257,12 +261,15 @@ export async function fetchResourceWithAcl(
   };
 }
 
-export async function fetchResource(iri: string): Promise<NormalizedResource> {
+export async function fetchResource(
+  iri: string,
+  normalizeDatasetFn = normalizeDataset
+): Promise<NormalizedResource> {
   const resource = await fetchLitDataset(iri);
   const dataset = resource as LitDataset;
   const thing = dataset as Thing;
 
-  return normalizeDataset(thing, iri);
+  return normalizeDatasetFn(thing, iri);
 }
 
 export function isUserOrMatch(webId: string, id: string): boolean {

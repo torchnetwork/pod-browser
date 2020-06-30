@@ -20,11 +20,12 @@
  */
 
 import React, { ReactElement } from "react";
-import { useRouter } from "next/router";
 import { Container } from "@material-ui/core";
+import { useRouter } from "next/router";
 import { DetailsMenuProvider } from "../../../src/contexts/detailsMenuContext";
 import { useRedirectIfLoggedOut } from "../../../src/effects/auth";
 import ContainerView from "../../container";
+import { PodLocationProvider } from "../../../src/contexts/podLocationContext";
 
 export default function Resource(): ReactElement {
   useRedirectIfLoggedOut();
@@ -34,9 +35,11 @@ export default function Resource(): ReactElement {
 
   return (
     <Container>
-      <DetailsMenuProvider>
-        <ContainerView iri={decodedIri} />
-      </DetailsMenuProvider>
+      <PodLocationProvider currentUri={decodedIri}>
+        <DetailsMenuProvider>
+          <ContainerView iri={decodedIri} />
+        </DetailsMenuProvider>
+      </PodLocationProvider>
     </Container>
   );
 }

@@ -19,33 +19,35 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { mount } from "enzyme";
-import { shallowToJson } from "enzyme-to-json";
+import { createContext, ReactElement, useContext } from "react";
+import useAuthenticatedProfile from "../../hooks/useAuthenticatedProfile";
+import UserContext from "../userContext";
+import usePodRoot from "../../hooks/usePodRoot";
 
-import { ThemeProvider } from "@material-ui/styles";
-import { useRedirectIfLoggedIn } from "../../../src/effects/auth";
-import LoginPage from "./index";
+interface PodLocation {
+  baseUri?: string | null;
+  currentUri: string;
+}
 
-import theme from "../../../src/theme";
-
-jest.mock("../../../src/effects/auth");
-
-describe("Login page", () => {
-  test("Renders a logout button", () => {
-    const tree = mount(
-      <ThemeProvider theme={theme}>
-        <LoginPage />
-      </ThemeProvider>
-    );
-    expect(shallowToJson(tree)).toMatchSnapshot();
-  });
-
-  test("Redirects if the user is logged out", () => {
-    mount(
-      <ThemeProvider theme={theme}>
-        <LoginPage />
-      </ThemeProvider>
-    );
-    expect(useRedirectIfLoggedIn).toHaveBeenCalled();
-  });
+const PodLocationContext = createContext<PodLocation>({
+  currentUri: "",
 });
+
+interface Props {
+  children?: ReactElement | ReactElement[];
+  currentUri: string;
+}
+
+function PodLocationProvider({ children, currentUri }: Props): ReactElement {
+  const { session } = useContext(UserContext);
+  const profile = useAuthenticatedProfile(session);
+  const baseUri = usePodRoot(currentUri, profile);
+  return (
+    <PodLocationContext.Provider value={{ baseUri, currentUri }}>
+      {children}
+    </PodLocationContext.Provider>
+  );
+}
+
+export { PodLocationProvider };
+export default PodLocationContext;
