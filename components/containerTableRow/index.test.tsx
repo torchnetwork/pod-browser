@@ -28,7 +28,11 @@ import { ThemeProvider } from "@material-ui/styles";
 import { ResourceDetails } from "../../src/lit-solid-helpers";
 import { useFetchResourceDetails } from "../../src/hooks/litPod";
 
-import ContainerTableRow, { handleTableRowClick, resourceHref } from "./index";
+import ContainerTableRow, {
+  handleTableRowClick,
+  resourceHref,
+  resourceLink,
+} from "./index";
 import theme from "../../src/theme";
 
 jest.mock("@solid/lit-pod");
@@ -145,5 +149,29 @@ describe("handleTableRowClick", () => {
 
     expect(setMenuOpen).not.toHaveBeenCalled();
     expect(setMenuContents).not.toHaveBeenCalled();
+  });
+});
+
+describe("resourceLink", () => {
+  test("it returns a next link if types is undefined", () => {
+    const component = resourceLink(undefined, "test", "http://example.com");
+    const tree = mount(component);
+    expect(shallowToJson(tree)).toMatchSnapshot();
+  });
+
+  test("it returns a next link if the resource is a container", () => {
+    const component = resourceLink(["Container"], "test", "http://example.com");
+    const tree = mount(component);
+    expect(shallowToJson(tree)).toMatchSnapshot();
+  });
+
+  test("it returns a regular anchor link if the resource is not a container", () => {
+    const component = resourceLink(
+      ["text/plain"],
+      "test",
+      "http://example.com"
+    );
+    const tree = mount(component);
+    expect(shallowToJson(tree)).toMatchSnapshot();
   });
 });

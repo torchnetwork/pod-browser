@@ -84,6 +84,30 @@ const useStyles = makeStyles<PrismTheme>((theme) =>
   createStyles(styles(theme) as StyleRules)
 );
 
+export function resourceLink(
+  types: string[] | undefined,
+  name: string,
+  iri: string
+): ReactElement {
+  const nextLink = (
+    <Link href="/resource/[iri]" as={resourceHref(iri)}>
+      <a>{name}</a>
+    </Link>
+  );
+
+  if (!types) return nextLink;
+
+  if (types.some((type) => type.match(/container/i))) {
+    return nextLink;
+  }
+
+  return (
+    <a href={iri} rel="noreferrer" target="_blank">
+      {name}
+    </a>
+  );
+}
+
 interface Props {
   resource: ResourceDetails;
 }
@@ -113,15 +137,11 @@ export default function ContainerTableRow({ resource }: Props): ReactElement {
       onClick={onClick}
     >
       <td className={bem("table__body-cell", "align-center", "width-preview")}>
-        {types && types.length ? (
-          <ResourceIcon types={types} bem={bem} />
-        ) : null}
+        <ResourceIcon types={types} bem={bem} />
       </td>
 
       <td className={bem("table__body-cell")}>
-        <Link href="/resource/[iri]" as={resourceHref(iri)}>
-          <a>{name}</a>
-        </Link>
+        {resourceLink(types, name, iri)}
       </td>
 
       {isLoading ? (

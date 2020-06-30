@@ -442,22 +442,26 @@ font-display: block;",
         >
           <td
             className="makeStyles-table__body-cell-1548 makeStyles-table__body-cell--align-center-1549 makeStyles-table__body-cell--width-preview-1551"
-          />
+          >
+            <ResourceIcon
+              bem={[Function]}
+              types={Array []}
+            >
+              <i
+                className="makeStyles-icon-file-1500 makeStyles-resource-icon-1555"
+              />
+            </ResourceIcon>
+          </td>
           <td
             className="makeStyles-table__body-cell-1548"
           >
-            <Link
-              as="/resource/https%3A%2F%2Fexample.com%2Fexample.ttl"
-              href="/resource/[iri]"
+            <a
+              href="https://example.com/example.ttl"
+              rel="noreferrer"
+              target="_blank"
             >
-              <a
-                href="/resource/https%3A%2F%2Fexample.com%2Fexample.ttl"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                /example.ttl
-              </a>
-            </Link>
+              /example.ttl
+            </a>
           </td>
           <td
             className="makeStyles-table__body-cell-1548"
@@ -964,18 +968,13 @@ font-display: block;",
           <td
             className="makeStyles-table__body-cell-1548"
           >
-            <Link
-              as="/resource/https%3A%2F%2Fexample.com%2Fexample.ttl"
-              href="/resource/[iri]"
+            <a
+              href="https://example.com/example.ttl"
+              rel="noreferrer"
+              target="_blank"
             >
-              <a
-                href="/resource/https%3A%2F%2Fexample.com%2Fexample.ttl"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                /example.ttl
-              </a>
-            </Link>
+              /example.ttl
+            </a>
           </td>
           <td
             className="makeStyles-table__body-cell-1548"
@@ -1432,22 +1431,26 @@ font-display: block;",
         >
           <td
             className="makeStyles-table__body-cell-1548 makeStyles-table__body-cell--align-center-1549 makeStyles-table__body-cell--width-preview-1551"
-          />
+          >
+            <ResourceIcon
+              bem={[Function]}
+              types={Array []}
+            >
+              <i
+                className="makeStyles-icon-file-1500 makeStyles-resource-icon-1555"
+              />
+            </ResourceIcon>
+          </td>
           <td
             className="makeStyles-table__body-cell-1548"
           >
-            <Link
-              as="/resource/https%3A%2F%2Fexample.com%2Fexample.ttl"
-              href="/resource/[iri]"
+            <a
+              href="https://example.com/example.ttl"
+              rel="noreferrer"
+              target="_blank"
             >
-              <a
-                href="/resource/https%3A%2F%2Fexample.com%2Fexample.ttl"
-                onClick={[Function]}
-                onMouseEnter={[Function]}
-              >
-                /example.ttl
-              </a>
-            </Link>
+              /example.ttl
+            </a>
           </td>
           <td
             className="makeStyles-table__body-cell-1548"
@@ -1460,4 +1463,44 @@ font-display: block;",
     </tbody>
   </table>
 </ThemeProvider>
+`;
+
+exports[`resourceLink it returns a next link if the resource is a container 1`] = `
+<Link
+  as="/resource/http%3A%2F%2Fexample.com"
+  href="/resource/[iri]"
+>
+  <a
+    href="/resource/http%3A%2F%2Fexample.com"
+    onClick={[Function]}
+    onMouseEnter={[Function]}
+  >
+    test
+  </a>
+</Link>
+`;
+
+exports[`resourceLink it returns a next link if types is undefined 1`] = `
+<Link
+  as="/resource/http%3A%2F%2Fexample.com"
+  href="/resource/[iri]"
+>
+  <a
+    href="/resource/http%3A%2F%2Fexample.com"
+    onClick={[Function]}
+    onMouseEnter={[Function]}
+  >
+    test
+  </a>
+</Link>
+`;
+
+exports[`resourceLink it returns a regular anchor link if the resource is not a container 1`] = `
+<a
+  href="http://example.com"
+  rel="noreferrer"
+  target="_blank"
+>
+  test
+</a>
 `;

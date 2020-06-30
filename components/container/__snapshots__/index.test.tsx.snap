@@ -10215,7 +10215,11 @@ font-display: block;",
           >
             <td
               className="makeStyles-table__body-cell-4661 makeStyles-table__body-cell--align-center-4662 makeStyles-table__body-cell--width-preview-4664"
-            />
+            >
+              <ResourceIcon
+                bem={[Function]}
+              />
+            </td>
             <td
               className="makeStyles-table__body-cell-4661"
             >
@@ -10286,7 +10290,11 @@ font-display: block;",
           >
             <td
               className="makeStyles-table__body-cell-4661 makeStyles-table__body-cell--align-center-4662 makeStyles-table__body-cell--width-preview-4664"
-            />
+            >
+              <ResourceIcon
+                bem={[Function]}
+              />
+            </td>
             <td
               className="makeStyles-table__body-cell-4661"
             >
@@ -10357,7 +10365,11 @@ font-display: block;",
           >
             <td
               className="makeStyles-table__body-cell-4661 makeStyles-table__body-cell--align-center-4662 makeStyles-table__body-cell--width-preview-4664"
-            />
+            >
+              <ResourceIcon
+                bem={[Function]}
+              />
+            </td>
             <td
               className="makeStyles-table__body-cell-4661"
             >
