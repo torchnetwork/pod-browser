@@ -19,32 +19,26 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { mountToJson } from "../__testUtils/mountWithTheme";
+import { mountToJson } from "../../__testUtils/mountWithTheme";
 
 import SortedTableCarat from "./index";
 
 describe("Sorted", () => {
   test("Displays an upwards facing carat when ascending", () => {
-    const rendered = mountToJson(
-      <SortedTableCarat sorted sortedDesc={false} />
-    );
+    const tree = mountToJson(<SortedTableCarat sorted sortedDesc={false} />);
 
-    expect(rendered).toMatchSnapshot();
+    expect(tree).toMatchSnapshot();
   });
 
   test("Displays a downwards facing carat when descending", () => {
-    const rendered = mountToJson(
-      <SortedTableCarat sorted sortedDesc={false} />
-    );
-    expect(rendered).toMatchSnapshot();
+    const tree = mountToJson(<SortedTableCarat sorted sortedDesc={false} />);
+    expect(tree).toMatchSnapshot();
   });
 });
 
 describe("Unsorted", () => {
   test("Displays nothing when unsorted", () => {
-    const rendered = mountToJson(
-      <SortedTableCarat sorted sortedDesc={false} />
-    );
-    expect(rendered).toMatchSnapshot();
+    const tree = mountToJson(<SortedTableCarat sorted sortedDesc={false} />);
+    expect(tree).toMatchSnapshot();
   });
 });
