@@ -32,11 +32,11 @@ import {
   IriString,
   LitDataset,
   Thing,
-  unstable_AccessModes,
+  unstable_Access,
   unstable_AgentAccess,
   unstable_fetchFile,
   unstable_fetchLitDatasetWithAcl,
-  unstable_getAgentAccessModesAll,
+  unstable_getAgentAccessAll,
 } from "@solid/lit-pod";
 import { ldp, space } from "rdf-namespaces";
 import { parseUrl } from "../stringHelpers";
@@ -90,7 +90,7 @@ export function displayTypes(types: string[]): string[] {
   return types?.length ? types.map((t: string): string => getTypeName(t)) : [];
 }
 
-export function displayPermissions(permissions: unstable_AccessModes): string {
+export function displayPermissions(permissions: unstable_Access): string {
   const perms = Object.values(permissions);
   if (perms.every((p) => p)) return "Full Control";
   if (perms.every((p) => !p)) return "No Access";
@@ -120,7 +120,7 @@ export async function fetchProfile(webId: string): Promise<Profile> {
 export interface NormalizedPermission {
   webId: string;
   alias: string;
-  acl: unstable_AccessModes;
+  acl: unstable_Access;
   profile: Profile;
 }
 
@@ -186,13 +186,13 @@ export interface ResourceDetails extends NormalizedResource {
 
 export const PERMISSIONS: string[] = ["read", "write", "append", "control"];
 
-export function parseStringAcl(acl: string): unstable_AccessModes {
+export function parseStringAcl(acl: string): unstable_Access {
   return PERMISSIONS.reduce((acc, key) => {
     return {
       ...acc,
       [key]: acl.includes(key),
     };
-  }, {} as unstable_AccessModes);
+  }, {} as unstable_Access);
 }
 
 export function permissionsFromWacAllowHeaders(
@@ -225,18 +225,33 @@ export interface NormalizedFile extends NormalizedResource {
 }
 
 export async function fetchFileWithAcl(iri: string): Promise<NormalizedFile> {
-  const response = await unstable_fetchFile(iri);
-  const file = await response.blob();
-  const { headers } = response;
-  const permissions = permissionsFromWacAllowHeaders(
-    headers.get("wac-allow") as string
-  );
-  const type = headers.get("content-type") as string;
+  const file = await unstable_fetchFile(iri);
+  const {
+    resourceInfo: { unstable_permissions, contentType: type },
+  } = file;
+
+  const permissions = unstable_permissions
+    ? [
+        {
+          webId: "user",
+          alias: displayPermissions(unstable_permissions.user),
+          profile: { webId: "user" },
+          acl: unstable_permissions?.user as unstable_Access,
+        } as NormalizedPermission,
+        {
+          webId: "public",
+          alias: displayPermissions(unstable_permissions.public),
+          profile: { webId: "public" },
+          acl: unstable_permissions?.public as unstable_Access,
+        } as NormalizedPermission,
+      ]
+    : [];
+  const types = type ? [type] : [];
 
   return {
     iri,
     permissions,
-    types: [type],
+    types,
     file,
   };
 }
@@ -246,7 +261,7 @@ export async function fetchResourceWithAcl(
   normalizePermissionsFn = normalizePermissions
 ): Promise<NormalizedResource> {
   const resource = await unstable_fetchLitDatasetWithAcl(iri);
-  const acl = await unstable_getAgentAccessModesAll(resource);
+  const acl = await unstable_getAgentAccessAll(resource);
   const permissions = acl ? await normalizePermissionsFn(acl) : undefined;
   const dataset = resource as LitDataset;
   const thing = dataset as Thing;

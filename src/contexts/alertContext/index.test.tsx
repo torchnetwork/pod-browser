@@ -19,41 +19,42 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { StyleRules } from "@material-ui/core";
-import { PrismTheme, content } from "@solid/lit-prism-patterns";
+import { useContext, ReactElement } from "react";
+import { shallow } from "enzyme";
+import { shallowToJson } from "enzyme-to-json";
+import AlertContext, { AlertProvider } from "./index";
 
-const rules = {
-  avatar: {
-    marginRight: "1rem",
-  },
-  centeredSection: {
-    padding: "1rem",
-  },
-  raw: {
-    height: "100%",
-    width: "100%",
-    maxHeight: "200px",
-    overflow: "auto",
-  },
-  listItem: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  formListItem: {
-    display: "block",
-  },
-  detailText: {
-    fontSize: "0.75rem",
-  },
-  typeValue: {
-    marginLeft: "auto",
-  },
-};
+function ChildComponent(): ReactElement {
+  const {
+    alertOpen,
+    message,
+    severity,
+    setAlertOpen,
+    setMessage,
+    setSeverity,
+  } = useContext(AlertContext);
 
-export default function styles(theme: PrismTheme): StyleRules {
-  return {
-    ...rules,
-    ...content.styles(theme),
-  };
+  setAlertOpen(true);
+  setMessage("message");
+  setSeverity("error");
+
+  return (
+    <div>
+      <div className="alertOpen">{alertOpen ? "true" : "false"}</div>
+      <div className="message">{message}</div>
+      <div className="severity">{severity}</div>
+    </div>
+  );
 }
+
+describe("AlertContext", () => {
+  test("it has context data", () => {
+    const component = shallow(
+      <AlertProvider>
+        <ChildComponent />
+      </AlertProvider>
+    );
+
+    expect(shallowToJson(component)).toMatchSnapshot();
+  });
+});

@@ -20,7 +20,6 @@
  */
 
 import * as ReactFns from "react";
-import { mock } from "jest-mock-extended";
 import { shallow } from "enzyme";
 import { shallowToJson } from "enzyme-to-json";
 import { mountToJson } from "../../__testUtils/mountWithTheme";
@@ -249,24 +248,45 @@ describe("Permission", () => {
   test("it returns null if given no permissions", () => {
     const classes = {};
 
-    const tree = shallow(<Permission classes={classes} permission={null} />);
+    const tree = shallow(
+      <Permission
+        iri="iri"
+        warnOnSubmit={false}
+        classes={classes}
+        permission={null}
+      />
+    );
 
     expect(shallowToJson(tree)).toMatchSnapshot();
   });
 
   test("it renders permissions if given", () => {
     const classes = {};
-    const permission = mock<NormalizedPermission>({
-      webId: "https://somepod.somehost.com/profile#me",
-      alias: "some-alias",
+    const webId = "https://somepod.somehost.com/profile#me";
+    const permission = {
+      webId,
+      alias: "Full Control",
       profile: {
+        webId,
         avatar: "https://somepod.somehost.com/public/photo.jpg",
       },
-    });
+      acl: {
+        read: true,
+        write: true,
+        append: true,
+        control: true,
+      },
+    } as NormalizedPermission;
 
     const tree = shallow(
-      <Permission classes={classes} permission={permission} />
+      <Permission
+        iri="iri"
+        warnOnSubmit={false}
+        classes={classes}
+        permission={permission}
+      />
     );
+
     expect(shallowToJson(tree)).toMatchSnapshot();
   });
 });
@@ -274,7 +294,11 @@ describe("Permission", () => {
 describe("ThirdPartyPermissions", () => {
   test("it returns null if given no permissions", () => {
     const tree = shallow(
-      <ThirdPartyPermissions classes={{}} thirdPartyPermissions={null} />
+      <ThirdPartyPermissions
+        iri="iri"
+        classes={{}}
+        thirdPartyPermissions={null}
+      />
     );
 
     expect(shallowToJson(tree)).toMatchSnapshot();
@@ -282,7 +306,11 @@ describe("ThirdPartyPermissions", () => {
 
   test("it returns a useful message if there are no third party permissions", () => {
     const tree = shallow(
-      <ThirdPartyPermissions classes={{}} thirdPartyPermissions={[]} />
+      <ThirdPartyPermissions
+        iri="iri"
+        classes={{}}
+        thirdPartyPermissions={[]}
+      />
     );
 
     expect(shallowToJson(tree)).toMatchSnapshot();
@@ -305,7 +333,7 @@ describe("ThirdPartyPermissions", () => {
           nickname: "owner",
           name: "Test Person",
         },
-      },
+      } as NormalizedPermission,
       {
         webId: "collaborator",
         alias: "Can View",
@@ -320,11 +348,12 @@ describe("ThirdPartyPermissions", () => {
           nickname: "collaborator",
           name: "Test Collaborator",
         },
-      },
+      } as NormalizedPermission,
     ];
 
     const tree = shallow(
       <ThirdPartyPermissions
+        iri="iri"
         classes={classes}
         thirdPartyPermissions={permissions}
       />

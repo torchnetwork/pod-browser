@@ -32,7 +32,7 @@ import {
 import { makeStyles } from "@material-ui/styles";
 import { PrismTheme } from "@solid/lit-prism-patterns";
 import UserContext, { ISession } from "../../src/contexts/userContext";
-import { useFetchResourceWithAcl } from "../../src/hooks/litPod";
+import PermissionsForm from "../permissionsForm";
 import DetailsLoading from "../detailsLoading";
 import { parseUrl } from "../../src/stringHelpers";
 import styles from "./styles";
@@ -51,15 +51,17 @@ export function displayName({ nickname, name, webId }: Profile): string {
 }
 
 export interface IPermission {
+  iri: string;
   permission: NormalizedPermission | null;
   classes: Record<string, string>;
+  warnOnSubmit: boolean;
 }
 
 export function Permission(props: IPermission): ReactElement | null {
-  const { permission, classes } = props;
+  const { permission, classes, warnOnSubmit, iri } = props;
   if (!permission) return null;
 
-  const { webId, alias, profile } = permission;
+  const { webId, profile } = permission;
   const { avatar } = profile;
   const avatarSrc = avatar || undefined;
 
@@ -73,14 +75,18 @@ export function Permission(props: IPermission): ReactElement | null {
       <Typography className={classes.detailText}>
         {displayName(profile)}
       </Typography>
-      <Typography className={`${classes.typeValue} ${classes.detailText}`}>
-        {alias}
-      </Typography>
+
+      <PermissionsForm
+        iri={iri}
+        permission={permission}
+        warnOnSubmit={warnOnSubmit}
+      />
     </ListItem>
   );
 }
 
 interface IThirdPartyPermissions {
+  iri: string;
   thirdPartyPermissions: NormalizedPermission[] | null;
   classes: Record<string, string>;
 }
@@ -88,7 +94,7 @@ interface IThirdPartyPermissions {
 export function ThirdPartyPermissions(
   props: IThirdPartyPermissions
 ): ReactElement | null {
-  const { thirdPartyPermissions, classes } = props;
+  const { iri, thirdPartyPermissions, classes } = props;
 
   if (!thirdPartyPermissions) return null;
 
@@ -113,9 +119,11 @@ export function ThirdPartyPermissions(
       <List>
         {thirdPartyPermissions.map((permission) => (
           <Permission
+            iri={iri}
             permission={permission}
             classes={classes}
             key={permission.webId}
+            warnOnSubmit={false}
           />
         ))}
       </List>
@@ -184,10 +192,8 @@ export default function ResourceDetails({
   iri,
   name = "",
   types = [],
+  permissions,
 }: Props): ReactElement {
-  const { error, data: resourceDetails } = useFetchResourceWithAcl(iri);
-  const { permissions } = resourceDetails || {};
-
   const classes = useStyles();
   const { session } = useContext(UserContext);
   const { webId } = session as ISession;
@@ -197,7 +203,7 @@ export default function ResourceDetails({
 
   // TODO:
   // Files without permissions throw an error in lit-pod.
-  if (!error && !permissions) {
+  if (!permissions) {
     return <DetailsLoading resource={{ iri, name, types }} />;
   }
 
@@ -218,11 +224,17 @@ export default function ResourceDetails({
       <section className={classes.centeredSection}>
         <h5 className={classes["content-h5"]}>My Access</h5>
         <List>
-          <Permission permission={userPermissions} classes={classes} />
+          <Permission
+            iri={iri}
+            permission={userPermissions}
+            classes={classes}
+            warnOnSubmit
+          />
         </List>
       </section>
 
       <ThirdPartyPermissions
+        iri={iri}
         thirdPartyPermissions={thirdPartyPermissions}
         classes={classes}
       />

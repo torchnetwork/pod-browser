@@ -22,7 +22,9 @@
 /* eslint-disable camelcase */
 import { ldp, space } from "rdf-namespaces";
 import * as litSolidFns from "@solid/lit-pod";
-import {
+import * as litSolidHelpers from "./index";
+
+const {
   displayPermissions,
   displayTypes,
   fetchFileWithAcl,
@@ -39,7 +41,7 @@ import {
   normalizePermissions,
   parseStringAcl,
   permissionsFromWacAllowHeaders,
-} from "./index";
+} = litSolidHelpers;
 
 const {
   addIri,
@@ -306,7 +308,7 @@ describe("fetchResourceWithAcl", () => {
       });
 
     jest
-      .spyOn(litSolidFns, "unstable_getAgentAccessModesAll")
+      .spyOn(litSolidFns, "unstable_getAgentAccessAll")
       .mockImplementationOnce(async () => {
         return Promise.resolve(perms);
       });
@@ -365,7 +367,7 @@ describe("fetchResourceWithAcl", () => {
       });
 
     jest
-      .spyOn(litSolidFns, "unstable_getAgentAccessModesAll")
+      .spyOn(litSolidFns, "unstable_getAgentAccessAll")
       .mockImplementationOnce(async () => {
         return Promise.resolve(undefined);
       });
@@ -476,7 +478,7 @@ describe("isUserOrMatch", () => {
 });
 
 describe("parseStringAcl", () => {
-  test("it parses a list of string permissions into an unstable_AccessModes", () => {
+  test("it parses a list of string permissions into an unstable_Access", () => {
     const fullControl = parseStringAcl("read write append control");
 
     expect(fullControl.read).toBe(true);
@@ -534,33 +536,56 @@ describe("permissionsFromWacAllowHeaders", () => {
 
 describe("fetchFileWithAcl", () => {
   test("it fetches a file and parses the wac-allow header", async () => {
-    const headers = new Headers();
-    const blob = jest.fn().mockImplementationOnce(() => "file contents");
+    jest.spyOn(litSolidFns, "unstable_fetchFile").mockResolvedValue({
+      text: "file contents",
+      resourceInfo: {
+        contentType: "type",
+        unstable_permissions: {
+          user: {
+            read: true,
+            write: true,
+            append: true,
+            control: true,
+          },
+          public: {
+            read: true,
+            write: true,
+            append: true,
+            control: true,
+          },
+        },
+      },
+    });
 
-    headers.append("content-type", "image/vnd.microsoft.icon");
-    headers.append(
-      "wac-allow",
-      'user="read write append control",public="read"'
-    );
+    const { iri, permissions, types } = await fetchFileWithAcl("some iri");
 
-    jest
-      .spyOn(litSolidFns, "unstable_fetchFile")
-      .mockImplementationOnce(async () => {
-        return Promise.resolve({
-          blob,
-          headers,
-        });
-      });
-
-    const { iri, permissions, types, file } = await fetchFileWithAcl(
-      "some iri"
-    );
-
-    expect(blob).toHaveBeenCalled();
     expect(iri).toEqual("some iri");
-    expect(types).toContain("image/vnd.microsoft.icon");
-    expect(file).toEqual("file contents");
+    expect(types).toContain("type");
     expect(permissions).toHaveLength(2);
+  });
+
+  test("it defaults to empty permissions if none are returned", async () => {
+    jest.spyOn(litSolidFns, "unstable_fetchFile").mockResolvedValue({
+      text: "file contents",
+      resourceInfo: {
+        contentType: "type",
+      },
+    });
+
+    const { permissions } = await fetchFileWithAcl("some iri");
+
+    expect(permissions).toHaveLength(0);
+  });
+
+  test("it defaults to an empty array if there is no type", async () => {
+    jest.spyOn(litSolidFns, "unstable_fetchFile").mockResolvedValue({
+      text: "file contents",
+      resourceInfo: {},
+    });
+
+    const { types } = await fetchFileWithAcl("some iri");
+
+    expect(types).toHaveLength(0);
   });
 });
 
@@ -590,7 +615,7 @@ describe("fetchResource", () => {
       });
 
     jest
-      .spyOn(litSolidFns, "unstable_getAgentAccessModesAll")
+      .spyOn(litSolidFns, "unstable_getAgentAccessAll")
       .mockImplementationOnce(async () => {
         return Promise.resolve(undefined);
       });

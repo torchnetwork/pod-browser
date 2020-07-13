@@ -19,41 +19,26 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { StyleRules } from "@material-ui/core";
-import { PrismTheme, content } from "@solid/lit-prism-patterns";
+import { useContext, ReactElement } from "react";
+import Alert from "@material-ui/lab/Alert";
+import { Snackbar } from "@material-ui/core";
+import AlertContext from "../../src/contexts/alertContext";
 
-const rules = {
-  avatar: {
-    marginRight: "1rem",
-  },
-  centeredSection: {
-    padding: "1rem",
-  },
-  raw: {
-    height: "100%",
-    width: "100%",
-    maxHeight: "200px",
-    overflow: "auto",
-  },
-  listItem: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-  },
-  formListItem: {
-    display: "block",
-  },
-  detailText: {
-    fontSize: "0.75rem",
-  },
-  typeValue: {
-    marginLeft: "auto",
-  },
-};
+export default function Notification(): ReactElement {
+  const { alertOpen, message, severity, setAlertOpen } = useContext(
+    AlertContext
+  );
 
-export default function styles(theme: PrismTheme): StyleRules {
-  return {
-    ...rules,
-    ...content.styles(theme),
-  };
+  return (
+    <Snackbar
+      open={alertOpen}
+      autoHideDuration={6000}
+      onClose={() => setAlertOpen(false)}
+      anchorOrigin={{ vertical: "top", horizontal: "center" }}
+    >
+      <Alert onClose={() => setAlertOpen(false)} severity={severity}>
+        {message}
+      </Alert>
+    </Snackbar>
+  );
 }
