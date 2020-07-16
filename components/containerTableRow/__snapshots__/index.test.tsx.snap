@@ -854,7 +854,9 @@ font-display: block;",
         <ContainerTableRow
           resource={
             Object {
-              "iri": "https://example.com/example.ttl",
+              "iri": NamedNode {
+                "value": "https://example.com/example.ttl",
+              },
               "name": "/example.ttl",
               "types": Array [],
             }
@@ -1782,7 +1784,9 @@ font-display: block;",
         <ContainerTableRow
           resource={
             Object {
-              "iri": "https://example.com/example.ttl",
+              "iri": NamedNode {
+                "value": "https://example.com/example.ttl",
+              },
               "name": "/example.ttl",
               "types": Array [
                 "some-type",
@@ -2694,7 +2698,9 @@ font-display: block;",
         <ContainerTableRow
           resource={
             Object {
-              "iri": "https://example.com/example.ttl",
+              "iri": NamedNode {
+                "value": "https://example.com/example.ttl",
+              },
               "name": "/example.ttl",
               "types": Array [],
             }

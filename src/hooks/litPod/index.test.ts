@@ -25,9 +25,9 @@ import {
   fetchLitDataset,
   getThingOne,
   getIriAll,
-  unstable_fetchResourceInfoWithAcl,
+  unstable_fetchResourceInfoWithAcl, Iri, stringAsIri,
 } from "@solid/lit-pod";
-import { namedNode } from "@rdfjs/dataset";
+import { namedNode } from "@rdfjs/data-model";
 import useSWR from "swr";
 import * as litSolidHelpers from "../../lit-solid-helpers";
 import {
@@ -189,10 +189,11 @@ describe("PodIrisFromWebId", () => {
 
 describe("useFetchContainerResourceIris", () => {
   test("it wraps fetchContainerResourceIris in SWR", () => {
-    useFetchContainerResourceIris("iri");
+    const iri: Iri = stringAsIri("iri");
+    useFetchContainerResourceIris(iri);
 
     expect(useSWR).toHaveBeenCalledWith(
-      ["iri", "getContainerResourceIris"],
+      [iri, stringAsIri("getContainerResourceIris")],
       fetchContainerResourceIris
     );
   });
@@ -200,10 +201,11 @@ describe("useFetchContainerResourceIris", () => {
 
 describe("useFetchResourceDetails", () => {
   test("it wraps fetchResourceDetails in SWR", () => {
-    useFetchResourceDetails("iri");
+    const iri: Iri = stringAsIri("iri");
+    useFetchResourceDetails(iri);
 
     expect(useSWR).toHaveBeenCalledWith(
-      ["iri", "fetchResourceDetails"],
+      [iri, stringAsIri("fetchResourceDetails")],
       fetchResourceDetails
     );
   });
@@ -211,10 +213,11 @@ describe("useFetchResourceDetails", () => {
 
 describe("useFetchResourceWithAcl", () => {
   test("it wraps fetchResourceWithAcl in SWR", () => {
-    useFetchResourceWithAcl("iri");
+    const iri: Iri = stringAsIri("iri");
+    useFetchResourceWithAcl(iri);
 
     expect(useSWR).toHaveBeenCalledWith(
-      ["iri", "fetchResourceWithAcl"],
+      [iri, stringAsIri("fetchResourceWithAcl")],
       litSolidHelpers.fetchResourceWithAcl
     );
   });
@@ -222,10 +225,11 @@ describe("useFetchResourceWithAcl", () => {
 
 describe("useFetchPodIrisFromWebId", () => {
   test("it wraps fetchPodIrisFromWebId in SWR", () => {
-    useFetchPodIrisFromWebId("iri");
+    const iri: Iri = stringAsIri("iri");
+    useFetchPodIrisFromWebId(iri);
 
     expect(useSWR).toHaveBeenCalledWith(
-      ["iri", "fetchPodIrisFromWebId"],
+      [iri, stringAsIri("fetchPodIrisFromWebId")],
       fetchPodIrisFromWebId
     );
   });

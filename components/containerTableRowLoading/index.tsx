@@ -24,9 +24,10 @@ import { TableCell, TableRow } from "@material-ui/core";
 import Link from "next/link";
 import { resourceHref } from "../containerTableRow";
 import { getIriPath } from "../../src/lit-solid-helpers";
+import {Iri} from "@solid/lit-pod";
 
 interface Props {
-  iri: string;
+  iri: Iri;
 }
 
 export default function ContainerTableRowSkeleton({

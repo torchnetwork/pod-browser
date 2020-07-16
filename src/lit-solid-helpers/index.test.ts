@@ -23,9 +23,11 @@
 import * as litSolidFns from "@solid/lit-pod";
 import * as litSolidHelpers from "./index";
 
-import { arrayContainsIri, Iri, stringAsIri } from "@solid/lit-pod";
+import {arrayContainsIri, Iri, iriAsString, stringAsIri} from "@solid/lit-pod";
 import { RDF, DCTERMS, FOAF, VCARD, LDP } from "@solid/lit-vocab-common";
 import { WS } from "@solid/lit-vocab-solid";
+import {INRUPT_TEST_IRI} from "../GENERATED/INRUPT_TEST_IRI";
+import {string} from "prop-types";
 
 const {
   displayPermissions,
@@ -239,7 +241,7 @@ describe("normalizePermissions", () => {
     };
 
     const expectedProfile = {
-      avatar: "http://example.com/avatar.png",
+      avatar: stringAsIri("http://example.com/avatar.png"),
       name: "string",
       nickname: "string",
     };
@@ -251,22 +253,22 @@ describe("normalizePermissions", () => {
       fetchProfileFn
     );
 
-    expect(perms1.webId).toEqual("acl1");
+    expect(perms1.webId).toEqual(stringAsIri("acl1"));
     expect(perms1.alias).toEqual("Can View");
     expect(perms1.acl).toMatchObject(acl.acl1);
     expect(perms1.profile).toMatchObject(expectedProfile);
 
-    expect(perms2.webId).toEqual("acl2");
+    expect(perms2.webId).toEqual(stringAsIri("acl2"));
     expect(perms2.alias).toEqual("Full Control");
     expect(perms2.acl).toMatchObject(acl.acl2);
     expect(perms2.profile).toMatchObject(expectedProfile);
 
-    expect(perms3.webId).toEqual("acl3");
+    expect(perms3.webId).toEqual(stringAsIri("acl3"));
     expect(perms3.alias).toEqual("Can Edit");
     expect(perms3.acl).toMatchObject(acl.acl3);
     expect(perms3.profile).toMatchObject(expectedProfile);
 
-    expect(perms4.webId).toEqual("acl4");
+    expect(perms4.webId).toEqual(stringAsIri("acl4"));
     expect(perms4.alias).toEqual("No Access");
     expect(perms4.acl).toMatchObject(acl.acl4);
     expect(perms4.profile).toMatchObject(expectedProfile);
@@ -299,7 +301,7 @@ describe("fetchResourceWithAcl", () => {
       },
     };
 
-    const expectedIri = "https://user.dev.inrupt.net/public/";
+    const expectedIri = stringAsIri("https://user.dev.inrupt.net/public/");
 
     jest
       .spyOn(litSolidFns, "unstable_fetchLitDatasetWithAcl")
@@ -385,21 +387,21 @@ describe("fetchResourceWithAcl", () => {
 describe("getUserPermissions", () => {
   test("it returns the permissions for the given webId", async () => {
     const acl = {
-      acl1: { read: true, write: false, control: false, append: false },
-      acl2: { read: true, write: true, control: true, append: true },
-      acl3: { read: true, write: true, control: false, append: true },
-      acl4: { read: false, write: false, control: false, append: false },
+      "acl1": { read: true, write: false, control: false, append: false },
+      "acl2": { read: true, write: true, control: true, append: true },
+      "acl3": { read: true, write: true, control: false, append: true },
+      "acl4": { read: false, write: false, control: false, append: false },
     };
 
     const normalizedPermissions = await normalizePermissions(
       acl,
       jest.fn().mockResolvedValue(null)
     );
-    const permissions = getUserPermissions("acl1", normalizedPermissions);
+    const permissions = getUserPermissions(stringAsIri("acl1"), normalizedPermissions);
 
-    expect(permissions.webId).toEqual("acl1");
-    expect(permissions.alias).toEqual("Can View");
-    expect(permissions.acl).toMatchObject(acl.acl1);
+    expect(permissions?.webId).toEqual(stringAsIri("acl1"));
+    expect(permissions?.alias).toEqual("Can View");
+    expect(permissions?.acl).toMatchObject(acl.acl1);
   });
 
   test("it returns null if given no permissions", () => {
@@ -409,14 +411,14 @@ describe("getUserPermissions", () => {
   test("it returns null if it can't find a permission matching the web id", () => {
     const permissions = [
       {
-        webId: "test",
+        webId: stringAsIri("test"),
         alias: "Can View",
         acl: { read: true, write: false, control: false, append: false },
         profile: { webId: "test" },
       },
     ];
 
-    const userPermissions = getUserPermissions("acl1", permissions);
+    const userPermissions = getUserPermissions(stringAsIri("acl1"), permissions);
 
     expect(userPermissions).toBeNull();
   });
@@ -436,45 +438,45 @@ describe("getThirdPartyPermissions", () => {
       jest.fn().mockResolvedValue(null)
     );
     const thirdPartyPermissions = getThirdPartyPermissions(
-      "acl1",
+        stringAsIri("acl1"),
       normalizedPermissions
     );
     const [perms2, perms3, perms4] = thirdPartyPermissions;
 
-    expect(thirdPartyPermissions.map(({ webId }) => webId)).not.toContain(
+    expect(thirdPartyPermissions.map(({ webId }) => iriAsString(webId))).not.toContain(
       "acl1"
     );
 
-    expect(perms2.webId).toEqual("acl2");
+    expect(perms2.webId).toEqual(stringAsIri("acl2"));
     expect(perms2.alias).toEqual("Full Control");
     expect(perms2.acl).toMatchObject(acl.acl2);
 
-    expect(perms3.webId).toEqual("acl3");
+    expect(perms3.webId).toEqual(stringAsIri("acl3"));
     expect(perms3.alias).toEqual("Can Edit");
     expect(perms3.acl).toMatchObject(acl.acl3);
 
-    expect(perms4.webId).toEqual("acl4");
+    expect(perms4.webId).toEqual(stringAsIri("acl4"));
     expect(perms4.alias).toEqual("No Access");
     expect(perms4.acl).toMatchObject(acl.acl4);
   });
 
   test("it returns an empty Array if given no permissions", () => {
-    expect(getThirdPartyPermissions("webId")).toBeInstanceOf(Array);
-    expect(getThirdPartyPermissions("webId")).toHaveLength(0);
+    expect(getThirdPartyPermissions(INRUPT_TEST_IRI.somePodWebId)).toBeInstanceOf(Array);
+    expect(getThirdPartyPermissions(INRUPT_TEST_IRI.somePodWebId)).toHaveLength(0);
   });
 });
 
 describe("isUserOrMatch", () => {
   test("it returns true when given two matching ids", () => {
-    expect(isUserOrMatch("webId", "webId")).toBe(true);
+    expect(isUserOrMatch(INRUPT_TEST_IRI.somePodWebId, INRUPT_TEST_IRI.somePodWebId)).toBe(true);
   });
 
   test("it returns false when given two unique ids", () => {
-    expect(isUserOrMatch("webId", "otherId")).toBe(false);
+    expect(isUserOrMatch(INRUPT_TEST_IRI.somePodWebId, INRUPT_TEST_IRI.someOtherPodWebId)).toBe(false);
   });
 
   test("it returns true when given the string 'user'", () => {
-    expect(isUserOrMatch("user", "anything")).toBe(true);
+    expect(isUserOrMatch(stringAsIri("user"), stringAsIri("anything"))).toBe(true);
   });
 });
 
@@ -508,7 +510,7 @@ describe("permissionsFromWacAllowHeaders", () => {
     const wacAllow = 'user="read write append control",public="read"';
     const [user, publicPerms] = permissionsFromWacAllowHeaders(wacAllow);
 
-    expect(user.webId).toEqual("user");
+    expect(user.webId).toEqual(stringAsIri("user"));
     expect(user.alias).toEqual("Full Control");
     expect(user.acl).toMatchObject({
       read: true,
@@ -518,7 +520,7 @@ describe("permissionsFromWacAllowHeaders", () => {
     });
     expect(user.profile.name).toEqual("user");
 
-    expect(publicPerms.webId).toEqual("public");
+    expect(publicPerms.webId).toEqual(stringAsIri("public"));
     expect(publicPerms.alias).toEqual("Can View");
     expect(publicPerms.acl).toMatchObject({
       read: true,
@@ -558,9 +560,10 @@ describe("fetchFileWithAcl", () => {
       },
     });
 
-    const { iri, permissions, types } = await fetchFileWithAcl("some iri");
+    const fileIri = stringAsIri("some iri");
+    const { iri, permissions, types } = await fetchFileWithAcl(fileIri);
 
-    expect(iri).toEqual("some iri");
+    expect(iri).toEqual(fileIri);
     expect(types).toContain("type");
     expect(permissions).toHaveLength(2);
   });
@@ -573,7 +576,7 @@ describe("fetchFileWithAcl", () => {
       },
     });
 
-    const { permissions } = await fetchFileWithAcl("some iri");
+    const { permissions } = await fetchFileWithAcl(stringAsIri("some iri"));
 
     expect(permissions).toHaveLength(0);
   });
@@ -584,7 +587,7 @@ describe("fetchFileWithAcl", () => {
       resourceInfo: {},
     });
 
-    const { types } = await fetchFileWithAcl("some iri");
+    const { types } = await fetchFileWithAcl(stringAsIri("some iri"));
 
     expect(types).toHaveLength(0);
   });
@@ -598,7 +601,7 @@ describe("fetchResource", () => {
 
     const normalizeDatasetFn = jest.fn().mockResolvedValue(null);
 
-    const expectedIri = "https://user.dev.inrupt.net/public/";
+    const expectedIri = stringAsIri("https://user.dev.inrupt.net/public/");
     await fetchResource(expectedIri, normalizeDatasetFn);
 
     expect(normalizeDatasetFn).toHaveBeenCalled();

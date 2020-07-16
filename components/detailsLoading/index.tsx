@@ -42,7 +42,7 @@ export default function DetailsLoading({ resource }: Props): ReactElement {
   return (
     <>
       <section className={classes.centeredSection}>
-        <h3 className={classes["content-h3"]} title={iri}>
+        <h3 className={classes["content-h3"]} title={iri.value}>
           {name}
         </h3>
       </section>

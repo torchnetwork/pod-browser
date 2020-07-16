@@ -850,7 +850,7 @@ font-display: block;",
     }
   >
     <PodLocationProvider
-      currentUri="https://www.mypodmanager.com"
+      currentUriAsString="https://www.mypodmanager.com"
     >
       <Breadcrumbs>
         <nav
@@ -1733,7 +1733,7 @@ font-display: block;",
     }
   >
     <PodLocationProvider
-      currentUri="https://www.mypodmanager.com/some/location"
+      currentUriAsString="https://www.mypodmanager.com/some/location"
     >
       <Breadcrumbs>
         <nav

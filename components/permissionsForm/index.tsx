@@ -25,6 +25,7 @@ import { PrismTheme } from "@solid/lit-prism-patterns";
 import { StyleRules } from "@material-ui/styles";
 import { AlertProps } from "@material-ui/lab/Alert";
 import {
+  Iri,
   unstable_Access,
   unstable_AclDataset,
   unstable_fetchLitDatasetWithAcl,
@@ -145,12 +146,12 @@ export function PermissionCheckbox({
 
 interface ISavePermissionHandler {
   access: unstable_Access;
-  iri: string;
+  iri: Iri;
   setMessage: React.Dispatch<React.SetStateAction<string>>;
   setSeverity: React.Dispatch<React.SetStateAction<AlertProps["severity"]>>;
   setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  webId: string;
+  webId: Iri;
 }
 
 export function savePermissionsHandler({
@@ -207,7 +208,7 @@ export function saveHandler({
 }
 
 interface IPermissionForm {
-  iri: string;
+  iri: Iri;
   permission: NormalizedPermission;
   warnOnSubmit: boolean;
 }

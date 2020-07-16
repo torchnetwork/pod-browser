@@ -44,17 +44,17 @@ export default function Breadcrumbs(): ReactElement {
     breadcrumbsList.current.scrollTo(breadcrumbsList.current.scrollWidth, 0);
   });
 
-  if (!podLocation.baseUri) return <Spinner />;
+  if (!podLocation.baseUriAsString) return <Spinner />;
 
-  const { baseUri, currentUri } = podLocation;
-  const crumbs = currentUri
-    .substr(baseUri.length)
+  const { baseUriAsString, currentUriAsString } = podLocation;
+  const crumbs = currentUriAsString
+    .substr(baseUriAsString.length)
     .split("/")
     .filter((crumb) => !!crumb);
 
   const resourceHref = (index = -1): string =>
     `/resource/${encodeURIComponent(
-      baseUri + crumbs.slice(0, index + 1).join("/")
+      baseUriAsString + crumbs.slice(0, index + 1).join("/")
     )}`;
 
   const breadcrumbLink = (crumb: string): ReactElement => (

@@ -44,7 +44,7 @@ const useStyles = makeStyles<PrismTheme>((theme) => {
 });
 
 interface IPodList {
-  iri: string;
+  iri: Iri;
 }
 
 export default function Container(props: IPodList): ReactElement {

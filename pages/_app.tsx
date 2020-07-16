@@ -49,6 +49,7 @@ import Notification from "../components/notification";
 
 import PodManagerHeader from "../components/header";
 import "./styles.css";
+import {stringAsIri} from "@solid/lit-pod";
 
 interface AppProps {
   Component: ComponentType;
@@ -79,7 +80,11 @@ export default function App(props: AppProps): ReactElement {
   }, []);
 
   useEffect(() => {
-    auth.trackSession(setSession).catch((e) => {
+    // PMCB55: Solid-Auth-Client has a 'Session' interface that defines the
+    // 'webId' property as a 'string', whereas ours defines it as type 'Iri' -
+    // so convert ours to align...
+    // auth.trackSession(setSession).catch((e) => {
+    auth.trackSession(() => session?.webId.value).catch((e) => {
       throw e;
     });
   }, []);
@@ -91,7 +96,12 @@ export default function App(props: AppProps): ReactElement {
     // Remove the server-side injected CSS.
     async function fetchSession(): Promise<void> {
       const sessionStorage = await auth.currentSession();
-      setSession(sessionStorage);
+      // PMCB55: Solid-Auth-Client has a 'Session' interface that defines the
+      // 'webId' property as a 'string', whereas ours defines it as type 'Iri' -
+      // so convert ours to align...
+      // setSession(sessionStorage);
+      setSession(sessionStorage ? { webId: stringAsIri(sessionStorage.webId) } : undefined);
+
       setIsLoadingSession(false);
     }
 

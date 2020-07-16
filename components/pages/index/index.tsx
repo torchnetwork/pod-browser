@@ -27,12 +27,13 @@ import UserContext from "../../../src/contexts/userContext";
 import { useRedirectIfLoggedOut } from "../../../src/effects/auth";
 import PodList from "../../podList";
 import { DetailsMenuProvider } from "../../../src/contexts/detailsMenuContext";
+import {stringAsIri} from "@solid/lit-pod";
 
 export default function Home(): ReactElement {
   useRedirectIfLoggedOut();
 
   const { session } = useContext(UserContext);
-  const { webId = "" } = session || {};
+  const { webId = stringAsIri("") } = session || {};
   const { data: podIris } = useFetchPodIrisFromWebId(webId);
 
   return (

@@ -3,7 +3,7 @@
 exports[`Index page Renders a logout button 1`] = `
 <WithStyles(ForwardRef(Container))>
   <PodLocationProvider
-    currentUri="https://mypod.myhost.com"
+    currentUriAsString="https://mypod.myhost.com"
   >
     <DetailsMenuProvider>
       <Container

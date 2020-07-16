@@ -25,25 +25,25 @@ import UserContext from "../userContext";
 import usePodRoot from "../../hooks/usePodRoot";
 
 interface PodLocation {
-  baseUri?: string | null;
-  currentUri: string;
+  baseUriAsString?: string | null;
+  currentUriAsString: string;
 }
 
 const PodLocationContext = createContext<PodLocation>({
-  currentUri: "",
+  currentUriAsString: "",
 });
 
 interface Props {
   children: ReactElement | ReactElement[] | undefined;
-  currentUri: string;
+  currentUriAsString: string;
 }
 
-function PodLocationProvider({ children, currentUri }: Props): ReactElement {
+function PodLocationProvider({ children, currentUriAsString }: Props): ReactElement {
   const { session } = useContext(UserContext);
   const profile = useAuthenticatedProfile(session);
-  const baseUri = usePodRoot(currentUri, profile);
+  const baseUriAsString = usePodRoot(currentUriAsString, profile);
   return (
-    <PodLocationContext.Provider value={{ baseUri, currentUri }}>
+    <PodLocationContext.Provider value={{ baseUriAsString, currentUriAsString }}>
       {children}
     </PodLocationContext.Provider>
   );

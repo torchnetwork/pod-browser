@@ -852,7 +852,9 @@ font-display: block;",
     <DetailsLoading
       resource={
         Object {
-          "iri": "iri",
+          "iri": NamedNode {
+            "value": "iri",
+          },
           "name": "name",
           "types": Array [
             "type",

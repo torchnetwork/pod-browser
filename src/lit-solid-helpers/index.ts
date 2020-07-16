@@ -30,7 +30,7 @@ import {
   getStringUnlocalizedOne,
   getThingOne, Iri, iriAsString,
   IriString,
-  LitDataset,
+  LitDataset, stringAsIri,
   Thing,
   unstable_Access,
   unstable_AgentAccess,
@@ -123,7 +123,7 @@ export async function fetchProfile(webId: Iri): Promise<Profile> {
 }
 
 export interface NormalizedPermission {
-  webId: string;
+  webId: Iri;
   alias: string;
   acl: unstable_Access;
   profile: Profile;
@@ -135,15 +135,19 @@ export async function normalizePermissions(
 ): Promise<NormalizedPermission[]> {
   return Promise.all(
     Object.keys(permissions).map(
-      async (webId: string): Promise<NormalizedPermission> => {
-        const acl = permissions[webId];
-        const profile = await fetchProfileFn(webId);
+      // PMCB55: Yes indeed, since we're using a Record<string, ...> here where
+      // the 'key' is actually a WebID (which, by definition, *MUST* be an
+      // IRI!), we need to treat WebID's as strings here (and then convert to
+      // proper IRIs when passing them on).
+      async (webIdAsString: string): Promise<NormalizedPermission> => {
+        const acl = permissions[webIdAsString];
+        const profile = await fetchProfileFn(stringAsIri(webIdAsString));
 
         return {
           acl,
           profile,
           alias: displayPermissions(acl),
-          webId,
+          webId: stringAsIri(webIdAsString),
         };
       }
     )
@@ -164,12 +168,11 @@ export function normalizeDataset(
   const size = getIntegerOne(dataset, POSIX.size);
   const contains = getIriAll(dataset, LDP.contains);
 
-  // PMCB55: We actually want the rdfs:label for this 'Type', if available -
-  // this needs the LIT Vocab Term registry...!?
+  // PMCB55: We actually want the rdfs:label for each 'Type', if available -
+  // for this we can just lookup the LIT Vocab Term registry...
   const termRegistry = new LitTermRegistry(getLocalStore());
   const types = rawType.map((iri) => {
     const result = termRegistry.lookupLabel(iriAsString(iri), "en");
-    console.log(result);
     return result === undefined ? iriAsString(iri) : result;
   });
 
@@ -212,10 +215,14 @@ export function permissionsFromWacAllowHeaders(
   wacAllow?: string
 ): NormalizedPermission[] {
   if (!wacAllow) return [];
+
   const permissions = wacAllow.split(",");
+
   return permissions.reduce(
     (acc: NormalizedPermission[], permission: string) => {
-      const [webId, stringAcl] = permission.split("=");
+      const [webIdAsString, stringAcl] = permission.split("=");
+      const webId = stringAsIri(webIdAsString);
+
       const acl = parseStringAcl(stringAcl);
       const alias = displayPermissions(acl);
 
@@ -225,7 +232,7 @@ export function permissionsFromWacAllowHeaders(
           webId,
           alias,
           acl,
-          profile: { webId, name: webId },
+          profile: { webId, name: iriAsString(webId) },
         },
       ];
     },
@@ -237,8 +244,8 @@ export interface NormalizedFile extends NormalizedResource {
   file: Blob;
 }
 
-export async function fetchFileWithAcl(iri: string): Promise<NormalizedFile> {
-  const file = await unstable_fetchFile(iri);
+export async function fetchFileWithAcl(iri: Iri): Promise<NormalizedFile> {
+  const file = await unstable_fetchFile(iriAsString(iri));
   const {
     resourceInfo: { unstable_permissions, contentType: type },
   } = file;
@@ -246,15 +253,15 @@ export async function fetchFileWithAcl(iri: string): Promise<NormalizedFile> {
   const permissions = unstable_permissions
     ? [
         {
-          webId: "user",
+          webId: stringAsIri("user"),
           alias: displayPermissions(unstable_permissions.user),
-          profile: { webId: "user" },
+          profile: { webId: stringAsIri("user") },
           acl: unstable_permissions?.user as unstable_Access,
         } as NormalizedPermission,
         {
-          webId: "public",
+          webId: stringAsIri("public"),
           alias: displayPermissions(unstable_permissions.public),
-          profile: { webId: "public" },
+          profile: { webId: stringAsIri("public") },
           acl: unstable_permissions?.public as unstable_Access,
         } as NormalizedPermission,
       ]
@@ -270,7 +277,7 @@ export async function fetchFileWithAcl(iri: string): Promise<NormalizedFile> {
 }
 
 export async function fetchResourceWithAcl(
-  iri: string,
+  iri: Iri,
   normalizePermissionsFn = normalizePermissions
 ): Promise<NormalizedResource> {
   const resource = await unstable_fetchLitDatasetWithAcl(iri);
@@ -286,7 +293,7 @@ export async function fetchResourceWithAcl(
 }
 
 export async function fetchResource(
-  iri: string,
+  iri: Iri,
   normalizeDatasetFn = normalizeDataset
 ): Promise<NormalizedResource> {
   const resource = await fetchLitDataset(iri);
@@ -296,12 +303,12 @@ export async function fetchResource(
   return normalizeDatasetFn(thing, iri);
 }
 
-export function isUserOrMatch(webId: string, id: string): boolean {
-  return webId === "user" || webId === id;
+export function isUserOrMatch(webId: Iri, id: Iri): boolean {
+  return webId.equals(stringAsIri("user")) || webId.equals(id);
 }
 
 export function getUserPermissions(
-  id: string,
+  id: Iri,
   permissions?: NormalizedPermission[]
 ): NormalizedPermission | null {
   if (!permissions) return null;
@@ -312,7 +319,7 @@ export function getUserPermissions(
 }
 
 export function getThirdPartyPermissions(
-  id: string,
+  id: Iri,
   permissions?: NormalizedPermission[]
 ): NormalizedPermission[] {
   if (!permissions) return [];

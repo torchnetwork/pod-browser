@@ -28,6 +28,7 @@ import { useFetchResourceWithAcl } from "../../src/hooks/litPod";
 import { NormalizedPermission } from "../../src/lit-solid-helpers";
 import * as stringHelpers from "../../src/stringHelpers";
 import ResourceDetails, * as resourceDetailFns from "./index";
+import {iriAsString, stringAsIri} from "@solid/lit-pod";
 
 const {
   displayName,
@@ -229,7 +230,7 @@ describe("Resource details", () => {
 describe("displayName", () => {
   const name = "Test Example";
   const nickname = "test_example";
-  const webId = "webId";
+  const webId = stringAsIri("webId");
 
   test("it returns the webId, if no name or nickname is defined", () => {
     expect(displayName({ webId })).toEqual("webId");
@@ -262,13 +263,13 @@ describe("Permission", () => {
 
   test("it renders permissions if given", () => {
     const classes = {};
-    const webId = "https://somepod.somehost.com/profile#me";
+    const webId = stringAsIri("https://somepod.somehost.com/profile#me");
     const permission = {
       webId,
       alias: "Full Control",
       profile: {
         webId,
-        avatar: "https://somepod.somehost.com/public/photo.jpg",
+        avatar: stringAsIri("https://somepod.somehost.com/public/photo.jpg"),
       },
       acl: {
         read: true,
@@ -280,7 +281,7 @@ describe("Permission", () => {
 
     const tree = shallow(
       <Permission
-        iri="iri"
+        iri={stringAsIri("iri")}
         warnOnSubmit={false}
         classes={classes}
         permission={permission}
@@ -307,7 +308,7 @@ describe("ThirdPartyPermissions", () => {
   test("it returns a useful message if there are no third party permissions", () => {
     const tree = shallow(
       <ThirdPartyPermissions
-        iri="iri"
+        iri={stringAsIri("iri")}
         classes={{}}
         thirdPartyPermissions={[]}
       />
@@ -320,7 +321,7 @@ describe("ThirdPartyPermissions", () => {
     const classes = {};
     const permissions = [
       {
-        webId: "owner",
+        webId: stringAsIri("owner"),
         alias: "Full Control",
         acl: {
           append: true,
@@ -329,13 +330,13 @@ describe("ThirdPartyPermissions", () => {
           write: true,
         },
         profile: {
-          avatar: "http://example.com/avatar.png",
+          avatar: stringAsIri("http://example.com/avatar.png"),
           nickname: "owner",
           name: "Test Person",
         },
       } as NormalizedPermission,
       {
-        webId: "collaborator",
+        webId: stringAsIri("collaborator"),
         alias: "Can View",
         acl: {
           append: false,
@@ -353,7 +354,7 @@ describe("ThirdPartyPermissions", () => {
 
     const tree = shallow(
       <ThirdPartyPermissions
-        iri="iri"
+        iri={stringAsIri("iri")}
         classes={classes}
         thirdPartyPermissions={permissions}
       />
@@ -415,7 +416,7 @@ describe("forceDownload", () => {
 
 describe("downloadResource", () => {
   test("it returns a handler to download the resource", () => {
-    const iri = "http://example.com/resource";
+    const iri = stringAsIri("http://example.com/resource");
     const handler = downloadResource(iri);
     const blobMock = jest.fn();
     const responseMock = { blob: blobMock };
@@ -431,21 +432,21 @@ describe("downloadResource", () => {
 
     handler();
 
-    expect(fetchMock).toHaveBeenCalledWith(iri);
+    expect(fetchMock).toHaveBeenCalledWith(iriAsString(iri));
   });
 });
 
 describe("DownloadLink", () => {
   test("returns null if resource is a container", () => {
     const type = "container";
-    const iri = "http://example.com/resource";
+    const iri = stringAsIri("http://example.com/resource");
     const tree = shallow(<DownloadLink type={type} iri={iri} />);
     expect(shallowToJson(tree)).toMatchSnapshot();
   });
 
   test("returns a download button if resource is not a container", () => {
     const type = "foo";
-    const iri = "http://example.com/resource";
+    const iri = stringAsIri("http://example.com/resource");
     const tree = shallow(<DownloadLink type={type} iri={iri} />);
     expect(shallowToJson(tree)).toMatchSnapshot();
   });

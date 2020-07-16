@@ -20,9 +20,10 @@
  */
 
 import { createContext } from "react";
+import { Iri } from "@solid/lit-pod";
 
 export interface ISession {
-  webId: string;
+  webId: Iri;
 }
 
 export interface UserContext {

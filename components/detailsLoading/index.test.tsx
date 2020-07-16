@@ -21,10 +21,11 @@
 
 import DetailsLoading from "./index";
 import { mountToJson } from "../../__testUtils/mountWithTheme";
+import {stringAsIri} from "@solid/lit-pod";
 
 describe("DetailsLoading", () => {
   test("Renders a details error view", () => {
-    const resource = { iri: "iri", name: "name", types: ["type"] };
+    const resource = { iri: stringAsIri("iri"), name: "name", types: ["type"] };
     const tree = mountToJson(<DetailsLoading resource={resource} />);
 
     expect(tree).toMatchSnapshot();

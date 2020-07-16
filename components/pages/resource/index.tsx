@@ -35,7 +35,7 @@ export default function Resource(): ReactElement {
 
   return (
     <Container>
-      <PodLocationProvider currentUri={decodedIri}>
+      <PodLocationProvider currentUriAsString={decodedIri}>
         <DetailsMenuProvider>
           <ContainerView iri={decodedIri} />
         </DetailsMenuProvider>

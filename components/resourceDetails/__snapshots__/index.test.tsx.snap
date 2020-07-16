@@ -23,7 +23,11 @@ exports[`Permission it renders permissions if given 1`] = `
     https://somepod.somehost.com/profile#me
   </WithStyles(ForwardRef(Typography))>
   <PermissionsForm
-    iri="iri"
+    iri={
+      NamedNode {
+        "value": "iri",
+      }
+    }
     permission={
       Object {
         "acl": Object {
@@ -34,10 +38,16 @@ exports[`Permission it renders permissions if given 1`] = `
         },
         "alias": "Full Control",
         "profile": Object {
-          "avatar": "https://somepod.somehost.com/public/photo.jpg",
-          "webId": "https://somepod.somehost.com/profile#me",
+          "avatar": NamedNode {
+            "value": "https://somepod.somehost.com/public/photo.jpg",
+          },
+          "webId": NamedNode {
+            "value": "https://somepod.somehost.com/profile#me",
+          },
         },
-        "webId": "https://somepod.somehost.com/profile#me",
+        "webId": NamedNode {
+          "value": "https://somepod.somehost.com/profile#me",
+        },
       }
     }
     warnOnSubmit={false}
@@ -921,7 +931,6 @@ font-display: block;",
         >
           <h3
             className="makeStyles-content-h3-30"
-            title="iri"
           >
             Resource Name
           </h3>
@@ -2231,7 +2240,6 @@ font-display: block;",
         >
           <h3
             className="makeStyles-content-h3-30"
-            title="iri"
           >
             Resource Name
           </h3>
@@ -3540,7 +3548,6 @@ font-display: block;",
         >
           <h3
             className="makeStyles-content-h3-30"
-            title="iri"
           />
         </section>
         <section
@@ -4848,7 +4855,6 @@ font-display: block;",
         >
           <h3
             className="makeStyles-content-h3-30"
-            title="iri"
           >
             Resource Name
           </h3>
@@ -6158,7 +6164,6 @@ font-display: block;",
         >
           <h3
             className="makeStyles-content-h3-30"
-            title="iri"
           >
             Resource Name
           </h3>
@@ -7461,7 +7466,6 @@ font-display: block;",
         >
           <h3
             className="makeStyles-content-h3-30"
-            title="iri"
           >
             Resource Name
           </h3>
@@ -7905,7 +7909,11 @@ exports[`ThirdPartyPermissions it renders permissions if given 1`] = `
   <WithStyles(ForwardRef(List))>
     <Permission
       classes={Object {}}
-      iri="iri"
+      iri={
+        NamedNode {
+          "value": "iri",
+        }
+      }
       key="owner"
       permission={
         Object {
@@ -7917,18 +7925,26 @@ exports[`ThirdPartyPermissions it renders permissions if given 1`] = `
           },
           "alias": "Full Control",
           "profile": Object {
-            "avatar": "http://example.com/avatar.png",
+            "avatar": NamedNode {
+              "value": "http://example.com/avatar.png",
+            },
             "name": "Test Person",
             "nickname": "owner",
           },
-          "webId": "owner",
+          "webId": NamedNode {
+            "value": "owner",
+          },
         }
       }
       warnOnSubmit={false}
     />
     <Permission
       classes={Object {}}
-      iri="iri"
+      iri={
+        NamedNode {
+          "value": "iri",
+        }
+      }
       key="collaborator"
       permission={
         Object {
@@ -7944,7 +7960,9 @@ exports[`ThirdPartyPermissions it renders permissions if given 1`] = `
             "name": "Test Collaborator",
             "nickname": "collaborator",
           },
-          "webId": "collaborator",
+          "webId": NamedNode {
+            "value": "collaborator",
+          },
         }
       }
       warnOnSubmit={false}

@@ -27,6 +27,7 @@ import { ResourceDetails } from "../../src/lit-solid-helpers";
 import { useFetchResourceDetails } from "../../src/hooks/litPod";
 
 import ContainerTableRow, { handleTableRowClick, resourceHref } from "./index";
+import {namedNode} from "@rdfjs/data-model";
 
 jest.mock("@solid/lit-pod");
 jest.mock("../../src/hooks/litPod");
@@ -34,7 +35,7 @@ jest.mock("../../src/hooks/litPod");
 describe("ContainerTableRow", () => {
   test("it renders a table row", () => {
     const resource = {
-      iri: "https://example.com/example.ttl",
+      iri: namedNode("https://example.com/example.ttl"),
       name: "/example.ttl",
       types: [],
     };
@@ -54,7 +55,7 @@ describe("ContainerTableRow", () => {
 
   test("it renders a table row with loaded data", () => {
     const resource = {
-      iri: "https://example.com/example.ttl",
+      iri: namedNode("https://example.com/example.ttl"),
       name: "/example.ttl",
       types: ["some-type"],
     };
@@ -74,7 +75,7 @@ describe("ContainerTableRow", () => {
 
   test("it renders a table row with loaded data without a type", () => {
     const resource = {
-      iri: "https://example.com/example.ttl",
+      iri: namedNode("https://example.com/example.ttl"),
       name: "/example.ttl",
       types: [],
     };
@@ -95,7 +96,7 @@ describe("ContainerTableRow", () => {
 
 describe("resourceHref", () => {
   test("it generates a resource link", () => {
-    const link = resourceHref("https://example.com/example.ttl");
+    const link = resourceHref(namedNode("https://example.com/example.ttl"));
     expect(link).toEqual("/resource/https%3A%2F%2Fexample.com%2Fexample.ttl");
   });
 });

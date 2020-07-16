@@ -21,9 +21,10 @@
 
 import { useEffect, useState } from "react";
 import { Profile } from "../../lit-solid-helpers";
+import { iriAsString } from "@solid/lit-pod";
 
-function normalizeBaseUri(baseUri: string): string {
-  return baseUri[baseUri.length - 1] === "/" ? baseUri : `${baseUri}/`;
+function normalizeBaseUri(baseUriAsString: string): string {
+  return baseUriAsString[baseUriAsString.length - 1] === "/" ? baseUriAsString : `${baseUriAsString}/`;
 }
 
 export default function usePodRoot(
@@ -35,15 +36,19 @@ export default function usePodRoot(
     if (location === "undefined") {
       return;
     }
-    const profilePod = (profile ? profile.pods || [] : []).find((pod) =>
-      location.startsWith(pod)
+
+    const profilePodIri = (profile ? profile.pods || [] : []).find((pod) =>
+      location.startsWith(iriAsString(pod))
     );
-    if (profilePod) {
-      setRootUri(normalizeBaseUri(profilePod));
+
+    if (profilePodIri) {
+      setRootUri(normalizeBaseUri(iriAsString(profilePodIri)));
       return;
     }
+
     const { origin } = new URL(location);
     setRootUri(normalizeBaseUri(origin));
   }, [location, profile]);
+
   return rootUri;
 }

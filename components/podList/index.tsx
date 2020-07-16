@@ -32,9 +32,10 @@ import DetailsContextMenu from "../detailsContextMenu";
 import { resourceHref } from "../containerTableRow";
 import Container from "../container";
 import { PodLocationProvider } from "../../src/contexts/podLocationContext";
+import {Iri} from "@solid/lit-pod";
 
 interface IPodList {
-  podIris: string[] | undefined;
+  podIris: Iri[] | undefined;
 }
 
 export default function PodList(props: IPodList): ReactElement | null {
@@ -49,8 +50,8 @@ export default function PodList(props: IPodList): ReactElement | null {
 
   if (podIris.length === 1) {
     return (
-      <PodLocationProvider currentUri={podIris[0]}>
-        <Container iri={podIris[0]} />
+      <PodLocationProvider currentUriAsString={podIris[0].value}>
+        <Container iri={podIris[0].value} />
       </PodLocationProvider>
     );
   }
@@ -65,11 +66,11 @@ export default function PodList(props: IPodList): ReactElement | null {
         </TableHead>
 
         <TableBody>
-          {podIris.map((iri: string) => (
+          {podIris.map((iri: Iri) => (
             <TableRow>
               <TableCell>
                 <Link href={resourceHref(iri)}>
-                  <a>{iri}</a>
+                  <a>{iri.value}</a>
                 </Link>
               </TableCell>
             </TableRow>

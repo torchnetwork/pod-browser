@@ -1,12 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Pod list Renders a container if there is one pod iri 1`] = `
-<PodLocationProvider
-  currentUri="https://mypod.myhost.com"
->
-  <Container
-    iri="https://mypod.myhost.com"
-  />
+<PodLocationProvider>
+  <Container />
 </PodLocationProvider>
 `;
 
@@ -24,22 +20,18 @@ exports[`Pod list Renders a table if there are multiple pod iris 1`] = `
       <WithStyles(ForwardRef(TableRow))>
         <WithStyles(ForwardRef(TableCell))>
           <Link
-            href="/resource/https%3A%2F%2Fmypod.myhost.com"
+            href="/resource/undefined"
           >
-            <a>
-              https://mypod.myhost.com
-            </a>
+            <a />
           </Link>
         </WithStyles(ForwardRef(TableCell))>
       </WithStyles(ForwardRef(TableRow))>
       <WithStyles(ForwardRef(TableRow))>
         <WithStyles(ForwardRef(TableCell))>
           <Link
-            href="/resource/https%3A%2F%2Fmyotherpod.myotherhost.com"
+            href="/resource/undefined"
           >
-            <a>
-              https://myotherpod.myotherhost.com
-            </a>
+            <a />
           </Link>
         </WithStyles(ForwardRef(TableCell))>
       </WithStyles(ForwardRef(TableRow))>

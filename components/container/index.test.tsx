@@ -22,11 +22,12 @@
 import { mountToJson } from "../../__testUtils/mountWithTheme";
 import * as litPodHooks from "../../src/hooks/litPod";
 import Container from "./index";
+import {stringAsIri} from "@solid/lit-pod";
 
 jest.mock("solid-auth-client");
 jest.mock("../../src/hooks/litPod");
 
-const iri = "https://mypod.myhost.com/public";
+const iri = stringAsIri("https://mypod.myhost.com/public");
 
 describe("Container view", () => {
   test("Renders a spinner if data is loading", () => {
@@ -34,7 +35,7 @@ describe("Container view", () => {
       data: undefined,
     });
 
-    const tree = mountToJson(<Container iri={iri} />);
+    const tree = mountToJson(<Container iri={iri.value} />);
     expect(tree).toMatchSnapshot();
   });
 
@@ -43,15 +44,15 @@ describe("Container view", () => {
       data: [],
     });
 
-    const tree = mountToJson(<Container iri={iri} />);
+    const tree = mountToJson(<Container iri={iri.value} />);
     expect(tree).toMatchSnapshot();
   });
 
   test("Renders a table with data", () => {
     const resources = [
-      "https://myaccount.mypodserver.com/inbox",
-      "https://myaccount.mypodserver.com/private",
-      "https://myaccount.mypodserver.com/note.txt",
+      stringAsIri("https://myaccount.mypodserver.com/inbox"),
+      stringAsIri("https://myaccount.mypodserver.com/private"),
+      stringAsIri("https://myaccount.mypodserver.com/note.txt"),
     ];
 
     (litPodHooks.useFetchContainerResourceIris as jest.Mock).mockReturnValue({
@@ -62,7 +63,7 @@ describe("Container view", () => {
       data: undefined,
     });
 
-    const tree = mountToJson(<Container iri={iri} />);
+    const tree = mountToJson(<Container iri={iri.value} />);
 
     expect(tree).toMatchSnapshot();
   });

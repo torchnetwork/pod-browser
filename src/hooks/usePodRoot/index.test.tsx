@@ -22,12 +22,14 @@
 import { renderHook } from "@testing-library/react-hooks";
 import usePodRoot from "./index";
 import { Profile } from "../../lit-solid-helpers";
+import {stringAsIri} from "@solid/lit-pod";
 
 const location = "https://foo.com/bar/baz";
 const locationWithNoEndingSlash = "https://bar.com";
+
 const profile: Profile = {
-  webId: "webId",
-  pods: ["https://foo.com/bar/", locationWithNoEndingSlash],
+  webId: stringAsIri("webId"),
+  pods: [stringAsIri("https://foo.com/bar/"), locationWithNoEndingSlash],
 };
 
 describe("usePodRoot", () => {
@@ -50,7 +52,9 @@ describe("usePodRoot", () => {
 
   test("it will use storage URI in profile if it matches location", () => {
     const { result } = renderHook(() => usePodRoot(location, profile));
-    expect(result.current).toEqual("https://foo.com/bar/");
+    const x = result.current;
+
+    expect(x).toEqual("https://foo.com/bar/");
   });
 
   test("it makes sure baseUri ends with slash", () => {

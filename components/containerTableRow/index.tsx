@@ -34,9 +34,10 @@ import DetailsMenuContext from "../../src/contexts/detailsMenuContext";
 import { ResourceDetails } from "../../src/lit-solid-helpers";
 
 import styles from "./styles";
+import {Iri} from "@solid/lit-pod";
 
-export function resourceHref(iri: string): string {
-  return `/resource/${encodeURIComponent(iri)}`;
+export function resourceHref(iri: Iri): string {
+  return `/resource/${encodeURIComponent(iri.value)}`;
 }
 
 interface TableRowClickHandlerParams {
@@ -123,11 +124,11 @@ export default function ContainerTableRow({ resource }: Props): ReactElement {
       </td>
 
       {isLoading ? (
-        <td key={`${iri}-type`} className={bem("table__body-cell")}>
+        <td key={`${iri.value}-type`} className={bem("table__body-cell")}>
           <Skeleton variant="text" width={100} />
         </td>
       ) : (
-        <td key={`${iri}-type`} className={bem("table__body-cell")}>
+        <td key={`${iri.value}-type`} className={bem("table__body-cell")}>
           {types[0] || "Resource"}
         </td>
       )}

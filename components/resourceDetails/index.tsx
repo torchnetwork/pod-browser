@@ -43,15 +43,16 @@ import {
   NormalizedResource,
   Profile,
 } from "../../src/lit-solid-helpers";
+import {Iri, iriAsString} from "@solid/lit-pod";
 
 export function displayName({ nickname, name, webId }: Profile): string {
   if (name) return name;
   if (nickname) return nickname;
-  return webId;
+  return iriAsString(webId);
 }
 
 export interface IPermission {
-  iri: string;
+  iri: Iri;
   permission: NormalizedPermission | null;
   classes: Record<string, string>;
   warnOnSubmit: boolean;
@@ -66,11 +67,13 @@ export function Permission(props: IPermission): ReactElement | null {
   const avatarSrc = avatar || undefined;
 
   return (
-    <ListItem key={webId} className={classes.listItem}>
+    // PMCB55: Not sure about 'webId.value' here - I don't think we can make the
+    // 'key' an actual IRI 'cos 'ListItem' is extending a React.ElementType...
+    <ListItem key={webId.value} className={classes.listItem}>
       <Avatar
         className={classes.avatar}
         alt={displayName(profile)}
-        src={avatarSrc}
+        src={avatarSrc?.value}
       />
       <Typography className={classes.detailText}>
         {displayName(profile)}
@@ -86,7 +89,7 @@ export function Permission(props: IPermission): ReactElement | null {
 }
 
 interface IThirdPartyPermissions {
-  iri: string;
+  iri: Iri;
   thirdPartyPermissions: NormalizedPermission[] | null;
   classes: Record<string, string>;
 }
@@ -122,7 +125,7 @@ export function ThirdPartyPermissions(
             iri={iri}
             permission={permission}
             classes={classes}
-            key={permission.webId}
+            key={permission.webId.value}
             warnOnSubmit={false}
           />
         ))}
@@ -151,12 +154,12 @@ export function forceDownload(name: string, file: Blob): void {
   document.body.removeChild(a);
 }
 
-export function downloadResource(iri: string) {
+export function downloadResource(iri: Iri) {
   return (): void => {
     const { pathname } = parseUrl(iri);
     const name = pathname.replace(/\//g, "");
 
-    fetch(iri)
+    fetch(iriAsString(iri))
       .then((response) => response.blob())
       .then((file) => forceDownload(name, file))
       .catch((e) => e);
@@ -165,7 +168,7 @@ export function downloadResource(iri: string) {
 
 interface IDownloadLink {
   type: string;
-  iri: string;
+  iri: Iri;
 }
 
 export function DownloadLink(props: IDownloadLink): ReactElement | null {
@@ -185,7 +188,7 @@ const useStyles = makeStyles<PrismTheme>((theme) =>
 
 export interface Props extends NormalizedResource {
   name?: string;
-  iri: string;
+  iri: Iri;
 }
 
 export default function ResourceDetails({
@@ -210,7 +213,7 @@ export default function ResourceDetails({
   return (
     <>
       <section className={classes.centeredSection}>
-        <h3 className={classes["content-h3"]} title={iri}>
+        <h3 className={classes["content-h3"]} title={iri.value}>
           {name}
         </h3>
       </section>

@@ -29,7 +29,7 @@ import {
   unstable_Access,
   unstable_fetchResourceInfoWithAcl,
   unstable_getAgentAccessAll,
-  isContainer, Iri,
+  isContainer, Iri, stringAsIri,
 } from "@solid/lit-pod";
 import { LDP } from "@solid/lit-vocab-common";
 import { WS } from "@solid/lit-vocab-solid";
@@ -49,9 +49,9 @@ export async function fetchContainerResourceIris(
   return iris;
 }
 
-export const GET_CONTAINER_RESOURCE_IRIS = "getContainerResourceIris";
-export function useFetchContainerResourceIris(iri: string): any {
-  return useSWR<string[]>(
+export const GET_CONTAINER_RESOURCE_IRIS = stringAsIri("getContainerResourceIris");
+export function useFetchContainerResourceIris(iri: Iri): any {
+  return useSWR<Iri[]>(
     [iri, GET_CONTAINER_RESOURCE_IRIS],
     fetchContainerResourceIris
   );
@@ -81,14 +81,14 @@ export async function fetchResourceDetails(
   };
 }
 
-export const FETCH_RESOURCE_DETAILS = "fetchResourceDetails";
-export function useFetchResourceDetails(iri: string): any {
+export const FETCH_RESOURCE_DETAILS = stringAsIri("fetchResourceDetails");
+export function useFetchResourceDetails(iri: Iri): any {
   return useSWR([iri, FETCH_RESOURCE_DETAILS], fetchResourceDetails);
 }
 
-export const FETCH_RESOURCE_WITH_ACL = "fetchResourceWithAcl";
-export function useFetchResourceWithAcl(iri: string): any {
-  return useSWR([iri, "fetchResourceWithAcl"], fetchResourceWithAcl);
+export const FETCH_RESOURCE_WITH_ACL = stringAsIri("fetchResourceWithAcl");
+export function useFetchResourceWithAcl(iri: Iri): any {
+  return useSWR([iri, stringAsIri("fetchResourceWithAcl")], fetchResourceWithAcl);
 }
 
 export async function fetchPodIrisFromWebId(webId: Iri): Promise<Iri[]> {
@@ -97,7 +97,7 @@ export async function fetchPodIrisFromWebId(webId: Iri): Promise<Iri[]> {
 
   return getIriAll(profile, WS.storage);
 }
-export const FETCH_POD_IRIS_FROM_WEB_ID = "fetchPodIrisFromWebId";
-export function useFetchPodIrisFromWebId(webId: string): any {
+export const FETCH_POD_IRIS_FROM_WEB_ID = stringAsIri("fetchPodIrisFromWebId");
+export function useFetchPodIrisFromWebId(webId: Iri): any {
   return useSWR([webId, FETCH_POD_IRIS_FROM_WEB_ID], fetchPodIrisFromWebId);
 }
