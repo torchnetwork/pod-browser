@@ -20,23 +20,23 @@
  */
 
 /* eslint-disable camelcase */
-import { ldp, space } from "rdf-namespaces";
 import * as litSolidFns from "@solid/lit-pod";
 import * as litSolidHelpers from "./index";
 
+import { arrayContainsIri, Iri, stringAsIri } from "@solid/lit-pod";
+import { RDF, DCTERMS, FOAF, VCARD, LDP } from "@solid/lit-vocab-common";
+import { WS } from "@solid/lit-vocab-solid";
+
 const {
   displayPermissions,
-  displayTypes,
   fetchFileWithAcl,
   fetchProfile,
   fetchResource,
   fetchResourceWithAcl,
   getIriPath,
   getThirdPartyPermissions,
-  getTypeName,
   getUserPermissions,
   isUserOrMatch,
-  namespace,
   normalizeDataset,
   normalizePermissions,
   parseStringAcl,
@@ -56,91 +56,80 @@ const {
 const timestamp = new Date(Date.UTC(2020, 5, 2, 15, 59, 21));
 
 function createResource(
-  iri: string,
-  type = "http://www.w3.org/ns/ldp#BasicContainer"
+  iri: Iri,
+  type: Iri = LDP.BasicContainer
 ): litSolidFns.LitDataset {
-  let publicContainer = createThing({ iri });
+  let publicContainer = createThing({ url: iri });
+
+  publicContainer = addIri(publicContainer, RDF.type, type);
+
+  publicContainer = addIri(publicContainer, RDF.type, LDP.Container);
+
+  publicContainer = setDatetime(publicContainer, DCTERMS.modified, timestamp);
 
   publicContainer = addIri(
     publicContainer,
-    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-    type
-  );
-
-  publicContainer = addIri(
-    publicContainer,
-    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-    "http://www.w3.org/ns/ldp#Container"
-  );
-
-  publicContainer = setDatetime(
-    publicContainer,
-    "http://purl.org/dc/terms/modified",
-    timestamp
-  );
-
-  publicContainer = addIri(
-    publicContainer,
-    "http://www.w3.org/ns/ldp#contains",
-    "https://user.dev.inrupt.net/public/games/"
+    LDP.contains,
+    stringAsIri("https://user.dev.inrupt.net/public/games/")
   );
 
   publicContainer = setDecimal(
     publicContainer,
-    "http://www.w3.org/ns/posix/stat#mtime",
+    stringAsIri("http://www.w3.org/ns/posix/stat#mtime"),
     1591131561.195
   );
 
   publicContainer = setInteger(
     publicContainer,
-    "http://www.w3.org/ns/posix/stat#size",
+    stringAsIri("http://www.w3.org/ns/posix/stat#size"),
     4096
   );
 
   return setThing(createLitDataset(), publicContainer);
 }
 
-describe("namespace", () => {
-  test("it reflects all the keys and values", () => {
-    Object.keys(namespace).forEach((key) => {
-      const value = namespace[key];
-      expect(value).not.toBeUndefined();
-      expect(namespace[value]).toEqual(key);
-    });
-  });
-
-  test("it contains all the definitions in ldp", () => {
-    const ldpWithType: Record<string, string> = ldp;
-    Object.keys(ldpWithType).forEach((key) => {
-      const value = namespace[key];
-      const expectedValue = ldpWithType[key];
-
-      expect(value).toEqual(expectedValue);
-    });
-  });
-});
-
-describe("getTypeName", () => {
-  test("it returns the type display name", () => {
-    const ldpWithType: Record<string, string> = ldp;
-
-    Object.keys(ldpWithType).forEach((key: string): void => {
-      expect(getTypeName(ldpWithType[key])).toEqual(key);
-    });
-  });
-
-  test("it returns the raw type when given an invalid type", () => {
-    expect(getTypeName("invalid")).toEqual("invalid");
-  });
-
-  test("it returns an empty string if given a falsey value", () => {
-    expect(getTypeName(undefined)).toEqual("");
-  });
-});
+// PMCB55: No need for this, as we use vocab terms now.
+// describe("namespace", () => {
+//   test("it reflects all the keys and values", () => {
+//     Object.keys(namespace).forEach((key) => {
+//       const value = namespace[key];
+//       expect(value).not.toBeUndefined();
+//       expect(namespace[value]).toEqual(key);
+//     });
+//   });
+//
+//   test("it contains all the definitions in ldp", () => {
+//     const ldpWithType: Record<string, string> = ldp;
+//     Object.keys(ldpWithType).forEach((key) => {
+//       const value = namespace[key];
+//       const expectedValue = ldpWithType[key];
+//
+//       expect(value).toEqual(expectedValue);
+//     });
+//   });
+// });
+//
+// describe("getTypeName", () => {
+//   test("it returns the type display name", () => {
+//     const ldpWithType: Record<string, string> = ldp;
+//
+//     Object.keys(ldpWithType).forEach((key: string): void => {
+//       expect(getTypeName(ldpWithType[key])).toEqual(key);
+//     });
+//   });
+//
+//   test("it returns the raw type when given an invalid type", () => {
+//     expect(getTypeName("invalid")).toEqual("invalid");
+//   });
+//
+//   test("it returns an empty string if given a falsey value", () => {
+//     expect(getTypeName(undefined)).toEqual("");
+//   });
+// });
 
 describe("normalizeDataset", () => {
   test("it returns a normalized dataset", () => {
-    const containerIri = "https://user.dev.inrupt.net/public/";
+    const containerIri = stringAsIri("https://user.dev.inrupt.net/public/");
     const litDataset = createResource(containerIri);
     const { iri, types, mtime, modified, size, contains } = normalizeDataset(
       litDataset,
@@ -152,14 +141,19 @@ describe("normalizeDataset", () => {
     expect(mtime).toEqual(1591131561.195);
     expect(modified).toEqual(new Date(Date.UTC(2020, 5, 2, 15, 59, 21)));
     expect(size).toEqual(4096);
-    expect(contains).toContain("https://user.dev.inrupt.net/public/games/");
+    expect(
+      arrayContainsIri(
+        contains,
+        stringAsIri("https://user.dev.inrupt.net/public/games/")
+      )
+    ).toBeTruthy();
   });
 
   test("it uses full type if no human-friendly name found", () => {
-    const containerIri = "https://user.dev.inrupt.net/public/";
+    const containerIri = stringAsIri("https://user.dev.inrupt.net/public/");
     const litDataset = createResource(
       containerIri,
-      "http://www.w3.org/ns/ldp#UnknownType"
+      stringAsIri("http://www.w3.org/ns/ldp#UnknownType")
     );
     const { types } = normalizeDataset(litDataset, containerIri);
 
@@ -168,22 +162,26 @@ describe("normalizeDataset", () => {
   });
 });
 
-describe("displayTypes", () => {
-  test("it returns a list of the human-friendly type names", () => {
-    const types = displayTypes([
-      "http://www.w3.org/ns/ldp#BasicContainer",
-      "http://www.w3.org/ns/ldp#Container",
-    ]);
-
-    expect(types).toContain("BasicContainer");
-    expect(types).toContain("Container");
-  });
-
-  test("it returns an empty Array if types are empty", () => {
-    const types = displayTypes([]);
-    expect(types).toHaveLength(0);
-  });
-});
+// PMCB55: No need for this, as we get from vocab term labels now.
+// describe("displayTypes", () => {
+//   test("it returns a list of the human-friendly type names", () => {
+//     // PMCB55: It seems this code is really just looking for rdfs:labels or
+//     // rdfs:comments for the LDP terms - something we get via Vocab Terms that
+//     // in turn comes for the LDP vocabulary itself...
+//     const types = displayTypes([
+//       "http://www.w3.org/ns/ldp#BasicContainer",
+//       "http://www.w3.org/ns/ldp#Container",
+//     ]);
+//
+//     expect(types).toContain("BasicContainer");
+//     expect(types).toContain("Container");
+//   });
+//
+//   test("it returns an empty Array if types are empty", () => {
+//     const types = displayTypes([]);
+//     expect(types).toHaveLength(0);
+//   });
+// });
 
 describe("displayPermissions", () => {
   test("it returns 'Full Control' when all options are true", () => {
@@ -277,9 +275,11 @@ describe("normalizePermissions", () => {
 
 describe("getIriPath", () => {
   test("it extracts the pathname from the iri", () => {
-    const path1 = getIriPath("https://user.dev.inrupt.net/public/");
+    const path1 = getIriPath(
+      stringAsIri("https://user.dev.inrupt.net/public/")
+    );
     const path2 = getIriPath(
-      "https://user.dev.inrupt.net/public/games/tictactoe/data.ttl"
+      stringAsIri("https://user.dev.inrupt.net/public/games/tictactoe/data.ttl")
     );
 
     expect(path1).toEqual("/public");
@@ -347,8 +347,9 @@ describe("fetchResourceWithAcl", () => {
     expect(modified).toEqual(timestamp);
     expect(mtime).toEqual(1591131561.195);
     expect(size).toEqual(4096);
-    expect(types).toContain("Container");
+
     expect(types).toContain("BasicContainer");
+    expect(types).toContain("Container");
 
     expect(ownerPerms.webId).toEqual("owner");
     expect(ownerPerms.alias).toEqual("Full Control");
@@ -621,7 +622,7 @@ describe("fetchResource", () => {
       });
 
     const { permissions, acl } = await fetchResourceWithAcl(
-      "https://user.dev.inrupt.net/public/"
+      stringAsIri("https://user.dev.inrupt.net/public/")
     );
 
     expect(permissions).toBeUndefined();
@@ -631,7 +632,9 @@ describe("fetchResource", () => {
 
 describe("fetchProfile", () => {
   it("fetches a profile and its information", async () => {
-    const profileWebId = "https://mypod.myhost.com/profile/card#me";
+    const profileWebId = stringAsIri(
+      "https://mypod.myhost.com/profile/card#me"
+    );
     const profileDataset = {};
 
     jest
@@ -642,38 +645,34 @@ describe("fetchProfile", () => {
 
     jest
       .spyOn(litSolidFns, "getStringUnlocalizedOne")
-      .mockImplementationOnce(async () => Promise.resolve());
+      .mockImplementationOnce(() => null);
 
     jest
       .spyOn(litSolidFns, "getStringUnlocalizedOne")
-      .mockImplementationOnce(async () => Promise.resolve());
+      .mockImplementationOnce(() => null);
 
-    jest
-      .spyOn(litSolidFns, "getIriOne")
-      .mockImplementationOnce(async () => Promise.resolve());
+    jest.spyOn(litSolidFns, "getIriOne").mockImplementationOnce(() => null);
 
-    jest
-      .spyOn(litSolidFns, "getIriAll")
-      .mockImplementationOnce(async () => Promise.resolve());
+    jest.spyOn(litSolidFns, "getIriAll").mockImplementationOnce(() => null);
 
     const profile = await fetchProfile(profileWebId);
 
     expect(litSolidFns.fetchLitDataset).toHaveBeenCalledWith(profileWebId);
     expect(litSolidFns.getStringUnlocalizedOne).toHaveBeenCalledWith(
       profileDataset,
-      namespace.nickname
+      FOAF.nick
     );
     expect(litSolidFns.getStringUnlocalizedOne).toHaveBeenCalledWith(
       profileDataset,
-      namespace.name
+      FOAF.name
     );
     expect(litSolidFns.getIriOne).toHaveBeenCalledWith(
       profileDataset,
-      namespace.hasPhoto
+      VCARD.hasPhoto
     );
     expect(litSolidFns.getIriAll).toHaveBeenCalledWith(
       profileDataset,
-      space.storage
+      WS.storage
     );
     expect(Object.keys(profile)).toEqual([
       "webId",

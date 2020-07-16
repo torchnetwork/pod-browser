@@ -20,6 +20,7 @@
  */
 
 import { parseUrl } from "./index";
+import {stringAsIri} from "@solid/lit-pod";
 
 describe("parseUrl", () => {
   test("it parses a given url into parts", () => {
@@ -32,7 +33,7 @@ describe("parseUrl", () => {
       port,
       protocol,
       search,
-    } = parseUrl("https://example.com:1000/path?query=param#hash");
+    } = parseUrl(stringAsIri("https://example.com:1000/path?query=param#hash"));
 
     expect(hash).toEqual("#hash");
     expect(host).toEqual("example.com:1000");
@@ -54,7 +55,7 @@ describe("parseUrl", () => {
       port,
       protocol,
       search,
-    } = parseUrl("not a url");
+    } = parseUrl(stringAsIri("not a url"));
 
     expect(hash).toEqual("");
     expect(host).toEqual("localhost");

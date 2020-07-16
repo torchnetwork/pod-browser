@@ -27,6 +27,7 @@ import {
   getIriAll,
   unstable_fetchResourceInfoWithAcl,
 } from "@solid/lit-pod";
+import { namedNode } from "@rdfjs/dataset";
 import useSWR from "swr";
 import * as litSolidHelpers from "../../lit-solid-helpers";
 import {
@@ -45,9 +46,9 @@ jest.mock("swr");
 describe("fetchContainerResourceIris", () => {
   test("it fetches the container resource iris", async () => {
     const resources = [
-      "https://myaccount.mypodserver.com/inbox",
-      "https://myaccount.mypodserver.com/private",
-      "https://myaccount.mypodserver.com/note.txt",
+      namedNode("https://myaccount.mypodserver.com/inbox"),
+      namedNode("https://myaccount.mypodserver.com/private"),
+      namedNode("https://myaccount.mypodserver.com/note.txt"),
     ];
 
     (getIriAll as jest.Mock).mockReturnValue(resources);
@@ -59,13 +60,13 @@ describe("fetchContainerResourceIris", () => {
 
 describe("fetchResourceDetails", () => {
   test("it fetches the resource, adding a human-readable name", async () => {
-    const iri = "https://dayton.dev.inrupt.net/public/";
+    const iri = namedNode("https://dayton.dev.inrupt.net/public/");
 
     (unstable_fetchResourceInfoWithAcl as jest.Mock).mockResolvedValue({
       resourceInfo: {
-        fetchedFrom: "https://dayton.dev.inrupt.net/public/",
+        fetchedFrom: namedNode("https://dayton.dev.inrupt.net/public/"),
         contentType: "application/octet-stream; charset=utf-8",
-        unstable_aclUrl: "https://dayton.dev.inrupt.net/public/.acl",
+        unstable_aclUrl: namedNode("https://dayton.dev.inrupt.net/public/.acl"),
         unstable_permissions: {
           user: {
             read: true,
@@ -85,9 +86,9 @@ describe("fetchResourceDetails", () => {
         fallbackAcl: {
           quads: {},
           resourceInfo: {
-            fetchedFrom: "https://dayton.dev.inrupt.net/.acl",
+            fetchedFrom: namedNode("https://dayton.dev.inrupt.net/.acl"),
             contentType: "text/turtle",
-            unstable_aclUrl: "https://dayton.dev.inrupt.net/.acl.acl",
+            unstable_aclUrl: namedNode("https://dayton.dev.inrupt.net/.acl.acl"),
             unstable_permissions: {
               user: {
                 read: true,
@@ -103,14 +104,14 @@ describe("fetchResourceDetails", () => {
               },
             },
           },
-          accessTo: "https://dayton.dev.inrupt.net/",
+          accessTo: namedNode("https://dayton.dev.inrupt.net/"),
         },
         resourceAcl: {
           quads: {},
           resourceInfo: {
-            fetchedFrom: "https://dayton.dev.inrupt.net/public/.acl",
+            fetchedFrom: namedNode("https://dayton.dev.inrupt.net/public/.acl"),
             contentType: "text/turtle",
-            unstable_aclUrl: "https://dayton.dev.inrupt.net/public/.acl.acl",
+            unstable_aclUrl: namedNode("https://dayton.dev.inrupt.net/public/.acl.acl"),
             unstable_permissions: {
               user: {
                 read: true,
@@ -126,14 +127,14 @@ describe("fetchResourceDetails", () => {
               },
             },
           },
-          accessTo: "https://dayton.dev.inrupt.net/public/",
+          accessTo: namedNode("https://dayton.dev.inrupt.net/public/"),
         },
       },
     });
 
     jest.spyOn(litSolidHelpers, "normalizePermissions").mockResolvedValue([
       {
-        webId: "https://dayton.dev.inrupt.net/card/#me",
+        webId: namedNode("https://dayton.dev.inrupt.net/card/#me"),
         alias: "Full Control",
         acl: {
           read: true,
@@ -141,7 +142,7 @@ describe("fetchResourceDetails", () => {
           append: true,
           control: true,
         },
-        profile: { webId: "https://dayton.dev.inrupt.net/card/#me" },
+        profile: { webId: namedNode("https://dayton.dev.inrupt.net/card/#me") },
       },
     ]);
 
@@ -152,7 +153,7 @@ describe("fetchResourceDetails", () => {
   });
 
   test("it fetches a file with ACL if the fetchResource call fails", async () => {
-    const iri = "https://dayton.dev.inrupt.net/file.txt";
+    const iri = namedNode("https://dayton.dev.inrupt.net/file.txt");
 
     jest.spyOn(litSolidHelpers, "fetchResource").mockImplementationOnce(() => {
       throw new Error("boom");
@@ -171,8 +172,8 @@ describe("fetchResourceDetails", () => {
 
 describe("PodIrisFromWebId", () => {
   test("Loads data from a webId", async () => {
-    const iri = "https://mypod.myhost.com/profile/card#me";
-    const iris = ["https://mypod.myhost.com/profile"];
+    const iri = namedNode("https://mypod.myhost.com/profile/card#me");
+    const iris = [namedNode("https://mypod.myhost.com/profile")];
 
     (fetchLitDataset as jest.Mock).mockResolvedValue({});
     (getThingOne as jest.Mock).mockImplementationOnce(() => {});

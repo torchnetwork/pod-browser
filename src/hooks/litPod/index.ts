@@ -29,23 +29,23 @@ import {
   unstable_Access,
   unstable_fetchResourceInfoWithAcl,
   unstable_getAgentAccessAll,
-  isContainer,
+  isContainer, Iri,
 } from "@solid/lit-pod";
-import { space } from "rdf-namespaces";
+import { LDP } from "@solid/lit-vocab-common";
+import { WS } from "@solid/lit-vocab-solid";
 import {
   fetchResourceWithAcl,
   getIriPath,
-  namespace,
   normalizePermissions,
   ResourceDetails,
 } from "../../lit-solid-helpers";
 
 export async function fetchContainerResourceIris(
-  containerIri: string
-): Promise<string[]> {
+  containerIri: Iri
+): Promise<Iri[]> {
   const litDataset = await fetchLitDataset(containerIri);
   const container = getThingOne(litDataset, containerIri);
-  const iris = getIriAll(container, namespace.contains);
+  const iris = getIriAll(container, LDP.contains);
   return iris;
 }
 
@@ -58,7 +58,7 @@ export function useFetchContainerResourceIris(iri: string): any {
 }
 
 export async function fetchResourceDetails(
-  iri: string
+  iri: Iri
 ): Promise<ResourceDetails> {
   const name = getIriPath(iri) as string;
   const resourceInfo = await unstable_fetchResourceInfoWithAcl(iri);
@@ -91,11 +91,11 @@ export function useFetchResourceWithAcl(iri: string): any {
   return useSWR([iri, "fetchResourceWithAcl"], fetchResourceWithAcl);
 }
 
-export async function fetchPodIrisFromWebId(webId: string): Promise<string[]> {
+export async function fetchPodIrisFromWebId(webId: Iri): Promise<Iri[]> {
   const profileDoc = await fetchLitDataset(webId);
   const profile = getThingOne(profileDoc, webId);
 
-  return getIriAll(profile, space.storage);
+  return getIriAll(profile, WS.storage);
 }
 export const FETCH_POD_IRIS_FROM_WEB_ID = "fetchPodIrisFromWebId";
 export function useFetchPodIrisFromWebId(webId: string): any {
