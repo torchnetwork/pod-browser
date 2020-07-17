@@ -21,9 +21,9 @@
 
 import { shallow } from "enzyme";
 import { shallowToJson } from "enzyme-to-json";
+import { stringAsIri } from "@solid/lit-pod";
 
 import PodList from "./index";
-import {stringAsIri} from "@solid/lit-pod";
 
 describe("Pod list", () => {
   test("Renders null if there are no pod iris", () => {

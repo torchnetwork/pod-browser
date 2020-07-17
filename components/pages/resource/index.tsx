@@ -22,11 +22,11 @@
 import React, { ReactElement } from "react";
 import { Container } from "@material-ui/core";
 import { useRouter } from "next/router";
+import { namedNode } from "@rdfjs/data-model";
 import { DetailsMenuProvider } from "../../../src/contexts/detailsMenuContext";
 import { useRedirectIfLoggedOut } from "../../../src/effects/auth";
 import ContainerView from "../../container";
 import { PodLocationProvider } from "../../../src/contexts/podLocationContext";
-import { namedNode } from "@rdfjs/data-model";
 
 export default function Resource(): ReactElement {
   useRedirectIfLoggedOut();
