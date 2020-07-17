@@ -21,8 +21,14 @@
 
 import { createStyles, PrismTheme } from "@solid/lit-prism-patterns";
 
+
 const styles = (theme: PrismTheme) => {
   return createStyles(theme, ["table"], {
+    "container-menu": {
+      display: "flex",
+      justifyContent: "space-between",
+      margin: theme.spacing(1, 0, 0),
+    },
     navigator: {
       marginTop: theme.spacing(1),
     },

@@ -20,7 +20,18 @@
  */
 import {Iri, iriAsString} from "@solid/lit-pod";
 
-export function parseUrl(url: Iri): Record<string, string> {
+export interface URL {
+  hash: string;
+  host: string;
+  hostname: string;
+  origin: string;
+  pathname: string;
+  port: string;
+  protocol: string;
+  search: string;
+}
+
+export function parseUrl(url: Iri): URL {
   const a = document.createElement("a");
   a.href = url.value;
 
