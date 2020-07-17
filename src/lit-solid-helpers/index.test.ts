@@ -21,8 +21,6 @@
 
 /* eslint-disable camelcase */
 import * as litSolidFns from "@solid/lit-pod";
-import * as litSolidHelpers from "./index";
-
 import {
   arrayContainsIri,
   Iri,
@@ -31,6 +29,7 @@ import {
 } from "@solid/lit-pod";
 import { RDF, DCTERMS, FOAF, VCARD, LDP } from "@solid/lit-vocab-common";
 import { WS } from "@solid/lit-vocab-solid";
+import * as litSolidHelpers from "./index";
 import { INRUPT_TEST_IRI } from "../GENERATED/INRUPT_TEST_IRI";
 
 const {

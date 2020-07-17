@@ -41,10 +41,10 @@ import {
   unstable_fetchLitDatasetWithAcl,
   unstable_getAgentAccessAll,
 } from "@solid/lit-pod";
-import { parseUrl } from "../stringHelpers";
 import { RDF, FOAF, VCARD, DCTERMS, POSIX, LDP } from "@solid/lit-vocab-common";
 import { WS } from "@solid/lit-vocab-solid";
 import { getLocalStore, LitTermRegistry } from "@solid/lit-term";
+import { parseUrl } from "../stringHelpers";
 
 export function getIriPath(iri: Iri): string | undefined {
   const { pathname } = parseUrl(iri);
@@ -127,9 +127,9 @@ export function normalizeDataset(
   // PMCB55: We actually want the rdfs:label for each 'Type', if available -
   // for this we can just lookup the LIT Vocab Term registry...
   const termRegistry = new LitTermRegistry(getLocalStore());
-  const types = rawType.map((iri) => {
-    const result = termRegistry.lookupLabel(iriAsString(iri), "en");
-    return result === undefined ? iriAsString(iri) : result;
+  const typeLabels = rawType.map((typeIri) => {
+    const result = termRegistry.lookupLabel(iriAsString(typeIri), "en");
+    return result === undefined ? iriAsString(typeIri) : result;
   });
 
   return {
@@ -138,7 +138,7 @@ export function normalizeDataset(
     modified,
     mtime,
     size,
-    types,
+    types: typeLabels,
   };
 }
 
