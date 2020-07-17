@@ -17,7 +17,9 @@ exports[`Pod list Renders a table if there are multiple pod iris 1`] = `
       </WithStyles(ForwardRef(TableRow))>
     </WithStyles(ForwardRef(TableHead))>
     <WithStyles(ForwardRef(TableBody))>
-      <WithStyles(ForwardRef(TableRow))>
+      <WithStyles(ForwardRef(TableRow))
+        key="https://mypod.myhost.com"
+      >
         <WithStyles(ForwardRef(TableCell))>
           <Link
             href="/resource/undefined"
@@ -26,7 +28,9 @@ exports[`Pod list Renders a table if there are multiple pod iris 1`] = `
           </Link>
         </WithStyles(ForwardRef(TableCell))>
       </WithStyles(ForwardRef(TableRow))>
-      <WithStyles(ForwardRef(TableRow))>
+      <WithStyles(ForwardRef(TableRow))
+        key="https://myotherpod.myotherhost.com"
+      >
         <WithStyles(ForwardRef(TableCell))>
           <Link
             href="/resource/undefined"

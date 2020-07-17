@@ -20,7 +20,7 @@
  */
 
 /* eslint-disable camelcase, @typescript-eslint/no-explicit-any */
-import { ReactElement, useContext } from "react";
+import { Dispatch, ReactElement, useContext } from "react";
 import { makeStyles, createStyles, StyleRules } from "@material-ui/styles";
 import Skeleton from "@material-ui/lab/Skeleton";
 import { PrismTheme, useBem } from "@solid/lit-prism-patterns";
@@ -41,7 +41,7 @@ export function resourceHref(iri: Iri): string {
 }
 
 interface TableRowClickHandlerParams {
-  setMenuOpen: (open: boolean) => void;
+  setMenuOpen: Dispatch<string>;
   setMenuContents: (contents: ReactElement) => void;
   resource: ResourceDetails;
 }
@@ -57,7 +57,7 @@ export function handleTableRowClick({
 
     const { types, name, iri, permissions } = resource;
 
-    setMenuOpen(true);
+    setMenuOpen(iri);
     setMenuContents(<DetailsLoading resource={resource} />);
     setMenuContents(
       <Details iri={iri} types={types} name={name} permissions={permissions} />

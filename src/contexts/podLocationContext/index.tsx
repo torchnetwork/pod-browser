@@ -24,7 +24,7 @@ import useAuthenticatedProfile from "../../hooks/useAuthenticatedProfile";
 import UserContext from "../userContext";
 import usePodRoot from "../../hooks/usePodRoot";
 
-interface PodLocation {
+export interface PodLocation {
   baseUriAsString?: string | null;
   currentUriAsString: string;
 }
