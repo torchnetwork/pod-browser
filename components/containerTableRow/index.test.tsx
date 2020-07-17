@@ -118,7 +118,7 @@ describe("handleTableRowClick", () => {
 
     await handler(evnt);
 
-    expect(setMenuOpen).toHaveBeenCalledWith(resource.iri);
+    expect(setMenuOpen).toHaveBeenCalledWith(resource.iri.value);
     expect(setMenuContents).toHaveBeenCalled();
   });
 

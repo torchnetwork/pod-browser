@@ -57,7 +57,7 @@ export function handleTableRowClick({
 
     const { types, name, iri, permissions } = resource;
 
-    setMenuOpen(iri);
+    setMenuOpen(iri.value);
     setMenuContents(<DetailsLoading resource={resource} />);
     setMenuContents(
       <Details iri={iri} types={types} name={name} permissions={permissions} />

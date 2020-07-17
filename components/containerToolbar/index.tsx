@@ -28,6 +28,7 @@ import PodLocationContext from "../../src/contexts/podLocationContext";
 import { useFetchResourceDetails } from "../../src/hooks/litPod";
 import DetailsLoading from "../detailsLoading";
 import Details from "../resourceDetails";
+import {stringAsIri} from "@solid/lit-pod";
 
 const useStyles = makeStyles<PrismTheme>((theme) =>
   createStyles(styles(theme) as StyleRules)
@@ -37,17 +38,17 @@ export default function ContainerToolbar(): ReactElement | null {
   const { menuOpen, setMenuOpen, setMenuContents } = useContext(
     DetailsMenuContext
   );
-  const { baseUri, currentUri } = useContext(PodLocationContext);
-  const { data } = useFetchResourceDetails(currentUri) || {};
+  const { baseUriAsString, currentUriAsString } = useContext(PodLocationContext);
+  const { data } = useFetchResourceDetails(stringAsIri(currentUriAsString)) || {};
   const bem = useBem(useStyles());
 
   useEffect(() => {
     function getPathName(): string {
-      const path = baseUri ? currentUri.substr(baseUri.length) : null;
+      const path = baseUriAsString ? currentUriAsString.substr(baseUriAsString.length) : null;
       return path === "" ? "All files" : path || "Unnamed";
     }
 
-    if (!!menuOpen && menuOpen === currentUri && data) {
+    if (!!menuOpen && menuOpen === currentUriAsString && data) {
       const { types, name, iri, permissions } = data;
       setMenuContents(<DetailsLoading resource={data} />);
       setMenuContents(
@@ -58,24 +59,24 @@ export default function ContainerToolbar(): ReactElement | null {
           permissions={permissions}
         />
       );
-    } else if (!!menuOpen && menuOpen === currentUri) {
+    } else if (!!menuOpen && menuOpen === currentUriAsString) {
       setMenuContents(
         <DetailsLoading
           resource={{
-            iri: currentUri,
+            iri: stringAsIri(currentUriAsString),
             name: getPathName(),
             types: ["Container"],
           }}
         />
       );
     }
-  }, [menuOpen, data, currentUri, baseUri, setMenuContents]);
+  }, [menuOpen, data, currentUriAsString, baseUriAsString, setMenuContents]);
 
   return (
     <div className={bem("container-toolbar")}>
       <button
         className={bem("icon-button")}
-        onClick={() => setMenuOpen(currentUri)}
+        onClick={() => setMenuOpen(currentUriAsString)}
         type="button"
       >
         <i className={bem("icon-info")} aria-label="View details" />
