@@ -102,7 +102,7 @@ describe("normalizeDataset", () => {
       containerIri
     );
     expect(iri).toEqual(containerIri);
-    expect(types).toContain("BasicContainer");
+    expect(types).toContain("Basic container");
     expect(types).toContain("Container");
     expect(mtime).toEqual(1591131561.195);
     expect(modified).toEqual(new Date(Date.UTC(2020, 5, 2, 15, 59, 21)));
@@ -293,7 +293,7 @@ describe("fetchResourceWithAcl", () => {
     expect(mtime).toEqual(1591131561.195);
     expect(size).toEqual(4096);
 
-    expect(types).toContain("BasicContainer");
+    expect(types).toContain("Basic container");
     expect(types).toContain("Container");
 
     expect(ownerPerms.webId).toEqual("owner");
