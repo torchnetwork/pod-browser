@@ -149,4 +149,4 @@ const INRUPT_TEST_IRI = {
   someNonRdfResource: namedNode("https://some.pod/someNonRdfResource"),
 };
 
-export { INRUPT_TEST_IRI };
+export default INRUPT_TEST_IRI;

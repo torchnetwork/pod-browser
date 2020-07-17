@@ -28,7 +28,7 @@ import React, { ComponentType, ReactElement, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import Head from "next/head";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import auth from "solid-auth-client";
+import auth, { Session } from "solid-auth-client";
 
 import {
   createStyles,
@@ -85,7 +85,11 @@ export default function App(props: AppProps): ReactElement {
     // so convert ours to align...
     // auth.trackSession(setSession).catch((e) => {
     auth
-      .trackSession(() => session?.webId.value)
+      .trackSession((sacSession: Session | undefined) => {
+        if (sacSession !== undefined) {
+          setSession({ webId: stringAsIri(sacSession.webId) });
+        }
+      })
       .catch((e) => {
         throw e;
       });
@@ -103,9 +107,9 @@ export default function App(props: AppProps): ReactElement {
       // so convert ours to align...
       // setSession(sessionStorage);
       setSession(
-        sessionStorage
-          ? { webId: stringAsIri(sessionStorage.webId) }
-          : undefined
+        sessionStorage === undefined
+          ? undefined
+          : { webId: stringAsIri(sessionStorage.webId) }
       );
 
       setIsLoadingSession(false);

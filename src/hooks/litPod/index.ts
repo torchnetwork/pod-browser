@@ -90,10 +90,7 @@ export function useFetchResourceDetails(iri: Iri): any {
 
 export const FETCH_RESOURCE_WITH_ACL = namedNode("fetchResourceWithAcl");
 export function useFetchResourceWithAcl(iri: Iri): any {
-  return useSWR(
-    [iri, namedNode("fetchResourceWithAcl")],
-    fetchResourceWithAcl
-  );
+  return useSWR([iri, namedNode("fetchResourceWithAcl")], fetchResourceWithAcl);
 }
 
 export async function fetchPodIrisFromWebId(webId: Iri): Promise<Iri[]> {

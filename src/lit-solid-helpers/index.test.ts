@@ -30,7 +30,7 @@ import {
 import { RDF, DCTERMS, FOAF, VCARD, LDP } from "@solid/lit-vocab-common";
 import { WS } from "@solid/lit-vocab-solid";
 import * as litSolidHelpers from "./index";
-import { INRUPT_TEST_IRI } from "../GENERATED/INRUPT_TEST_IRI";
+import INRUPT_TEST_IRI from "../GENERATED/INRUPT_TEST_IRI";
 
 const {
   displayPermissions,
