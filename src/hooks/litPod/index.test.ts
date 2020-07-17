@@ -27,7 +27,6 @@ import {
   getIriAll,
   unstable_fetchResourceInfoWithAcl,
   Iri,
-  stringAsIri,
 } from "@solid/lit-pod";
 import { namedNode } from "@rdfjs/data-model";
 import useSWR from "swr";
@@ -42,6 +41,9 @@ import {
   useFetchPodIrisFromWebId,
 } from "./index";
 
+// PMCB55: When we mock out all of a library, we mock out it's utility functions
+// too - so for this test suite we use the 'namedNode()' function from RDF/JS to
+// create IRIs from test strings.
 jest.mock("@solid/lit-pod");
 jest.mock("swr");
 
@@ -195,11 +197,11 @@ describe("PodIrisFromWebId", () => {
 
 describe("useFetchContainerResourceIris", () => {
   test("it wraps fetchContainerResourceIris in SWR", () => {
-    const iri: Iri = stringAsIri("iri");
+    const iri: Iri = namedNode("iri");
     useFetchContainerResourceIris(iri);
 
     expect(useSWR).toHaveBeenCalledWith(
-      [iri, stringAsIri("getContainerResourceIris")],
+      [iri, namedNode("getContainerResourceIris")],
       fetchContainerResourceIris
     );
   });
@@ -207,11 +209,11 @@ describe("useFetchContainerResourceIris", () => {
 
 describe("useFetchResourceDetails", () => {
   test("it wraps fetchResourceDetails in SWR", () => {
-    const iri: Iri = stringAsIri("iri");
+    const iri: Iri = namedNode("iri");
     useFetchResourceDetails(iri);
 
     expect(useSWR).toHaveBeenCalledWith(
-      [iri, stringAsIri("fetchResourceDetails")],
+      [iri, namedNode("fetchResourceDetails")],
       fetchResourceDetails
     );
   });
@@ -219,11 +221,11 @@ describe("useFetchResourceDetails", () => {
 
 describe("useFetchResourceWithAcl", () => {
   test("it wraps fetchResourceWithAcl in SWR", () => {
-    const iri: Iri = stringAsIri("iri");
+    const iri: Iri = namedNode("iri");
     useFetchResourceWithAcl(iri);
 
     expect(useSWR).toHaveBeenCalledWith(
-      [iri, stringAsIri("fetchResourceWithAcl")],
+      [iri, namedNode("fetchResourceWithAcl")],
       litSolidHelpers.fetchResourceWithAcl
     );
   });
@@ -231,11 +233,11 @@ describe("useFetchResourceWithAcl", () => {
 
 describe("useFetchPodIrisFromWebId", () => {
   test("it wraps fetchPodIrisFromWebId in SWR", () => {
-    const iri: Iri = stringAsIri("iri");
+    const iri: Iri = namedNode("iri");
     useFetchPodIrisFromWebId(iri);
 
     expect(useSWR).toHaveBeenCalledWith(
-      [iri, stringAsIri("fetchPodIrisFromWebId")],
+      [iri, namedNode("fetchPodIrisFromWebId")],
       fetchPodIrisFromWebId
     );
   });

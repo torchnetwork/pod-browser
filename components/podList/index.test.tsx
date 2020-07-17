@@ -23,6 +23,7 @@ import { shallow } from "enzyme";
 import { shallowToJson } from "enzyme-to-json";
 
 import PodList from "./index";
+import {stringAsIri} from "@solid/lit-pod";
 
 describe("Pod list", () => {
   test("Renders null if there are no pod iris", () => {
@@ -32,7 +33,7 @@ describe("Pod list", () => {
   });
 
   test("Renders a container if there is one pod iri", () => {
-    const iris = ["https://mypod.myhost.com"];
+    const iris = [stringAsIri("https://mypod.myhost.com")];
     const tree = shallow(<PodList podIris={iris} />);
 
     expect(shallowToJson(tree)).toMatchSnapshot();
@@ -40,8 +41,8 @@ describe("Pod list", () => {
 
   test("Renders a table if there are multiple pod iris", () => {
     const iris = [
-      "https://mypod.myhost.com",
-      "https://myotherpod.myotherhost.com",
+      stringAsIri("https://mypod.myhost.com"),
+      stringAsIri("https://myotherpod.myotherhost.com"),
     ];
 
     const tree = shallow(<PodList podIris={iris} />);

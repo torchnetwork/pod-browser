@@ -850,7 +850,11 @@ font-display: block;",
     }
   >
     <Container
-      iri="https://mypod.myhost.com/public"
+      iri={
+        NamedNode {
+          "value": "https://mypod.myhost.com/public",
+        }
+      }
     >
       <Spinner>
         <WithStyles(ForwardRef(Container))>
@@ -1779,7 +1783,11 @@ font-display: block;",
     }
   >
     <Container
-      iri="https://mypod.myhost.com/public"
+      iri={
+        NamedNode {
+          "value": "https://mypod.myhost.com/public",
+        }
+      }
     >
       <div
         className="makeStyles-container-menu-19"
@@ -3983,7 +3991,11 @@ font-display: block;",
     }
   >
     <Container
-      iri="https://mypod.myhost.com/public"
+      iri={
+        NamedNode {
+          "value": "https://mypod.myhost.com/public",
+        }
+      }
     >
       <div
         className="makeStyles-container-menu-19"

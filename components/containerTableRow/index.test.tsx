@@ -29,6 +29,9 @@ import { useFetchResourceDetails } from "../../src/hooks/litPod";
 
 import ContainerTableRow, { handleTableRowClick, resourceHref } from "./index";
 
+// PMCB55: When we mock out all of a library, we mock out it's utility functions
+// too - so for this test suite we use the 'namedNode()' function from RDF/JS to
+// create IRIs from test strings.
 jest.mock("@solid/lit-pod");
 jest.mock("../../src/hooks/litPod");
 

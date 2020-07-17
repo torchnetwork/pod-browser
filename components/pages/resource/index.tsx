@@ -26,18 +26,20 @@ import { DetailsMenuProvider } from "../../../src/contexts/detailsMenuContext";
 import { useRedirectIfLoggedOut } from "../../../src/effects/auth";
 import ContainerView from "../../container";
 import { PodLocationProvider } from "../../../src/contexts/podLocationContext";
+import { namedNode } from "@rdfjs/data-model";
 
 export default function Resource(): ReactElement {
   useRedirectIfLoggedOut();
 
   const router = useRouter();
-  const decodedIri = decodeURIComponent(router.query.iri as string);
+  const decodedIriAsString = decodeURIComponent(router.query.iri as string);
+  const iri = namedNode(decodedIriAsString);
 
   return (
     <Container>
-      <PodLocationProvider currentUriAsString={decodedIri}>
+      <PodLocationProvider currentUriAsString={decodedIriAsString}>
         <DetailsMenuProvider>
-          <ContainerView iri={decodedIri} />
+          <ContainerView iri={iri} />
         </DetailsMenuProvider>
       </PodLocationProvider>
     </Container>

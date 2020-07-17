@@ -360,7 +360,7 @@ describe("getUserPermissions", () => {
         webId: stringAsIri("test"),
         alias: "Can View",
         acl: { read: true, write: false, control: false, append: false },
-        profile: { webId: "test" },
+        profile: { webId: stringAsIri("test") },
       },
     ];
 

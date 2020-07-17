@@ -907,7 +907,11 @@ font-display: block;",
     }
   >
     <ResourceDetails
-      iri="iri"
+      iri={
+        NamedNode {
+          "value": "iri",
+        }
+      }
       name="Resource Name"
       types={
         Array [
@@ -918,7 +922,9 @@ font-display: block;",
       <DetailsLoading
         resource={
           Object {
-            "iri": "iri",
+            "iri": NamedNode {
+              "value": "iri",
+            },
             "name": "Resource Name",
             "types": Array [
               "Resource",
@@ -931,6 +937,7 @@ font-display: block;",
         >
           <h3
             className="makeStyles-content-h3-30"
+            title="iri"
           >
             Resource Name
           </h3>
@@ -2216,7 +2223,11 @@ font-display: block;",
     }
   >
     <ResourceDetails
-      iri="iri"
+      iri={
+        NamedNode {
+          "value": "iri",
+        }
+      }
       name="Resource Name"
       types={
         Array [
@@ -2227,7 +2238,9 @@ font-display: block;",
       <DetailsLoading
         resource={
           Object {
-            "iri": "iri",
+            "iri": NamedNode {
+              "value": "iri",
+            },
             "name": "Resource Name",
             "types": Array [
               "Resource",
@@ -2240,6 +2253,7 @@ font-display: block;",
         >
           <h3
             className="makeStyles-content-h3-30"
+            title="iri"
           >
             Resource Name
           </h3>
@@ -3525,7 +3539,11 @@ font-display: block;",
     }
   >
     <ResourceDetails
-      iri="iri"
+      iri={
+        NamedNode {
+          "value": "iri",
+        }
+      }
       types={
         Array [
           "Resource",
@@ -3535,7 +3553,9 @@ font-display: block;",
       <DetailsLoading
         resource={
           Object {
-            "iri": "iri",
+            "iri": NamedNode {
+              "value": "iri",
+            },
             "name": "",
             "types": Array [
               "Resource",
@@ -3548,6 +3568,7 @@ font-display: block;",
         >
           <h3
             className="makeStyles-content-h3-30"
+            title="iri"
           />
         </section>
         <section
@@ -4831,7 +4852,11 @@ font-display: block;",
     }
   >
     <ResourceDetails
-      iri="iri"
+      iri={
+        NamedNode {
+          "value": "iri",
+        }
+      }
       name="Resource Name"
       types={
         Array [
@@ -4842,7 +4867,9 @@ font-display: block;",
       <DetailsLoading
         resource={
           Object {
-            "iri": "iri",
+            "iri": NamedNode {
+              "value": "iri",
+            },
             "name": "Resource Name",
             "types": Array [
               "Resource",
@@ -4855,6 +4882,7 @@ font-display: block;",
         >
           <h3
             className="makeStyles-content-h3-30"
+            title="iri"
           >
             Resource Name
           </h3>
@@ -6140,7 +6168,11 @@ font-display: block;",
     }
   >
     <ResourceDetails
-      iri="iri"
+      iri={
+        NamedNode {
+          "value": "iri",
+        }
+      }
       name="Resource Name"
       types={
         Array [
@@ -6151,7 +6183,9 @@ font-display: block;",
       <DetailsLoading
         resource={
           Object {
-            "iri": "iri",
+            "iri": NamedNode {
+              "value": "iri",
+            },
             "name": "Resource Name",
             "types": Array [
               "Resource",
@@ -6164,6 +6198,7 @@ font-display: block;",
         >
           <h3
             className="makeStyles-content-h3-30"
+            title="iri"
           >
             Resource Name
           </h3>
@@ -7449,13 +7484,19 @@ font-display: block;",
     }
   >
     <ResourceDetails
-      iri="iri"
+      iri={
+        NamedNode {
+          "value": "iri",
+        }
+      }
       name="Resource Name"
     >
       <DetailsLoading
         resource={
           Object {
-            "iri": "iri",
+            "iri": NamedNode {
+              "value": "iri",
+            },
             "name": "Resource Name",
             "types": Array [],
           }
@@ -7466,6 +7507,7 @@ font-display: block;",
         >
           <h3
             className="makeStyles-content-h3-30"
+            title="iri"
           >
             Resource Name
           </h3>

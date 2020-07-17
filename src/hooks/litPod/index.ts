@@ -31,8 +31,8 @@ import {
   unstable_getAgentAccessAll,
   isContainer,
   Iri,
-  stringAsIri,
 } from "@solid/lit-pod";
+import { namedNode } from "@rdfjs/data-model";
 import { LDP } from "@solid/lit-vocab-common";
 import { WS } from "@solid/lit-vocab-solid";
 import {
@@ -51,7 +51,7 @@ export async function fetchContainerResourceIris(
   return iris;
 }
 
-export const GET_CONTAINER_RESOURCE_IRIS = stringAsIri(
+export const GET_CONTAINER_RESOURCE_IRIS = namedNode(
   "getContainerResourceIris"
 );
 export function useFetchContainerResourceIris(iri: Iri): any {
@@ -83,15 +83,15 @@ export async function fetchResourceDetails(iri: Iri): Promise<ResourceDetails> {
   };
 }
 
-export const FETCH_RESOURCE_DETAILS = stringAsIri("fetchResourceDetails");
+export const FETCH_RESOURCE_DETAILS = namedNode("fetchResourceDetails");
 export function useFetchResourceDetails(iri: Iri): any {
   return useSWR([iri, FETCH_RESOURCE_DETAILS], fetchResourceDetails);
 }
 
-export const FETCH_RESOURCE_WITH_ACL = stringAsIri("fetchResourceWithAcl");
+export const FETCH_RESOURCE_WITH_ACL = namedNode("fetchResourceWithAcl");
 export function useFetchResourceWithAcl(iri: Iri): any {
   return useSWR(
-    [iri, stringAsIri("fetchResourceWithAcl")],
+    [iri, namedNode("fetchResourceWithAcl")],
     fetchResourceWithAcl
   );
 }
@@ -102,7 +102,7 @@ export async function fetchPodIrisFromWebId(webId: Iri): Promise<Iri[]> {
 
   return getIriAll(profile, WS.storage);
 }
-export const FETCH_POD_IRIS_FROM_WEB_ID = stringAsIri("fetchPodIrisFromWebId");
+export const FETCH_POD_IRIS_FROM_WEB_ID = namedNode("fetchPodIrisFromWebId");
 export function useFetchPodIrisFromWebId(webId: Iri): any {
   return useSWR([webId, FETCH_POD_IRIS_FROM_WEB_ID], fetchPodIrisFromWebId);
 }

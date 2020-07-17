@@ -45,7 +45,7 @@ jest.mock("../../src/hooks/litPod");
 describe("Resource details", () => {
   test("renders loading without name without breaking", () => {
     jest.spyOn(ReactFns, "useContext").mockImplementation(() => ({
-      session: { webId: "owner" },
+      session: { webId: stringAsIri("owner") },
     }));
 
     (useFetchResourceWithAcl as jest.Mock).mockReturnValue({
@@ -54,7 +54,7 @@ describe("Resource details", () => {
     });
 
     const tree = mountToJson(
-      <ResourceDetails types={["Resource"]} iri="iri" />
+      <ResourceDetails types={["Resource"]} iri={stringAsIri("iri")} />
     );
 
     expect(tree).toMatchSnapshot();
@@ -62,7 +62,7 @@ describe("Resource details", () => {
 
   test("renders loading if there is no data or error", () => {
     jest.spyOn(ReactFns, "useContext").mockImplementation(() => ({
-      session: { webId: "owner" },
+      session: { webId: stringAsIri("owner") },
     }));
 
     (useFetchResourceWithAcl as jest.Mock).mockReturnValue({
@@ -71,7 +71,7 @@ describe("Resource details", () => {
     });
 
     const tree = mountToJson(
-      <ResourceDetails name="Resource Name" types={["Resource"]} iri="iri" />
+      <ResourceDetails name="Resource Name" types={["Resource"]} iri={stringAsIri("iri")} />
     );
 
     expect(tree).toMatchSnapshot();
@@ -79,7 +79,7 @@ describe("Resource details", () => {
 
   test("renders 'no access' if there is an error", () => {
     jest.spyOn(ReactFns, "useContext").mockImplementation(() => ({
-      session: { webId: "owner" },
+      session: { webId: stringAsIri("owner") },
     }));
 
     (useFetchResourceWithAcl as jest.Mock).mockReturnValue({
@@ -88,7 +88,7 @@ describe("Resource details", () => {
     });
 
     const tree = mountToJson(
-      <ResourceDetails name="Resource Name" types={["Resource"]} iri="iri" />
+      <ResourceDetails name="Resource Name" types={["Resource"]} iri={stringAsIri("iri")} />
     );
 
     expect(tree).toMatchSnapshot();
@@ -96,12 +96,12 @@ describe("Resource details", () => {
 
   test("renders resource details", () => {
     jest.spyOn(ReactFns, "useContext").mockImplementation(() => ({
-      session: { webId: "owner" },
+      session: { webId: stringAsIri("owner") },
     }));
 
     const permissions = [
       {
-        webId: "owner",
+        webId: stringAsIri("owner"),
         alias: "Full Control",
         acl: {
           append: true,
@@ -110,13 +110,13 @@ describe("Resource details", () => {
           write: true,
         },
         profile: {
-          avatar: "http://example.com/avatar.png",
+          avatar: stringAsIri("http://example.com/avatar.png"),
           nickname: "owner",
           name: "Test Person",
         },
       },
       {
-        webId: "collaborator",
+        webId: stringAsIri("collaborator"),
         alias: "Can View",
         acl: {
           append: false,
@@ -137,7 +137,7 @@ describe("Resource details", () => {
     });
 
     const tree = mountToJson(
-      <ResourceDetails name="Resource Name" types={["Resource"]} iri="iri" />
+      <ResourceDetails name="Resource Name" types={["Resource"]} iri={stringAsIri("iri")} />
     );
 
     expect(tree).toMatchSnapshot();
@@ -145,12 +145,12 @@ describe("Resource details", () => {
 
   test("renders no 3rd party access message", () => {
     jest.spyOn(ReactFns, "useContext").mockImplementation(() => ({
-      session: { webId: "owner" },
+      session: { webId: stringAsIri("owner") },
     }));
 
     const permissions = [
       {
-        webId: "owner",
+        webId: stringAsIri("owner"),
         alias: "Full Control",
         acl: {
           append: true,
@@ -159,7 +159,7 @@ describe("Resource details", () => {
           write: true,
         },
         profile: {
-          avatar: "http://example.com/avatar.png",
+          avatar: stringAsIri("http://example.com/avatar.png"),
           nickname: "owner",
           name: "Test Person",
         },
@@ -171,7 +171,7 @@ describe("Resource details", () => {
     });
 
     const tree = mountToJson(
-      <ResourceDetails name="Resource Name" types={["Resource"]} iri="iri" />
+      <ResourceDetails name="Resource Name" types={["Resource"]} iri={stringAsIri("iri")} />
     );
 
     expect(tree).toMatchSnapshot();
@@ -179,12 +179,12 @@ describe("Resource details", () => {
 
   test("renders with no types", () => {
     jest.spyOn(ReactFns, "useContext").mockImplementation(() => ({
-      session: { webId: "owner" },
+      session: { webId: stringAsIri("owner") },
     }));
 
     const permissions = [
       {
-        webId: "owner",
+        webId: stringAsIri("owner"),
         alias: "Full Control",
         acl: {
           append: true,
@@ -193,13 +193,13 @@ describe("Resource details", () => {
           write: true,
         },
         profile: {
-          avatar: "http://example.com/avatar.png",
+          avatar: stringAsIri("http://example.com/avatar.png"),
           nickname: "owner",
           name: "Test Person",
         },
       },
       {
-        webId: "collaborator",
+        webId: stringAsIri("collaborator"),
         alias: "Can View",
         acl: {
           append: false,
@@ -220,7 +220,7 @@ describe("Resource details", () => {
     });
 
     const tree = mountToJson(
-      <ResourceDetails name="Resource Name" iri="iri" />
+      <ResourceDetails name="Resource Name" iri={stringAsIri("iri")} />
     );
 
     expect(tree).toMatchSnapshot();
@@ -251,7 +251,7 @@ describe("Permission", () => {
 
     const tree = shallow(
       <Permission
-        iri="iri"
+        iri={stringAsIri("iri")}
         warnOnSubmit={false}
         classes={classes}
         permission={null}
@@ -296,7 +296,7 @@ describe("ThirdPartyPermissions", () => {
   test("it returns null if given no permissions", () => {
     const tree = shallow(
       <ThirdPartyPermissions
-        iri="iri"
+        iri={stringAsIri("iri")}
         classes={{}}
         thirdPartyPermissions={null}
       />

@@ -35,7 +35,7 @@ describe("Container view", () => {
       data: undefined,
     });
 
-    const tree = mountToJson(<Container iri={iri.value} />);
+    const tree = mountToJson(<Container iri={iri} />);
     expect(tree).toMatchSnapshot();
   });
 
@@ -44,7 +44,7 @@ describe("Container view", () => {
       data: [],
     });
 
-    const tree = mountToJson(<Container iri={iri.value} />);
+    const tree = mountToJson(<Container iri={iri} />);
     expect(tree).toMatchSnapshot();
   });
 
@@ -63,7 +63,7 @@ describe("Container view", () => {
       data: undefined,
     });
 
-    const tree = mountToJson(<Container iri={iri.value} />);
+    const tree = mountToJson(<Container iri={iri} />);
 
     expect(tree).toMatchSnapshot();
   });
