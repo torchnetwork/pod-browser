@@ -160,7 +160,9 @@ export default function Container(props: IPodList): ReactElement {
           {rows.map((row) => {
             prepareRow(row);
             const details = row.original as ResourceDetails;
-            return <ContainerTableRow key={details.iri.value} resource={details} />;
+            return (
+              <ContainerTableRow key={details.iri.value} resource={details} />
+            );
           })}
         </tbody>
       </table>
