@@ -49,8 +49,6 @@ describe("PodLocationContext", () => {
       </PodLocationProvider>
     );
 
-    const x = component.find("#BaseUriAsString");
-    const y = component.find("#BaseUriAsString").text()
     expect(component.find("#BaseUriAsString").text()).toEqual("https://foo.test/");
     expect(component.find("#CurrentUriAsString").text()).toEqual(
       "https://foo.test/bar/baz"

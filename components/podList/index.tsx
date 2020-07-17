@@ -28,11 +28,11 @@ import {
   TableRow,
 } from "@material-ui/core";
 import Link from "next/link";
+import { Iri } from "@solid/lit-pod";
 import DetailsContextMenu from "../detailsContextMenu";
 import { resourceHref } from "../containerTableRow";
 import Container from "../container";
 import { PodLocationProvider } from "../../src/contexts/podLocationContext";
-import {Iri} from "@solid/lit-pod";
 
 interface IPodList {
   podIris: Iri[] | undefined;

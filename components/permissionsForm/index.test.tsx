@@ -32,12 +32,11 @@ import PermissionsForm, {
   PermissionCheckbox,
   saveHandler,
 } from "./index";
-import {stringAsIri} from "@solid/lit-pod";
 
 describe("PermissionsForm", () => {
   test("Renders a permissions form", () => {
-    const iri = stringAsIri("https://mypod.myhost.com");
-    const webId = stringAsIri("https://mypod.myhost.com/profile/card#me");
+    const iri = LitPodFns.stringAsIri("https://mypod.myhost.com");
+    const webId = LitPodFns.stringAsIri("https://mypod.myhost.com/profile/card#me");
     const permission = {
       webId,
       alias: "Full Control",
@@ -105,12 +104,12 @@ describe("savePermissionsHandler", () => {
       append: true,
       control: true,
     } as LitPodFns.unstable_Access;
-    const iri = stringAsIri("http://example.com");
+    const iri = LitPodFns.stringAsIri("http://example.com");
     const setAlertOpen = jest.fn();
     const setDialogOpen = jest.fn();
     const setMessage = jest.fn();
     const setSeverity = jest.fn();
-    const webId = stringAsIri("http://example.com/profile/card#me");
+    const webId = LitPodFns.stringAsIri("http://example.com/profile/card#me");
 
     const handler = savePermissionsHandler({
       access,
@@ -153,12 +152,12 @@ describe("savePermissionsHandler", () => {
       append: true,
       control: true,
     } as LitPodFns.unstable_Access;
-    const iri = stringAsIri("http://example.com");
+    const iri = LitPodFns.stringAsIri("http://example.com");
     const setAlertOpen = jest.fn();
     const setDialogOpen = jest.fn();
     const setMessage = jest.fn();
     const setSeverity = jest.fn();
-    const webId = stringAsIri("http://example.com/profile/card#me");
+    const webId = LitPodFns.stringAsIri("http://example.com/profile/card#me");
 
     const handler = savePermissionsHandler({
       access,

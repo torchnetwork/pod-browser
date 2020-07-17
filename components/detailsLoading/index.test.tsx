@@ -19,9 +19,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import {stringAsIri} from "@solid/lit-pod";
 import DetailsLoading from "./index";
 import { mountToJson } from "../../__testUtils/mountWithTheme";
-import {stringAsIri} from "@solid/lit-pod";
 
 describe("DetailsLoading", () => {
   test("Renders a details error view", () => {

@@ -22,13 +22,13 @@
 import * as ReactFns from "react";
 import { shallow } from "enzyme";
 import { shallowToJson } from "enzyme-to-json";
+import {iriAsString, stringAsIri} from "@solid/lit-pod";
 import { mountToJson } from "../../__testUtils/mountWithTheme";
 
 import { useFetchResourceWithAcl } from "../../src/hooks/litPod";
 import { NormalizedPermission } from "../../src/lit-solid-helpers";
 import * as stringHelpers from "../../src/stringHelpers";
 import ResourceDetails, * as resourceDetailFns from "./index";
-import {iriAsString, stringAsIri} from "@solid/lit-pod";
 
 const {
   displayName,

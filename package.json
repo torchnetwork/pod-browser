@@ -16,6 +16,7 @@
     "type": "git",
     "url": "git+https://github.com/inrupt/pod-manager.git"
   },
+
   "author": "Inrupt <engineering@inrupt.com>",
   "license": "UNLICENSED",
   "bugs": {

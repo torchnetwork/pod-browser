@@ -26,6 +26,7 @@ import Skeleton from "@material-ui/lab/Skeleton";
 import { PrismTheme, useBem } from "@solid/lit-prism-patterns";
 import Link from "next/link";
 import clsx from "clsx";
+import { Iri } from "@solid/lit-pod";
 
 import DetailsLoading from "../detailsLoading";
 import Details from "../resourceDetails";
@@ -34,7 +35,6 @@ import DetailsMenuContext from "../../src/contexts/detailsMenuContext";
 import { ResourceDetails } from "../../src/lit-solid-helpers";
 
 import styles from "./styles";
-import {Iri} from "@solid/lit-pod";
 
 export function resourceHref(iri: Iri): string {
   return `/resource/${encodeURIComponent(iri.value)}`;

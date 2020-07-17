@@ -49,9 +49,7 @@ const INRUPT_TEST_IRI = {
   // NS: _NS,
 
   somePodRoot: namedNode("https://some.pod/"),
-  somePodContainer: namedNode(
-    "https://some.pod/rootContainer/container/"
-  ),
+  somePodContainer: namedNode("https://some.pod/rootContainer/container/"),
   someOtherPodContainer: namedNode(
     "https://some.other.pod.com/canBeAnywhere/rootContainer/otherContainer"
   ),
@@ -88,30 +86,22 @@ const INRUPT_TEST_IRI = {
   ),
 
   somePodGroupId: namedNode("https://some.pod/group#id"),
-  somePodOtherGroupId: namedNode(
-    "https://some.other.pod/otherGroup#other-id"
-  ),
+  somePodOtherGroupId: namedNode("https://some.other.pod/otherGroup#other-id"),
 
   /**
    * Identifies the IRI of another generic Pod resource.
    */
-  someOtherPodResource: namedNode(
-    "https://some.other.pod.com/OtherResource"
-  ),
+  someOtherPodResource: namedNode("https://some.other.pod.com/OtherResource"),
 
   /**
    * An arbitrary RDF named graph.
    */
-  arbitraryNamedGraph: namedNode(
-    "https://some.pod/arbitraryNamedGraph"
-  ),
+  arbitraryNamedGraph: namedNode("https://some.pod/arbitraryNamedGraph"),
 
   /**
    * An arbitrary WebID.
    */
-  somePodWebId: namedNode(
-    "https://some.pod/somePodWebId/profile/card#me"
-  ),
+  somePodWebId: namedNode("https://some.pod/somePodWebId/profile/card#me"),
   someOtherPodWebId: namedNode("https://some.other.pod.com#i"),
 
   /**
@@ -156,9 +146,7 @@ const INRUPT_TEST_IRI = {
   /**
    * An arbitrary non-RDF resource.
    */
-  someNonRdfResource: namedNode(
-    "https://some.pod/someNonRdfResource"
-  ),
+  someNonRdfResource: namedNode("https://some.pod/someNonRdfResource"),
 };
 
 export { INRUPT_TEST_IRI };

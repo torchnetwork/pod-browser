@@ -22,9 +22,9 @@
 import { ReactElement } from "react";
 import { TableCell, TableRow } from "@material-ui/core";
 import Link from "next/link";
+import {Iri} from "@solid/lit-pod";
 import { resourceHref } from "../containerTableRow";
 import { getIriPath } from "../../src/lit-solid-helpers";
-import {Iri} from "@solid/lit-pod";
 
 interface Props {
   iri: Iri;

@@ -23,11 +23,16 @@
 import * as litSolidFns from "@solid/lit-pod";
 import * as litSolidHelpers from "./index";
 
-import {arrayContainsIri, Iri, iriAsString, stringAsIri} from "@solid/lit-pod";
+import {
+  arrayContainsIri,
+  Iri,
+  iriAsString,
+  stringAsIri,
+} from "@solid/lit-pod";
 import { RDF, DCTERMS, FOAF, VCARD, LDP } from "@solid/lit-vocab-common";
 import { WS } from "@solid/lit-vocab-solid";
-import {INRUPT_TEST_IRI} from "../GENERATED/INRUPT_TEST_IRI";
-import {string} from "prop-types";
+import { INRUPT_TEST_IRI } from "../GENERATED/INRUPT_TEST_IRI";
+import { string } from "prop-types";
 
 const {
   displayPermissions,
@@ -387,17 +392,20 @@ describe("fetchResourceWithAcl", () => {
 describe("getUserPermissions", () => {
   test("it returns the permissions for the given webId", async () => {
     const acl = {
-      "acl1": { read: true, write: false, control: false, append: false },
-      "acl2": { read: true, write: true, control: true, append: true },
-      "acl3": { read: true, write: true, control: false, append: true },
-      "acl4": { read: false, write: false, control: false, append: false },
+      acl1: { read: true, write: false, control: false, append: false },
+      acl2: { read: true, write: true, control: true, append: true },
+      acl3: { read: true, write: true, control: false, append: true },
+      acl4: { read: false, write: false, control: false, append: false },
     };
 
     const normalizedPermissions = await normalizePermissions(
       acl,
       jest.fn().mockResolvedValue(null)
     );
-    const permissions = getUserPermissions(stringAsIri("acl1"), normalizedPermissions);
+    const permissions = getUserPermissions(
+      stringAsIri("acl1"),
+      normalizedPermissions
+    );
 
     expect(permissions?.webId).toEqual(stringAsIri("acl1"));
     expect(permissions?.alias).toEqual("Can View");
@@ -418,7 +426,10 @@ describe("getUserPermissions", () => {
       },
     ];
 
-    const userPermissions = getUserPermissions(stringAsIri("acl1"), permissions);
+    const userPermissions = getUserPermissions(
+      stringAsIri("acl1"),
+      permissions
+    );
 
     expect(userPermissions).toBeNull();
   });
@@ -438,14 +449,14 @@ describe("getThirdPartyPermissions", () => {
       jest.fn().mockResolvedValue(null)
     );
     const thirdPartyPermissions = getThirdPartyPermissions(
-        stringAsIri("acl1"),
+      stringAsIri("acl1"),
       normalizedPermissions
     );
     const [perms2, perms3, perms4] = thirdPartyPermissions;
 
-    expect(thirdPartyPermissions.map(({ webId }) => iriAsString(webId))).not.toContain(
-      "acl1"
-    );
+    expect(
+      thirdPartyPermissions.map(({ webId }) => iriAsString(webId))
+    ).not.toContain("acl1");
 
     expect(perms2.webId).toEqual(stringAsIri("acl2"));
     expect(perms2.alias).toEqual("Full Control");
@@ -461,22 +472,35 @@ describe("getThirdPartyPermissions", () => {
   });
 
   test("it returns an empty Array if given no permissions", () => {
-    expect(getThirdPartyPermissions(INRUPT_TEST_IRI.somePodWebId)).toBeInstanceOf(Array);
-    expect(getThirdPartyPermissions(INRUPT_TEST_IRI.somePodWebId)).toHaveLength(0);
+    expect(
+      getThirdPartyPermissions(INRUPT_TEST_IRI.somePodWebId)
+    ).toBeInstanceOf(Array);
+    expect(getThirdPartyPermissions(INRUPT_TEST_IRI.somePodWebId)).toHaveLength(
+      0
+    );
   });
 });
 
 describe("isUserOrMatch", () => {
   test("it returns true when given two matching ids", () => {
-    expect(isUserOrMatch(INRUPT_TEST_IRI.somePodWebId, INRUPT_TEST_IRI.somePodWebId)).toBe(true);
+    expect(
+      isUserOrMatch(INRUPT_TEST_IRI.somePodWebId, INRUPT_TEST_IRI.somePodWebId)
+    ).toBe(true);
   });
 
   test("it returns false when given two unique ids", () => {
-    expect(isUserOrMatch(INRUPT_TEST_IRI.somePodWebId, INRUPT_TEST_IRI.someOtherPodWebId)).toBe(false);
+    expect(
+      isUserOrMatch(
+        INRUPT_TEST_IRI.somePodWebId,
+        INRUPT_TEST_IRI.someOtherPodWebId
+      )
+    ).toBe(false);
   });
 
   test("it returns true when given the string 'user'", () => {
-    expect(isUserOrMatch(stringAsIri("user"), stringAsIri("anything"))).toBe(true);
+    expect(isUserOrMatch(stringAsIri("user"), stringAsIri("anything"))).toBe(
+      true
+    );
   });
 });
 
