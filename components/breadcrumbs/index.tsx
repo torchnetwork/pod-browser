@@ -44,6 +44,11 @@ export default function Breadcrumbs(): ReactElement {
     breadcrumbsList.current.scrollTo(breadcrumbsList.current.scrollWidth, 0);
   });
 
+  // PMCB55: Rather than change 'baseUri' and 'currentUri' to be Iri objects (as
+
+  // it seems they may be intended to remain as Strings), I've just renamed them
+  // to explicitly state that they are Strings (i.e. just needs discussion
+  // before switching them to Iri objects).
   if (!podLocation.baseUriAsString) return <Spinner />;
 
   const { baseUriAsString, currentUriAsString } = podLocation;

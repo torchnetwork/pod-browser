@@ -11581,7 +11581,7 @@ font-display: block;",
           role="rowgroup"
         >
           <ContainerTableRow
-            key="[object Object]"
+            key="https://myaccount.mypodserver.com/inbox"
             resource={
               Object {
                 "iri": NamedNode {
@@ -11654,7 +11654,7 @@ font-display: block;",
             </tr>
           </ContainerTableRow>
           <ContainerTableRow
-            key="[object Object]"
+            key="https://myaccount.mypodserver.com/private"
             resource={
               Object {
                 "iri": NamedNode {
@@ -11727,7 +11727,7 @@ font-display: block;",
             </tr>
           </ContainerTableRow>
           <ContainerTableRow
-            key="[object Object]"
+            key="https://myaccount.mypodserver.com/note.txt"
             resource={
               Object {
                 "iri": NamedNode {
