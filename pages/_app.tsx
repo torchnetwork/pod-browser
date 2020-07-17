@@ -86,7 +86,7 @@ export default function App(props: AppProps): ReactElement {
     // auth.trackSession(setSession).catch((e) => {
     auth
       .trackSession((sacSession: Session | undefined) => {
-        if (sacSession !== undefined) {
+        if (sacSession !== undefined && sacSession !== null) {
           setSession({ webId: stringAsIri(sacSession.webId) });
         }
       })
@@ -107,7 +107,7 @@ export default function App(props: AppProps): ReactElement {
       // so convert ours to align...
       // setSession(sessionStorage);
       setSession(
-        sessionStorage === undefined
+        sessionStorage === undefined || sessionStorage === null
           ? undefined
           : { webId: stringAsIri(sessionStorage.webId) }
       );
