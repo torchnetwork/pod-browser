@@ -47,10 +47,8 @@ export default function usePodRoot(
       setRootUri(normalizeBaseUri(iriAsString(profilePodIri)));
       return;
     }
-
     const { origin } = new URL(location);
     setRootUri(normalizeBaseUri(origin));
   }, [location, profile]);
-
   return rootUri;
 }

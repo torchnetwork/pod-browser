@@ -71,7 +71,11 @@ describe("Resource details", () => {
     });
 
     const tree = mountToJson(
-      <ResourceDetails name="Resource Name" types={["Resource"]} iri={stringAsIri("iri")} />
+      <ResourceDetails
+        name="Resource Name"
+        types={["Resource"]}
+        iri={stringAsIri("iri")}
+      />
     );
 
     expect(tree).toMatchSnapshot();
@@ -88,7 +92,11 @@ describe("Resource details", () => {
     });
 
     const tree = mountToJson(
-      <ResourceDetails name="Resource Name" types={["Resource"]} iri={stringAsIri("iri")} />
+      <ResourceDetails
+        name="Resource Name"
+        types={["Resource"]}
+        iri={stringAsIri("iri")}
+      />
     );
 
     expect(tree).toMatchSnapshot();
@@ -137,7 +145,11 @@ describe("Resource details", () => {
     });
 
     const tree = mountToJson(
-      <ResourceDetails name="Resource Name" types={["Resource"]} iri={stringAsIri("iri")} />
+      <ResourceDetails
+        name="Resource Name"
+        types={["Resource"]}
+        iri={stringAsIri("iri")}
+      />
     );
 
     expect(tree).toMatchSnapshot();
@@ -171,7 +183,11 @@ describe("Resource details", () => {
     });
 
     const tree = mountToJson(
-      <ResourceDetails name="Resource Name" types={["Resource"]} iri={stringAsIri("iri")} />
+      <ResourceDetails
+        name="Resource Name"
+        types={["Resource"]}
+        iri={stringAsIri("iri")}
+      />
     );
 
     expect(tree).toMatchSnapshot();

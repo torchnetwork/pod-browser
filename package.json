@@ -16,7 +16,6 @@
     "type": "git",
     "url": "git+https://github.com/inrupt/pod-manager.git"
   },
-
   "author": "Inrupt <engineering@inrupt.com>",
   "license": "UNLICENSED",
   "bugs": {
@@ -33,11 +32,9 @@
     "@solid/lit-vocab-common": "^0.4.11",
     "@solid/lit-vocab-solid": "^0.4.11",
     "encoding": "^0.1.12",
-    "install": "^0.13.0",
     "jss": "^10.3.0",
     "jss-preset-default": "^10.3.0",
     "next": "^9.4.4",
-    "npm": "^6.14.6",
     "prop-types": "^15.7.2",
     "rdf-namespaces": "^1.8.0",
     "react": "^16.13.1",

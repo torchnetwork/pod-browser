@@ -52,9 +52,7 @@ describe("usePodRoot", () => {
 
   test("it will use storage URI in profile if it matches location", () => {
     const { result } = renderHook(() => usePodRoot(location, profile));
-    const x = result.current;
-
-    expect(x).toEqual("https://foo.com/bar/");
+    expect(result.current).toEqual("https://foo.com/bar/");
   });
 
   test("it makes sure baseUri ends with slash", () => {

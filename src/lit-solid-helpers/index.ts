@@ -94,10 +94,10 @@ export async function normalizePermissions(
 ): Promise<NormalizedPermission[]> {
   return Promise.all(
     Object.keys(permissions).map(
-      // PMCB55: Yes indeed, since we're using a Record<string, ...> here where
-      // the 'key' is actually a WebID (which, by definition, *MUST* be an
-      // IRI!), we need to treat WebID's as strings here (and then convert to
-      // proper IRIs when passing them on).
+      // PMCB55: Since we're using a Record<string, ...>, where the 'key' is
+      // actually a WebID (which, by definition, *MUST* be an IRI), we need to
+      // treat WebID's as strings (and then convert to proper IRIs when
+      // passing them on).
       async (webIdAsString: string): Promise<NormalizedPermission> => {
         const acl = permissions[webIdAsString];
         const profile = await fetchProfileFn(stringAsIri(webIdAsString));
