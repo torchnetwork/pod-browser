@@ -35,14 +35,14 @@ import namespace from "@rdfjs/namespace";
 
 const RDFJS_NAMESPACE = namespace("https://inrupt.com/vocab/test#");
 
-const _NAMESPACE = "https://inrupt.com/vocab/test#";
+const NAMESPACE_AS_STRING = "https://inrupt.com/vocab/test#";
 // function _NS(localName: string) {
 //   return _NAMESPACE + localName;
 // }
 
 const INRUPT_TEST_IRI = {
   PREFIX: "inrupt_test_iri",
-  NAMESPACE: _NAMESPACE,
+  NAMESPACE: NAMESPACE_AS_STRING,
   PREFIX_AND_NAMESPACE: {
     inrupt_test_iri: "https://inrupt.com/vocab/test/iri#",
   },
@@ -149,4 +149,4 @@ const INRUPT_TEST_IRI = {
   someNonRdfResource: namedNode("https://some.pod/someNonRdfResource"),
 };
 
-export { INRUPT_TEST_IRI };
+export default { INRUPT_TEST_IRI };

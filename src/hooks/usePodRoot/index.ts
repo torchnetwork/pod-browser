@@ -20,11 +20,13 @@
  */
 
 import { useEffect, useState } from "react";
-import { Profile } from "../../lit-solid-helpers";
 import { iriAsString } from "@solid/lit-pod";
+import { Profile } from "../../lit-solid-helpers";
 
 function normalizeBaseUri(baseUriAsString: string): string {
-  return baseUriAsString[baseUriAsString.length - 1] === "/" ? baseUriAsString : `${baseUriAsString}/`;
+  return baseUriAsString[baseUriAsString.length - 1] === "/"
+    ? baseUriAsString
+    : `${baseUriAsString}/`;
 }
 
 export default function usePodRoot(

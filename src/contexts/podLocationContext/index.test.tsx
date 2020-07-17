@@ -28,7 +28,9 @@ jest.mock("../../hooks/useAuthenticatedProfile");
 jest.mock("../../hooks/usePodRoot");
 
 function ChildComponent(): ReactElement {
-  const { baseUriAsString, currentUriAsString } = useContext(PodLocationContext);
+  const { baseUriAsString, currentUriAsString } = useContext(
+    PodLocationContext
+  );
   return (
     <>
       <div id="BaseUriAsString">{baseUriAsString}</div>
@@ -49,7 +51,9 @@ describe("PodLocationContext", () => {
       </PodLocationProvider>
     );
 
-    expect(component.find("#BaseUriAsString").text()).toEqual("https://foo.test/");
+    expect(component.find("#BaseUriAsString").text()).toEqual(
+      "https://foo.test/"
+    );
     expect(component.find("#CurrentUriAsString").text()).toEqual(
       "https://foo.test/bar/baz"
     );

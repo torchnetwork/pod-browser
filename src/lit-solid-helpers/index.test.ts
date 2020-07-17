@@ -32,7 +32,6 @@ import {
 import { RDF, DCTERMS, FOAF, VCARD, LDP } from "@solid/lit-vocab-common";
 import { WS } from "@solid/lit-vocab-solid";
 import { INRUPT_TEST_IRI } from "../GENERATED/INRUPT_TEST_IRI";
-import { string } from "prop-types";
 
 const {
   displayPermissions,
@@ -95,45 +94,6 @@ function createResource(
   return setThing(createLitDataset(), publicContainer);
 }
 
-// PMCB55: No need for this, as we use vocab terms now.
-// describe("namespace", () => {
-//   test("it reflects all the keys and values", () => {
-//     Object.keys(namespace).forEach((key) => {
-//       const value = namespace[key];
-//       expect(value).not.toBeUndefined();
-//       expect(namespace[value]).toEqual(key);
-//     });
-//   });
-//
-//   test("it contains all the definitions in ldp", () => {
-//     const ldpWithType: Record<string, string> = ldp;
-//     Object.keys(ldpWithType).forEach((key) => {
-//       const value = namespace[key];
-//       const expectedValue = ldpWithType[key];
-//
-//       expect(value).toEqual(expectedValue);
-//     });
-//   });
-// });
-//
-// describe("getTypeName", () => {
-//   test("it returns the type display name", () => {
-//     const ldpWithType: Record<string, string> = ldp;
-//
-//     Object.keys(ldpWithType).forEach((key: string): void => {
-//       expect(getTypeName(ldpWithType[key])).toEqual(key);
-//     });
-//   });
-//
-//   test("it returns the raw type when given an invalid type", () => {
-//     expect(getTypeName("invalid")).toEqual("invalid");
-//   });
-//
-//   test("it returns an empty string if given a falsey value", () => {
-//     expect(getTypeName(undefined)).toEqual("");
-//   });
-// });
-
 describe("normalizeDataset", () => {
   test("it returns a normalized dataset", () => {
     const containerIri = stringAsIri("https://user.dev.inrupt.net/public/");
@@ -168,27 +128,6 @@ describe("normalizeDataset", () => {
     expect(types).toContain("Container");
   });
 });
-
-// PMCB55: No need for this, as we get from vocab term labels now.
-// describe("displayTypes", () => {
-//   test("it returns a list of the human-friendly type names", () => {
-//     // PMCB55: It seems this code is really just looking for rdfs:labels or
-//     // rdfs:comments for the LDP terms - something we get via Vocab Terms that
-//     // in turn comes for the LDP vocabulary itself...
-//     const types = displayTypes([
-//       "http://www.w3.org/ns/ldp#BasicContainer",
-//       "http://www.w3.org/ns/ldp#Container",
-//     ]);
-//
-//     expect(types).toContain("BasicContainer");
-//     expect(types).toContain("Container");
-//   });
-//
-//   test("it returns an empty Array if types are empty", () => {
-//     const types = displayTypes([]);
-//     expect(types).toHaveLength(0);
-//   });
-// });
 
 describe("displayPermissions", () => {
   test("it returns 'Full Control' when all options are true", () => {

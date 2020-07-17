@@ -31,6 +31,7 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { PrismTheme } from "@solid/lit-prism-patterns";
+import { Iri, iriAsString } from "@solid/lit-pod";
 import UserContext, { ISession } from "../../src/contexts/userContext";
 import PermissionsForm from "../permissionsForm";
 import DetailsLoading from "../detailsLoading";
@@ -43,7 +44,6 @@ import {
   NormalizedResource,
   Profile,
 } from "../../src/lit-solid-helpers";
-import {Iri, iriAsString} from "@solid/lit-pod";
 
 export function displayName({ nickname, name, webId }: Profile): string {
   if (name) return name;

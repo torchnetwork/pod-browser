@@ -28,9 +28,12 @@ import {
   getIriAll,
   getIriOne,
   getStringUnlocalizedOne,
-  getThingOne, Iri, iriAsString,
+  getThingOne,
+  Iri,
+  iriAsString,
   IriString,
-  LitDataset, stringAsIri,
+  LitDataset,
+  stringAsIri,
   Thing,
   unstable_Access,
   unstable_AgentAccess,
@@ -41,56 +44,12 @@ import {
 import { parseUrl } from "../stringHelpers";
 import { RDF, FOAF, VCARD, DCTERMS, POSIX, LDP } from "@solid/lit-vocab-common";
 import { WS } from "@solid/lit-vocab-solid";
-import {getLocalStore, LitTermRegistry} from "@solid/lit-term";
-
-// const ldpWithType: Record<string, string> = ldp;
-//
-// const typeNameMap = Object.keys(ldpWithType).reduce(
-//   (acc: Record<string, string>, key: string): Record<string, string> => {
-//     const value = ldpWithType[key];
-//     return {
-//       ...acc,
-//       [value]: key,
-//     };
-//   },
-//   {}
-// );
-//
-// // TODO use ldp namespace when available
-// export const namespace: Record<string, string> = {
-//   ...ldp,
-//   ...typeNameMap,
-//   mtime: "http://www.w3.org/ns/posix/stat#mtime",
-//   "http://www.w3.org/ns/posix/stat#mtime": "mtime",
-//   modified: "http://purl.org/dc/terms/modified",
-//   "http://purl.org/dc/terms/modified": "modified",
-//   size: "http://www.w3.org/ns/posix/stat#size",
-//   "http://www.w3.org/ns/posix/stat#size": "size",
-//   nickname: "http://xmlns.com/foaf/0.1/nick",
-//   "http://xmlns.com/foaf/0.1/nick": "nickname",
-//   familyName: "http://xmlns.com/foaf/0.1/familyName",
-//   "http://xmlns.com/foaf/0.1/familyName": "familyName",
-//   img: "http://xmlns.com/foaf/0.1/img",
-//   "http://xmlns.com/foaf/0.1/img": "img",
-//   name: "http://xmlns.com/foaf/0.1/name",
-//   "http://xmlns.com/foaf/0.1/name": "name",
-//   hasPhoto: "http://www.w3.org/2006/vcard/ns#hasPhoto",
-//   "http://www.w3.org/2006/vcard/ns#hasPhoto": "hasPhoto",
-// };
+import { getLocalStore, LitTermRegistry } from "@solid/lit-term";
 
 export function getIriPath(iri: Iri): string | undefined {
   const { pathname } = parseUrl(iri);
   return pathname.replace(/\/?$/, "");
 }
-
-// export function getTypeName(rawType: string): string {
-//   if (!rawType) return "";
-//   return typeNameMap[rawType] || rawType;
-// }
-//
-// export function displayTypes(types: string[]): string[] {
-//   return types?.length ? types.map((t: string): string => getTypeName(t)) : [];
-// }
 
 export function displayPermissions(permissions: unstable_Access): string {
   const perms = Object.values(permissions);
@@ -158,10 +117,7 @@ export function normalizeDataset(
   dataset: Thing,
   iri: IriString
 ): NormalizedResource {
-  const rawType = getIriAll(
-    dataset,
-    RDF.type
-  );
+  const rawType = getIriAll(dataset, RDF.type);
 
   const mtime = getDecimalOne(dataset, POSIX.mtime);
   const modified = getDatetimeOne(dataset, DCTERMS.modified);

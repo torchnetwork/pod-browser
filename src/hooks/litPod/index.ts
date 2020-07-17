@@ -29,7 +29,9 @@ import {
   unstable_Access,
   unstable_fetchResourceInfoWithAcl,
   unstable_getAgentAccessAll,
-  isContainer, Iri, stringAsIri,
+  isContainer,
+  Iri,
+  stringAsIri,
 } from "@solid/lit-pod";
 import { LDP } from "@solid/lit-vocab-common";
 import { WS } from "@solid/lit-vocab-solid";
@@ -49,7 +51,9 @@ export async function fetchContainerResourceIris(
   return iris;
 }
 
-export const GET_CONTAINER_RESOURCE_IRIS = stringAsIri("getContainerResourceIris");
+export const GET_CONTAINER_RESOURCE_IRIS = stringAsIri(
+  "getContainerResourceIris"
+);
 export function useFetchContainerResourceIris(iri: Iri): any {
   return useSWR<Iri[]>(
     [iri, GET_CONTAINER_RESOURCE_IRIS],
@@ -57,9 +61,7 @@ export function useFetchContainerResourceIris(iri: Iri): any {
   );
 }
 
-export async function fetchResourceDetails(
-  iri: Iri
-): Promise<ResourceDetails> {
+export async function fetchResourceDetails(iri: Iri): Promise<ResourceDetails> {
   const name = getIriPath(iri) as string;
   const resourceInfo = await unstable_fetchResourceInfoWithAcl(iri);
   const accessModeList = unstable_getAgentAccessAll(resourceInfo);
@@ -88,7 +90,10 @@ export function useFetchResourceDetails(iri: Iri): any {
 
 export const FETCH_RESOURCE_WITH_ACL = stringAsIri("fetchResourceWithAcl");
 export function useFetchResourceWithAcl(iri: Iri): any {
-  return useSWR([iri, stringAsIri("fetchResourceWithAcl")], fetchResourceWithAcl);
+  return useSWR(
+    [iri, stringAsIri("fetchResourceWithAcl")],
+    fetchResourceWithAcl
+  );
 }
 
 export async function fetchPodIrisFromWebId(webId: Iri): Promise<Iri[]> {

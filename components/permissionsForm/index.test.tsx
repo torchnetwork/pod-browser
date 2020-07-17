@@ -36,7 +36,9 @@ import PermissionsForm, {
 describe("PermissionsForm", () => {
   test("Renders a permissions form", () => {
     const iri = LitPodFns.stringAsIri("https://mypod.myhost.com");
-    const webId = LitPodFns.stringAsIri("https://mypod.myhost.com/profile/card#me");
+    const webId = LitPodFns.stringAsIri(
+      "https://mypod.myhost.com/profile/card#me"
+    );
     const permission = {
       webId,
       alias: "Full Control",

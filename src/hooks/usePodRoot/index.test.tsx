@@ -20,9 +20,9 @@
  */
 
 import { renderHook } from "@testing-library/react-hooks";
+import { stringAsIri } from "@solid/lit-pod";
 import usePodRoot from "./index";
 import { Profile } from "../../lit-solid-helpers";
-import {stringAsIri} from "@solid/lit-pod";
 
 const location = "https://foo.com/bar/baz";
 const locationWithNoEndingSlash = "https://bar.com";

@@ -22,7 +22,7 @@
 /* eslint-disable camelcase */
 import { mock } from "jest-mock-extended";
 
-import {namedNode} from "@rdfjs/data-model";
+import { namedNode } from "@rdfjs/data-model";
 import { mountToJson } from "../../__testUtils/mountWithTheme";
 import { ResourceDetails } from "../../src/lit-solid-helpers";
 import { useFetchResourceDetails } from "../../src/hooks/litPod";

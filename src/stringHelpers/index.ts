@@ -18,7 +18,8 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import {Iri, iriAsString} from "@solid/lit-pod";
+
+import { Iri } from "@solid/lit-pod";
 
 export function parseUrl(url: Iri): Record<string, string> {
   const a = document.createElement("a");

@@ -38,12 +38,17 @@ interface Props {
   currentUriAsString: string;
 }
 
-function PodLocationProvider({ children, currentUriAsString }: Props): ReactElement {
+function PodLocationProvider({
+  children,
+  currentUriAsString,
+}: Props): ReactElement {
   const { session } = useContext(UserContext);
   const profile = useAuthenticatedProfile(session);
   const baseUriAsString = usePodRoot(currentUriAsString, profile);
   return (
-    <PodLocationContext.Provider value={{ baseUriAsString, currentUriAsString }}>
+    <PodLocationContext.Provider
+      value={{ baseUriAsString, currentUriAsString }}
+    >
       {children}
     </PodLocationContext.Provider>
   );

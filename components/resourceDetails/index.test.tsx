@@ -22,7 +22,7 @@
 import * as ReactFns from "react";
 import { shallow } from "enzyme";
 import { shallowToJson } from "enzyme-to-json";
-import {iriAsString, stringAsIri} from "@solid/lit-pod";
+import { iriAsString, stringAsIri } from "@solid/lit-pod";
 import { mountToJson } from "../../__testUtils/mountWithTheme";
 
 import { useFetchResourceWithAcl } from "../../src/hooks/litPod";

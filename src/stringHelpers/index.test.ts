@@ -19,8 +19,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import { stringAsIri } from "@solid/lit-pod";
 import { parseUrl } from "./index";
-import {stringAsIri} from "@solid/lit-pod";
 
 describe("parseUrl", () => {
   test("it parses a given url into parts", () => {

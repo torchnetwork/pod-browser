@@ -19,7 +19,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {stringAsIri} from "@solid/lit-pod";
+import { stringAsIri } from "@solid/lit-pod";
 import { mountToJson } from "../../__testUtils/mountWithTheme";
 import * as litPodHooks from "../../src/hooks/litPod";
 import Container from "./index";

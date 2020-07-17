@@ -25,7 +25,9 @@ import {
   fetchLitDataset,
   getThingOne,
   getIriAll,
-  unstable_fetchResourceInfoWithAcl, Iri, stringAsIri,
+  unstable_fetchResourceInfoWithAcl,
+  Iri,
+  stringAsIri,
 } from "@solid/lit-pod";
 import { namedNode } from "@rdfjs/data-model";
 import useSWR from "swr";
@@ -88,7 +90,9 @@ describe("fetchResourceDetails", () => {
           resourceInfo: {
             fetchedFrom: namedNode("https://dayton.dev.inrupt.net/.acl"),
             contentType: "text/turtle",
-            unstable_aclUrl: namedNode("https://dayton.dev.inrupt.net/.acl.acl"),
+            unstable_aclUrl: namedNode(
+              "https://dayton.dev.inrupt.net/.acl.acl"
+            ),
             unstable_permissions: {
               user: {
                 read: true,
@@ -111,7 +115,9 @@ describe("fetchResourceDetails", () => {
           resourceInfo: {
             fetchedFrom: namedNode("https://dayton.dev.inrupt.net/public/.acl"),
             contentType: "text/turtle",
-            unstable_aclUrl: namedNode("https://dayton.dev.inrupt.net/public/.acl.acl"),
+            unstable_aclUrl: namedNode(
+              "https://dayton.dev.inrupt.net/public/.acl.acl"
+            ),
             unstable_permissions: {
               user: {
                 read: true,

@@ -21,7 +21,7 @@
 
 import React, { ReactElement, useContext } from "react";
 import { Container } from "@material-ui/core";
-import {stringAsIri} from "@solid/lit-pod";
+import { stringAsIri } from "@solid/lit-pod";
 
 import { useFetchPodIrisFromWebId } from "../../../src/hooks/litPod";
 import UserContext from "../../../src/contexts/userContext";
