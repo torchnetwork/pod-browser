@@ -22,13 +22,13 @@
 import { ReactElement, useContext, useEffect } from "react";
 import { createStyles, makeStyles, StyleRules } from "@material-ui/styles";
 import { PrismTheme, useBem } from "@solid/lit-prism-patterns";
+import { stringAsIri } from "@solid/lit-pod";
 import styles from "./styles";
 import DetailsMenuContext from "../../src/contexts/detailsMenuContext";
 import PodLocationContext from "../../src/contexts/podLocationContext";
 import { useFetchResourceDetails } from "../../src/hooks/litPod";
 import DetailsLoading from "../detailsLoading";
 import Details from "../resourceDetails";
-import {stringAsIri} from "@solid/lit-pod";
 
 const useStyles = makeStyles<PrismTheme>((theme) =>
   createStyles(styles(theme) as StyleRules)
@@ -38,13 +38,18 @@ export default function ContainerToolbar(): ReactElement | null {
   const { menuOpen, setMenuOpen, setMenuContents } = useContext(
     DetailsMenuContext
   );
-  const { baseUriAsString, currentUriAsString } = useContext(PodLocationContext);
-  const { data } = useFetchResourceDetails(stringAsIri(currentUriAsString)) || {};
+  const { baseUriAsString, currentUriAsString } = useContext(
+    PodLocationContext
+  );
+  const { data } =
+    useFetchResourceDetails(stringAsIri(currentUriAsString)) || {};
   const bem = useBem(useStyles());
 
   useEffect(() => {
     function getPathName(): string {
-      const path = baseUriAsString ? currentUriAsString.substr(baseUriAsString.length) : null;
+      const path = baseUriAsString
+        ? currentUriAsString.substr(baseUriAsString.length)
+        : null;
       return path === "" ? "All files" : path || "Unnamed";
     }
 
