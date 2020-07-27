@@ -37,6 +37,11 @@ import {
   unstable_fetchFile,
   unstable_fetchLitDatasetWithAcl,
   unstable_getAgentAccessAll,
+  unstable_getResourceAcl,
+  unstable_hasAccessibleAcl,
+  unstable_hasResourceAcl,
+  unstable_saveAclFor,
+  unstable_setAgentResourceAccess,
 } from "@solid/lit-pod";
 import { ldp, space } from "rdf-namespaces";
 import { parseUrl } from "../stringHelpers";
@@ -53,6 +58,13 @@ const typeNameMap = Object.keys(ldpWithType).reduce(
   },
   {}
 );
+
+export const ACL_KEYS = {
+  READ: "read",
+  WRITE: "write",
+  APPEND: "append",
+  CONTROL: "control",
+};
 
 // TODO use ldp namespace when available
 export const namespace: Record<string, string> = {
@@ -75,6 +87,10 @@ export const namespace: Record<string, string> = {
   hasPhoto: "http://www.w3.org/2006/vcard/ns#hasPhoto",
   "http://www.w3.org/2006/vcard/ns#hasPhoto": "hasPhoto",
 };
+
+export function isContainerIri(iri: string): boolean {
+  return iri.charAt(iri.length - 1) === "/";
+}
 
 export function getIriPath(iri: string): string | undefined {
   const { pathname } = parseUrl(iri);
@@ -122,6 +138,67 @@ export interface NormalizedPermission {
   alias: string;
   acl: unstable_Access;
   profile: Profile;
+}
+
+interface ISavePermissions {
+  iri: string;
+  webId: string;
+  access: unstable_Access;
+}
+
+export interface IResponse {
+  error?: string;
+  response?: unknown;
+}
+
+interface IResponder {
+  respond: (response: unknown) => IResponse;
+  error: (message: string) => IResponse;
+}
+
+export function createResponder(): IResponder {
+  const respond = (response: unknown): IResponse => {
+    return { response };
+  };
+  const error = (message: string): IResponse => {
+    return { error: message };
+  };
+
+  return { respond, error };
+}
+
+export async function savePermissions({
+  iri,
+  webId,
+  access,
+}: ISavePermissions): Promise<IResponse> {
+  const { respond, error } = createResponder();
+
+  const dataset = await unstable_fetchLitDatasetWithAcl(iri);
+
+  if (!dataset) return error("dataset is empty");
+
+  if (!unstable_hasResourceAcl(dataset)) {
+    return error("dataset does not have resource ACL");
+  }
+
+  const aclDataset = unstable_getResourceAcl(dataset);
+
+  if (!aclDataset) return error("aclDataset is empty");
+
+  if (!unstable_hasAccessibleAcl(aclDataset)) {
+    return error("aclDataset does not have accessible ACL");
+  }
+
+  const updatedAcl = unstable_setAgentResourceAccess(aclDataset, webId, access);
+
+  if (!updatedAcl) return error("updatedAcl is empty");
+
+  const response = await unstable_saveAclFor(dataset, updatedAcl);
+
+  if (!response) return error("response is empty");
+
+  return respond(response);
 }
 
 export async function normalizePermissions(
@@ -180,7 +257,7 @@ export interface NormalizedResource {
   permissions?: NormalizedPermission[];
 }
 
-export interface ResourceDetails extends NormalizedResource {
+export interface IResourceDetails extends NormalizedResource {
   name: string;
 }
 

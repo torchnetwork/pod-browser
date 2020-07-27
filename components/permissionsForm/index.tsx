@@ -20,33 +20,30 @@
  */
 
 /* eslint-disable camelcase */
-import { ReactElement, useState, useContext } from "react";
+import { Dispatch, ReactElement, useContext, useEffect, useState } from "react";
 import { PrismTheme } from "@solid/lit-prism-patterns";
 import { StyleRules } from "@material-ui/styles";
 import { AlertProps } from "@material-ui/lab/Alert";
-import {
-  unstable_Access,
-  unstable_AclDataset,
-  unstable_fetchLitDatasetWithAcl,
-  unstable_getResourceAcl,
-  unstable_setAgentResourceAccess,
-} from "@solid/lit-pod";
+import { unstable_Access } from "@solid/lit-pod";
 import {
   Button,
   Checkbox,
   createStyles,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   FormControlLabel,
   List,
   ListItem,
   makeStyles,
 } from "@material-ui/core";
 import KeyboardArrowDown from "@material-ui/icons/KeyboardArrowDown";
+import KeyboardArrowUp from "@material-ui/icons/KeyboardArrowUp";
 import AlertContext from "../../src/contexts/alertContext";
-import { NormalizedPermission } from "../../src/lit-solid-helpers";
+import ConfirmationDialogContext from "../../src/contexts/confirmationDialogContext";
+import {
+  displayPermissions,
+  NormalizedPermission,
+  ACL_KEYS,
+  IResponse,
+} from "../../src/lit-solid-helpers";
 import styles from "./styles";
 
 const useStyles = makeStyles<PrismTheme>((theme) =>
@@ -58,41 +55,6 @@ interface IConfirmDialog {
   open: boolean;
   setOpen: (open: boolean) => void;
   onConfirm: () => void;
-}
-
-export function confirmationDialog({
-  warn,
-  open,
-  setOpen,
-  onConfirm,
-}: IConfirmDialog): ReactElement | null {
-  if (!warn) return null;
-
-  return (
-    <Dialog
-      disableBackdropClick
-      disableEscapeKeyDown
-      maxWidth="xs"
-      aria-labelledby="permission-edit-confirmation"
-      open={open}
-    >
-      <DialogTitle>Change Personal Access</DialogTitle>
-      <DialogContent dividers>
-        <p>
-          You are about to edit your own access to this resource. Are you sure
-          you wish to continue?
-        </p>
-      </DialogContent>
-      <DialogActions>
-        <Button autoFocus onClick={() => setOpen(false)} color="primary">
-          Cancel
-        </Button>
-        <Button type="submit" color="primary" onClick={onConfirm}>
-          Ok
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
 }
 
 export function setPermissionHandler(
@@ -145,40 +107,32 @@ export function PermissionCheckbox({
 
 interface ISavePermissionHandler {
   access: unstable_Access;
-  iri: string;
-  setMessage: React.Dispatch<React.SetStateAction<string>>;
-  setSeverity: React.Dispatch<React.SetStateAction<AlertProps["severity"]>>;
-  setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  webId: string;
+  setMessage: Dispatch<string>;
+  setSeverity: Dispatch<AlertProps["severity"]>;
+  setDialogOpen: Dispatch<boolean>;
+  setAlertOpen: Dispatch<boolean>;
+  onSave: (access: unstable_Access) => Promise<IResponse>;
 }
 
 export function savePermissionsHandler({
   access,
-  iri,
+  onSave,
+  setAlertOpen,
+  setDialogOpen,
   setMessage,
   setSeverity,
-  setDialogOpen,
-  setAlertOpen,
-  webId,
 }: ISavePermissionHandler): () => void {
   return async (): Promise<void> => {
-    const dataset = await unstable_fetchLitDatasetWithAcl(iri);
-    const aclDataset = unstable_getResourceAcl(dataset);
+    const { response, error } = await onSave(access);
 
-    try {
-      await unstable_setAgentResourceAccess(
-        aclDataset as unstable_AclDataset,
-        webId,
-        access as unstable_Access
-      );
+    if (response) {
       setDialogOpen(false);
       setMessage("Your permissions have been saved!");
       setAlertOpen(true);
-    } catch (e) {
+    } else {
       setDialogOpen(false);
       setSeverity("error" as AlertProps["severity"]);
-      setMessage("There was an error saving permissions!");
+      setMessage(error as string);
       setAlertOpen(true);
     }
   };
@@ -186,9 +140,9 @@ export function savePermissionsHandler({
 
 interface ISaveHandler {
   warnOnSubmit: boolean;
-  setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setDialogOpen: Dispatch<boolean>;
   savePermissions: () => void;
-  setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setAlertOpen: Dispatch<boolean>;
 }
 
 export function saveHandler({
@@ -200,76 +154,131 @@ export function saveHandler({
     if (warnOnSubmit) {
       setDialogOpen(true);
     } else {
-      setDialogOpen(false);
       await savePermissions();
     }
   };
 }
 
+export function toggleOpen(
+  open: boolean,
+  setOpen: Dispatch<boolean>
+): () => void {
+  return () => setOpen(!open);
+}
+
 interface IPermissionForm {
-  iri: string;
-  permission: NormalizedPermission;
+  permission: Partial<NormalizedPermission>;
   warnOnSubmit: boolean;
+  onSave: (access: unstable_Access) => Promise<IResponse>;
 }
 
 export default function PermissionsForm({
-  iri,
   permission,
-  warnOnSubmit = false,
+  warnOnSubmit,
+  onSave,
 }: IPermissionForm): ReactElement | null {
-  const { webId, acl, alias } = permission;
+  const { acl } = permission;
 
   const classes = useStyles();
   const [access, setAccess] = useState(acl);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
+  const icon = formOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />;
   const { setMessage, setSeverity, setAlertOpen } = useContext(AlertContext);
-
-  if (!permission) return null;
-  if (!access.control) return null;
+  const [confirmationSetup, setConfirmationSetup] = useState(false);
+  const { setTitle, setOpen, setContent, confirmed, setConfirmed } = useContext(
+    ConfirmationDialogContext
+  );
+  const unstableAccess = access as unstable_Access;
 
   const savePermissions = savePermissionsHandler({
-    access,
-    iri,
+    access: unstableAccess,
+    onSave,
+    setAlertOpen,
+    setDialogOpen: setOpen,
     setMessage,
     setSeverity,
-    setDialogOpen,
-    setAlertOpen,
-    webId,
   });
 
   const handleSaveClick = saveHandler({
     savePermissions,
-    setDialogOpen,
+    setDialogOpen: setOpen,
     setAlertOpen,
     warnOnSubmit,
   });
-  const readChange = setPermissionHandler(access, "read", setAccess);
-  const writeChange = setPermissionHandler(access, "write", setAccess);
-  const appendChange = setPermissionHandler(access, "append", setAccess);
-  const controlChange = setPermissionHandler(access, "control", setAccess);
+
+  const readChange = setPermissionHandler(
+    unstableAccess,
+    ACL_KEYS.READ,
+    setAccess
+  );
+  const writeChange = setPermissionHandler(
+    unstableAccess,
+    ACL_KEYS.WRITE,
+    setAccess
+  );
+  const appendChange = setPermissionHandler(
+    unstableAccess,
+    ACL_KEYS.APPEND,
+    setAccess
+  );
+  const controlChange = setPermissionHandler(
+    unstableAccess,
+    ACL_KEYS.CONTROL,
+    setAccess
+  );
+  const handleToggleClick = toggleOpen(formOpen, setFormOpen);
+
+  useEffect(() => {
+    if (confirmationSetup && !confirmed) return;
+
+    setTitle("Confirm Access Permissions");
+    setContent(
+      <p>
+        You are about to change your own access to this resource, are you sure
+        you wish to continue?
+      </p>
+    );
+    setConfirmationSetup(true);
+
+    if (confirmed) {
+      setOpen(false);
+      setConfirmed(false);
+      savePermissions();
+    }
+  }, [
+    setTitle,
+    setContent,
+    confirmed,
+    setOpen,
+    setConfirmed,
+    savePermissions,
+    confirmationSetup,
+    setConfirmationSetup,
+  ]);
 
   return (
     // prettier-ignore
     // This chooses typescript rules over prettier in a battle over adding parenthesis to JSX
-    <details>
-      <summary className={classes.summary}>
-        <span>{alias}</span>
-        <span className={classes.selectIcon}>
-          <KeyboardArrowDown />
-        </span>
-      </summary>
-      <List>
-        <PermissionCheckbox value={access.read} classes={classes} label="read" onChange={readChange} />
-        <PermissionCheckbox value={access.write} classes={classes} label="write" onChange={writeChange} />
-        <PermissionCheckbox value={access.append} classes={classes} label="append" onChange={appendChange} />
-        <PermissionCheckbox value={access.control} classes={classes} label="control" onChange={controlChange} />
-      </List>
-
-      <Button onClick={handleSaveClick} variant="contained">
-        Save
+    <div className={classes.container}>
+      <Button
+        className={classes.summary}
+        onClick={handleToggleClick}
+        endIcon={icon}
+      >
+        <span>{displayPermissions(unstableAccess)}</span>
       </Button>
+      <section className={formOpen ? classes.selectionOpen : classes.selectionClosed}>
+        <List>
+          <PermissionCheckbox value={unstableAccess.read} classes={classes} label="read" onChange={readChange} />
+          <PermissionCheckbox value={unstableAccess.write} classes={classes} label="write" onChange={writeChange} />
+          <PermissionCheckbox value={unstableAccess.append} classes={classes} label="append" onChange={appendChange} />
+          <PermissionCheckbox value={unstableAccess.control} classes={classes} label="control" onChange={controlChange} />
+        </List>
 
-      {confirmationDialog({warn: warnOnSubmit, open: dialogOpen, setOpen: setDialogOpen, onConfirm: savePermissions})}
-    </details>
+        <Button onClick={handleSaveClick} variant="contained">
+          Save
+        </Button>
+      </section>
+    </div>
   );
 }

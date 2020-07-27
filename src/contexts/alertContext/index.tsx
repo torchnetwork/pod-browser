@@ -20,25 +20,27 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  createContext,
-  ReactElement,
-  useState,
-  Dispatch,
-  SetStateAction,
-} from "react";
+import { createContext, ReactElement, useState, Dispatch } from "react";
 import { AlertProps } from "@material-ui/lab/Alert";
 
 interface IAlertContext {
-  alertOpen?: boolean;
-  message?: string;
-  severity?: AlertProps["severity"];
-  setAlertOpen?: Dispatch<SetStateAction<boolean>> | any;
-  setMessage?: Dispatch<SetStateAction<string>> | any;
-  setSeverity?: Dispatch<SetStateAction<AlertProps["severity"]>> | any;
+  alertOpen: boolean;
+  message: string;
+  severity: AlertProps["severity"];
+  setAlertOpen: Dispatch<boolean>;
+  setMessage: Dispatch<string>;
+  setSeverity: Dispatch<AlertProps["severity"]>;
 }
 
-const AlertContext = createContext<IAlertContext>({});
+const AlertContext = createContext<IAlertContext>({
+  alertOpen: false,
+  message: "",
+  severity: "success",
+  setAlertOpen: () => false,
+  setMessage: () => "",
+  setSeverity: () => "success",
+});
+
 export default AlertContext;
 
 interface IAlertProvider {
