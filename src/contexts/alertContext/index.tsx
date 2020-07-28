@@ -20,7 +20,13 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createContext, ReactElement, useState, Dispatch } from "react";
+import {
+  createContext,
+  ReactElement,
+  ReactNode,
+  useState,
+  Dispatch,
+} from "react";
 import { AlertProps } from "@material-ui/lab/Alert";
 
 interface IAlertContext {
@@ -41,13 +47,11 @@ const AlertContext = createContext<IAlertContext>({
   setSeverity: () => "success",
 });
 
-export default AlertContext;
-
 interface IAlertProvider {
-  children: ReactElement | ReactElement[] | undefined | null;
+  children: ReactNode;
 }
 
-export function AlertProvider({ children }: IAlertProvider): ReactElement {
+function AlertProvider({ children }: IAlertProvider): ReactElement {
   const [alertOpen, setAlertOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [severity, setSeverity] = useState("success" as AlertProps["severity"]);
@@ -67,3 +71,6 @@ export function AlertProvider({ children }: IAlertProvider): ReactElement {
     </AlertContext.Provider>
   );
 }
+
+export { AlertProvider };
+export default AlertContext;

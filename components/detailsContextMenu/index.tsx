@@ -19,20 +19,24 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { ReactElement, useContext } from "react";
+import { ReactElement, useContext, useEffect } from "react";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+import { AlertProps } from "@material-ui/lab/Alert";
 import { Drawer, IconButton } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import { useRouter } from "next/router";
 import DetailsMenuContext, {
   DETAILS_CONTEXT_ACTIONS,
 } from "../../src/contexts/detailsMenuContext";
+import AlertContext from "../../src/contexts/alertContext";
 import styles from "./styles";
 import useEscKey from "../../src/effects/useEscKey";
 import DetailsLoading from "../detailsLoading";
+import DetailsError from "../detailsError";
 import ResourceDetails from "../resourceDetails";
 import ResourceSharing from "../resourceSharing";
 import { useFetchResourceDetails } from "../../src/hooks/litPod";
-import { parseUrl } from "../../src/stringHelpers";
+import { parseUrl, stripQueryParams } from "../../src/stringHelpers";
 
 const useStyles = makeStyles(styles);
 
@@ -44,9 +48,22 @@ interface IContentsProps {
 export function Contents({ action, iri }: IContentsProps): ReactElement | null {
   const { pathname } = parseUrl(iri);
   const { data, error } = useFetchResourceDetails(iri);
+  const { setAlertOpen, setMessage, setSeverity } = useContext(AlertContext);
+  const errorMessage = "There was an error fetching the details.";
 
-  if (!data) return <DetailsLoading name={pathname} />;
-  if (error) return null;
+  useEffect(() => {
+    if (error) {
+      setSeverity("error" as AlertProps["severity"]);
+      setMessage(errorMessage);
+      setAlertOpen(true);
+    }
+  });
+
+  if (error) {
+    return <DetailsError message={errorMessage} name={pathname} iri={iri} />;
+  }
+
+  if (!data) return <DetailsLoading name={pathname} iri={iri} />;
 
   const { permissions } = data;
 
@@ -57,14 +74,21 @@ export function Contents({ action, iri }: IContentsProps): ReactElement | null {
       );
 
     default:
-      return <ResourceDetails resource={data} />;
+      return <ResourceDetails resource={{ ...data, name: pathname }} />;
   }
 }
 
 export default function DetailsContextMenu(): ReactElement | null {
   const { menuOpen, setMenuOpen, action, iri } = useContext(DetailsMenuContext);
   const classes = useStyles();
-  const closeDrawer = () => setMenuOpen(false);
+  const router = useRouter();
+
+  const closeDrawer = async () => {
+    setMenuOpen(false);
+    const { asPath } = router;
+    const pathname = stripQueryParams(asPath) || "/";
+    await router.replace({ pathname });
+  };
 
   useEscKey(closeDrawer);
 
@@ -82,9 +106,7 @@ export default function DetailsContextMenu(): ReactElement | null {
         <ChevronRightIcon />
       </IconButton>
       <div className={classes.drawerContent}>
-        {!iri
-          ? <DetailsLoading />
-          : <Contents action={action as string} iri={iri as string} />}
+        <Contents action={action as string} iri={iri as string} />
       </div>
     </Drawer>
   );

@@ -44,7 +44,7 @@ import {
   unstable_setAgentResourceAccess,
 } from "@solid/lit-pod";
 import { ldp, space } from "rdf-namespaces";
-import { parseUrl } from "../stringHelpers";
+import { parseUrl, isUrl } from "../stringHelpers";
 
 const ldpWithType: Record<string, string> = ldp;
 
@@ -206,19 +206,21 @@ export async function normalizePermissions(
   fetchProfileFn = fetchProfile
 ): Promise<NormalizedPermission[]> {
   return Promise.all(
-    Object.keys(permissions).map(
-      async (webId: string): Promise<NormalizedPermission> => {
-        const acl = permissions[webId];
-        const profile = await fetchProfileFn(webId);
+    Object.keys(permissions)
+      .filter(isUrl)
+      .map(
+        async (webId: string): Promise<NormalizedPermission> => {
+          const acl = permissions[webId];
+          const profile = await fetchProfileFn(webId);
 
-        return {
-          acl,
-          profile,
-          alias: displayPermissions(acl),
-          webId,
-        };
-      }
-    )
+          return {
+            acl,
+            profile,
+            alias: displayPermissions(acl),
+            webId,
+          };
+        }
+      )
   );
 }
 
