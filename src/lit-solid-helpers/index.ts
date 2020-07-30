@@ -59,11 +59,67 @@ const typeNameMap = Object.keys(ldpWithType).reduce(
   {}
 );
 
-export const ACL_KEYS = {
+export const ACCESS_KEYS = {
   READ: "read",
   WRITE: "write",
   APPEND: "append",
   CONTROL: "control",
+};
+
+interface IAccessMode {
+  alias: string;
+  acl: unstable_Access;
+}
+
+export const ACCESS_MODES: Record<string, IAccessMode> = {
+  NO_ACCESS: {
+    alias: "No access",
+    acl: {
+      [ACCESS_KEYS.READ]: false,
+      [ACCESS_KEYS.WRITE]: false,
+      [ACCESS_KEYS.APPEND]: false,
+      [ACCESS_KEYS.CONTROL]: false,
+    },
+  },
+  CAN_VIEW: {
+    alias: "View",
+    acl: {
+      [ACCESS_KEYS.READ]: true,
+      [ACCESS_KEYS.WRITE]: false,
+      [ACCESS_KEYS.APPEND]: false,
+      [ACCESS_KEYS.CONTROL]: false,
+    },
+  },
+
+  CAN_EDIT: {
+    alias: "Edit",
+    acl: {
+      [ACCESS_KEYS.READ]: true,
+      [ACCESS_KEYS.WRITE]: true,
+      [ACCESS_KEYS.APPEND]: true,
+      [ACCESS_KEYS.CONTROL]: false,
+    },
+  },
+
+  CAN_APPEND: {
+    alias: "Append",
+    acl: {
+      [ACCESS_KEYS.READ]: true,
+      [ACCESS_KEYS.WRITE]: false,
+      [ACCESS_KEYS.APPEND]: true,
+      [ACCESS_KEYS.CONTROL]: false,
+    },
+  },
+
+  FULL_CONTROL: {
+    alias: "Control",
+    acl: {
+      [ACCESS_KEYS.READ]: true,
+      [ACCESS_KEYS.WRITE]: true,
+      [ACCESS_KEYS.APPEND]: true,
+      [ACCESS_KEYS.CONTROL]: true,
+    },
+  },
 };
 
 // TODO use ldp namespace when available
@@ -106,12 +162,28 @@ export function displayTypes(types: string[]): string[] {
   return types?.length ? types.map((t: string): string => getTypeName(t)) : [];
 }
 
-export function displayPermissions(permissions: unstable_Access): string {
-  const perms = Object.values(permissions);
-  if (perms.every((p) => p)) return "Full Control";
-  if (perms.every((p) => !p)) return "No Access";
-  if (permissions.write) return "Can Edit";
-  return "Can View";
+export function aclForAlias(alias: string): unstable_Access {
+  const key = Object.keys(ACCESS_MODES).find(
+    (k) => ACCESS_MODES[k].alias === alias
+  );
+  return ACCESS_MODES[key] && ACCESS_MODES[key].acl;
+}
+
+export function displayPermissions(
+  permissions: unstable_Access | Record<string, boolean>
+): string {
+  const mode = Object.keys(ACCESS_MODES).find((key: string): boolean => {
+    const stringKey = key as string;
+    const foundMode = ACCESS_MODES[stringKey];
+
+    return (
+      foundMode.acl.read === permissions.read &&
+      foundMode.acl.write === permissions.write &&
+      foundMode.acl.append === permissions.append &&
+      foundMode.acl.control === permissions.control
+    );
+  });
+  return mode ? ACCESS_MODES[mode].alias : ACCESS_MODES.NO_ACCESS.alias;
 }
 
 export interface Profile {

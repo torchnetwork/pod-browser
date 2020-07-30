@@ -60,6 +60,7 @@ import {
   Profile,
   savePermissions,
 } from "../../src/lit-solid-helpers";
+import { stripQueryParams } from "../../src/stringHelpers";
 import styles from "../resourceDetails/styles";
 import PermissionsForm from "../permissionsForm";
 
@@ -206,7 +207,7 @@ export function handlePermissionUpdate({
   webId,
 }: IHandlePermissionUpdate) {
   return async (access: unstable_Access): Promise<IResponse> => {
-    if (displayPermissions(access) === "No Access") {
+    if (displayPermissions(access) === "No access") {
       setThirdPartyPermissions(
         thirdPartyPermissions.filter((p) => p.webId !== webId)
       );
@@ -402,7 +403,8 @@ export default function ResourceSharing({
   );
   const classes = useStyles();
   const router = useRouter();
-  const { pathname } = router;
+  const { asPath } = router;
+  const pathname = stripQueryParams(asPath);
   const iriString = iri as string;
 
   return (

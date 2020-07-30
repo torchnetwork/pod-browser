@@ -83,7 +83,7 @@ describe("Contents", () => {
 
     jest
       .spyOn(RouterFns, "useRouter")
-      .mockReturnValueOnce({ pathname: "/pathname/", replace: jest.fn() });
+      .mockReturnValueOnce({ asPath: "/pathname/", replace: jest.fn() });
 
     const tree = mountToJson(<Contents iri="/iri/" action="details" />);
 
@@ -110,7 +110,7 @@ describe("Contents", () => {
 
     jest
       .spyOn(RouterFns, "useRouter")
-      .mockReturnValue({ pathname: "/pathname/", replace: jest.fn() });
+      .mockReturnValue({ asPath: "/pathname/", replace: jest.fn() });
 
     const tree = mountToJson(<Contents iri={iri} action="details" />);
 
@@ -121,6 +121,11 @@ describe("Contents", () => {
     const iri = "/iri/";
     const webId = "webId";
     const mockUserContext = { session: { webId } };
+    const mockAlertContext = {
+      setAlertOpen: jest.fn(),
+      setMessage: jest.fn(),
+      setSeverity: jest.fn(),
+    };
     const mockDetailsMenuContext = {
       menuOpen: false,
       setMenuOpen: jest.fn(),
@@ -143,7 +148,8 @@ describe("Contents", () => {
     jest
       .spyOn(ReactFns, "useContext")
       .mockReturnValueOnce(mockDetailsMenuContext)
-      .mockReturnValueOnce(mockUserContext);
+      .mockReturnValueOnce(mockUserContext)
+      .mockReturnValueOnce(mockAlertContext);
 
     jest
       .spyOn(LitPodFns, "useFetchResourceDetails")
@@ -151,7 +157,7 @@ describe("Contents", () => {
 
     jest
       .spyOn(RouterFns, "useRouter")
-      .mockReturnValueOnce({ pathname: "/pathname/", replace: jest.fn() });
+      .mockReturnValueOnce({ asPath: "/pathname/", replace: jest.fn() });
 
     const tree = mountToJson(<Contents iri={iri} action="sharing" />);
 
@@ -174,7 +180,7 @@ describe("Contents", () => {
 
     jest
       .spyOn(RouterFns, "useRouter")
-      .mockReturnValueOnce({ pathname: "/pathname/", replace: jest.fn() });
+      .mockReturnValueOnce({ asPath: "/pathname/", replace: jest.fn() });
 
     const tree = mountToJson(<Contents iri={iri} action="details" />);
 

@@ -26,11 +26,9 @@ import { mountToJson } from "enzyme-to-json";
 import * as LitPodFns from "@solid/lit-pod";
 import { NormalizedPermission } from "../../src/lit-solid-helpers";
 import PermissionsForm, {
-  setPermissionHandler,
   savePermissionsHandler,
-  PermissionCheckbox,
-  saveHandler,
-  toggleOpen,
+  changeHandler,
+  submitHandler,
 } from "./index";
 
 describe("PermissionsForm", () => {
@@ -101,8 +99,8 @@ describe("PermissionsForm", () => {
     const setContent = jest.fn();
     const setConfirmed = jest.fn();
     const setAccess = jest.fn();
+    const setSelectedAccess = jest.fn();
     const setConfirmationSetup = jest.fn();
-    const setFormOpen = jest.fn();
 
     jest
       .spyOn(ReactFns, "useContext")
@@ -118,7 +116,7 @@ describe("PermissionsForm", () => {
     jest
       .spyOn(ReactFns, "useState")
       .mockReturnValueOnce([permission.acl, setAccess])
-      .mockReturnValueOnce([false, setFormOpen])
+      .mockReturnValueOnce(["Control", setSelectedAccess])
       .mockReturnValueOnce([false, setConfirmationSetup]);
 
     jest.spyOn(ReactFns, "useEffect");
@@ -161,7 +159,7 @@ describe("PermissionsForm", () => {
     const setConfirmed = jest.fn();
     const setAccess = jest.fn();
     const setConfirmationSetup = jest.fn();
-    const setFormOpen = jest.fn();
+    const setSelectedAccess = jest.fn();
 
     jest
       .spyOn(LitPodFns, "unstable_fetchLitDatasetWithAcl")
@@ -187,7 +185,7 @@ describe("PermissionsForm", () => {
     jest
       .spyOn(ReactFns, "useState")
       .mockReturnValueOnce([permission.acl, setAccess])
-      .mockReturnValueOnce([false, setFormOpen])
+      .mockReturnValueOnce(["Control", setSelectedAccess])
       .mockReturnValueOnce([false, setConfirmationSetup]);
 
     jest.spyOn(ReactFns, "useEffect");
@@ -198,29 +196,6 @@ describe("PermissionsForm", () => {
 
     expect(setOpen).toHaveBeenCalledWith(false);
     expect(setConfirmed).toHaveBeenCalledWith(false);
-  });
-});
-
-describe("setPermissionHandler", () => {
-  test("it creates a toggle function", () => {
-    const access = {
-      read: true,
-      write: true,
-      append: true,
-      control: true,
-    };
-    const expectedAccess = {
-      read: false,
-      write: true,
-      append: true,
-      control: true,
-    };
-    const setPermission = jest.fn();
-    const toggleFunction = setPermissionHandler(access, "read", setPermission);
-
-    toggleFunction();
-
-    expect(setPermission).toHaveBeenCalledWith(expectedAccess);
   });
 });
 
@@ -287,78 +262,129 @@ describe("savePermissionsHandler", () => {
   });
 });
 
-describe("PermissionCheckbox", () => {
-  test("it renders a permission checkbox", () => {
-    const onChange = jest.fn();
-    const classes = {
-      listItem: "listItem",
-      label: "label",
-      checkbox: "checkbox",
-    };
-    const label = "Read";
-    const value = true;
+describe("changeHandler", () => {
+  test("it sets the access based on the alias", async () => {
+    const savePermissions = jest.fn();
+    const setAccess = jest.fn();
+    const setDialogOpen = jest.fn();
+    const setSelectedAccess = jest.fn();
+    const warnOnSubmit = true;
 
-    const tree = mount(
-      <PermissionCheckbox
-        value={value}
-        classes={classes}
-        label={label}
-        onChange={onChange}
-      />
-    );
+    const handler = changeHandler({
+      savePermissions,
+      setAccess,
+      setDialogOpen,
+      setSelectedAccess,
+      warnOnSubmit,
+    });
 
-    expect(mountToJson(tree)).toMatchSnapshot();
-  });
-});
+    await handler({ target: { value: "Control" } });
 
-describe("saveHandler", () => {
-  test("it opens the dialog if warnOnSubmit is true", async () => {
-    const args = {
-      savePermissions: jest.fn(),
-      setDialogOpen: jest.fn(),
-      warnOnSubmit: true,
-    };
-
-    const handler = saveHandler(args);
-
-    await handler();
-
-    expect(args.setDialogOpen).toHaveBeenCalledWith(true);
+    expect(setAccess).toHaveBeenCalledWith({
+      read: true,
+      write: true,
+      append: true,
+      control: true,
+    });
   });
 
-  test("it saves the permissions, and shows an alert when warnOnSubmit is false", async () => {
-    const args = {
-      savePermissions: jest.fn(),
-      setDialogOpen: jest.fn(),
-      warnOnSubmit: false,
-    };
+  test("it sets the selected access alias", async () => {
+    const savePermissions = jest.fn();
+    const setAccess = jest.fn();
+    const setDialogOpen = jest.fn();
+    const setSelectedAccess = jest.fn();
+    const warnOnSubmit = true;
 
-    const handler = saveHandler(args);
+    const handler = changeHandler({
+      savePermissions,
+      setAccess,
+      setDialogOpen,
+      setSelectedAccess,
+      warnOnSubmit,
+    });
 
-    await handler();
+    await handler({ target: { value: "Control" } });
 
-    expect(args.savePermissions).toHaveBeenCalled();
-  });
-});
-
-describe("toggleOpen", () => {
-  test("it calls setOpen with false is open is true", () => {
-    const setOpen = jest.fn();
-    const open = true;
-
-    const toggle = toggleOpen(open, setOpen);
-    toggle();
-
-    expect(setOpen).toHaveBeenCalledWith(false);
+    expect(setSelectedAccess).toHaveBeenCalledWith("Control");
   });
 
-  test("it calls setOpen with true is open is false", () => {
-    const setOpen = jest.fn();
-    const open = false;
+  test("it does not set the selected access alias if it is undefined", async () => {
+    const savePermissions = jest.fn();
+    const setAccess = jest.fn();
+    const setDialogOpen = jest.fn();
+    const setSelectedAccess = jest.fn();
+    const warnOnSubmit = true;
 
-    const toggle = toggleOpen(open, setOpen);
-    toggle();
+    const handler = changeHandler({
+      savePermissions,
+      setAccess,
+      setDialogOpen,
+      setSelectedAccess,
+      warnOnSubmit,
+    });
 
-    expect(setOpen).toHaveBeenCalledWith(true);
+    await handler({ target: { value: "Nonexistent" } });
+
+    expect(setSelectedAccess).not.toHaveBeenCalledWith();
+  });
+
+  test("it does not set the access based on the alias when undefined", async () => {
+    const savePermissions = jest.fn();
+    const setAccess = jest.fn();
+    const setDialogOpen = jest.fn();
+    const setSelectedAccess = jest.fn();
+    const warnOnSubmit = true;
+
+    const handler = changeHandler({
+      savePermissions,
+      setAccess,
+      setDialogOpen,
+      setSelectedAccess,
+      warnOnSubmit,
+    });
+
+    await handler({ target: { value: "" } });
+
+    expect(setAccess).not.toHaveBeenCalledWith();
+  });
+
+  test("it sets the dialog to open if warnOnSubmit is true", async () => {
+    const savePermissions = jest.fn();
+    const setAccess = jest.fn();
+    const setDialogOpen = jest.fn();
+    const setSelectedAccess = jest.fn();
+    const warnOnSubmit = true;
+
+    const handler = changeHandler({
+      savePermissions,
+      setAccess,
+      setDialogOpen,
+      setSelectedAccess,
+      warnOnSubmit,
+    });
+
+    await handler({ target: { value: "Control" } });
+
+    expect(setDialogOpen).toHaveBeenCalledWith(true);
+  });
+
+  test("it saves the permissions if warnOnSubmit is false", async () => {
+    const savePermissions = jest.fn();
+    const setAccess = jest.fn();
+    const setDialogOpen = jest.fn();
+    const setSelectedAccess = jest.fn();
+    const warnOnSubmit = false;
+
+    const handler = changeHandler({
+      savePermissions,
+      setAccess,
+      setDialogOpen,
+      setSelectedAccess,
+      warnOnSubmit,
+    });
+
+    await handler({ target: { value: "Control" } });
+
+    expect(savePermissions).toHaveBeenCalled();
   });
 });

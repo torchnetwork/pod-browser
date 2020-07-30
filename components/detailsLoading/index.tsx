@@ -34,6 +34,7 @@ import Skeleton from "@material-ui/lab/Skeleton";
 import { PrismTheme } from "@solid/lit-prism-patterns";
 import { makeStyles, createStyles } from "@material-ui/core/styles";
 import styles from "./styles";
+import { stripQueryParams } from "../../src/stringHelpers";
 
 const useStyles = makeStyles<PrismTheme>((theme) =>
   createStyles(styles(theme))
@@ -47,7 +48,8 @@ interface Props {
 function DetailsLoading({ name, iri }: Props): ReactElement {
   const classes = useStyles();
   const router = useRouter();
-  const { pathname } = router;
+  const { asPath } = router;
+  const pathname = stripQueryParams(asPath);
 
   return (
     <>

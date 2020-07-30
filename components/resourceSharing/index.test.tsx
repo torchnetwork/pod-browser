@@ -40,7 +40,7 @@ describe("ResourceSharing", () => {
     const name = "name";
     const iri = "iri";
     const webId = "webId";
-    const alias = "Full Control";
+    const alias = "Control";
     const acl = {
       read: true,
       write: true,
@@ -69,18 +69,12 @@ describe("ResourceSharing", () => {
 
     jest
       .spyOn(RouterFns, "useRouter")
-      .mockReturnValueOnce({ pathname: "/pathname/", replace: jest.fn() });
+      .mockReturnValueOnce({ asPath: "/pathname/", replace: jest.fn() });
 
     jest
       .spyOn(ReactFns, "useContext")
       .mockReturnValueOnce({ session: { webId } })
-      .mockReturnValueOnce({
-        setTitle,
-        setOpen,
-        setContent,
-        confirmed,
-        setConfirmed,
-      });
+      .mockReturnValueOnce({ session: { webId } });
 
     const tree = mountToJson(
       <ResourceSharing iri={iri} name={name} permissions={permissions} />
@@ -184,7 +178,7 @@ describe("saveThirdPartyPermissionHandler", () => {
     expect(setAddedAgents).toHaveBeenCalledWith([]);
     expect(setThirdPartyPermissions).toHaveBeenCalledWith([
       {
-        alias: "Full Control",
+        alias: "Control",
         acl: access,
         webId,
         profile,
@@ -367,7 +361,7 @@ describe("ThirdPartyPermissions", () => {
     const avatar = "avatar";
     const name = "name";
     const permission = {
-      alias: "Full Control",
+      alias: "Control",
       profile: { webId, avatar, name },
       acl: {
         read: true,
@@ -401,7 +395,7 @@ describe("ThirdPartyPermissionsList", () => {
   test("it renders the third party permissions", () => {
     const iri = "iri";
     const webId = "webId";
-    const alias = "Full Control";
+    const alias = "Control";
     const profile = { webId };
     const setThirdPartyPermissions = jest.fn();
     const acl = {

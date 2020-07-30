@@ -21,89 +21,18 @@
 
 /* eslint-disable camelcase */
 import { Dispatch, ReactElement, useContext, useEffect, useState } from "react";
-import { PrismTheme } from "@solid/lit-prism-patterns";
-import { StyleRules } from "@material-ui/styles";
-import { AlertProps } from "@material-ui/lab/Alert";
 import { unstable_Access } from "@solid/lit-pod";
-import {
-  Button,
-  Checkbox,
-  createStyles,
-  FormControlLabel,
-  List,
-  ListItem,
-  makeStyles,
-} from "@material-ui/core";
-import KeyboardArrowDown from "@material-ui/icons/KeyboardArrowDown";
-import KeyboardArrowUp from "@material-ui/icons/KeyboardArrowUp";
+import { MenuItem, Select } from "@material-ui/core";
+import { AlertProps } from "@material-ui/lab/Alert";
 import AlertContext from "../../src/contexts/alertContext";
 import ConfirmationDialogContext from "../../src/contexts/confirmationDialogContext";
 import {
-  displayPermissions,
   NormalizedPermission,
-  ACL_KEYS,
+  ACCESS_MODES,
+  displayPermissions,
   IResponse,
+  aclForAlias,
 } from "../../src/lit-solid-helpers";
-import styles from "./styles";
-
-const useStyles = makeStyles<PrismTheme>((theme) =>
-  createStyles(styles(theme) as StyleRules)
-);
-
-interface IConfirmDialog {
-  warn: boolean;
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  onConfirm: () => void;
-}
-
-export function setPermissionHandler(
-  access: Record<string, boolean>,
-  key: string,
-  setAccess: (access: unstable_Access) => void
-): () => void {
-  return () => {
-    const value = !access[key];
-    setAccess({
-      ...access,
-      [key]: value,
-    } as unstable_Access);
-  };
-}
-
-interface IPermissionCheckbox {
-  label: string;
-  classes: Record<string, string>;
-  onChange: () => void;
-  value: boolean;
-}
-
-export function PermissionCheckbox({
-  value,
-  label,
-  classes,
-  onChange,
-}: IPermissionCheckbox): ReactElement {
-  const name = label.toLowerCase();
-
-  return (
-    // prettier-ignore
-    <ListItem className={classes.listItem}>
-      <FormControlLabel
-        classes={{ label: classes.label }}
-        label={label}
-        control={(
-          <Checkbox
-            classes={{ root: classes.checkbox }}
-            checked={value}
-            name={name}
-            onChange={onChange}
-          />
-        )}
-      />
-    </ListItem>
-  );
-}
 
 interface ISavePermissionHandler {
   access: unstable_Access;
@@ -138,32 +67,43 @@ export function savePermissionsHandler({
   };
 }
 
-interface ISaveHandler {
-  warnOnSubmit: boolean;
-  setDialogOpen: Dispatch<boolean>;
-  savePermissions: () => void;
-  setAlertOpen: Dispatch<boolean>;
+export function accessSelectOptions(): ReactElement[] {
+  return Object.values(ACCESS_MODES).map(({ alias }, i) => (
+    <MenuItem key={i} value={alias}>
+      {alias}
+    </MenuItem>
+  ));
 }
 
-export function saveHandler({
-  setDialogOpen,
-  warnOnSubmit,
+interface ISaveHandler {
+  setSelectedAccess: Dispatch<string>;
+  setAccess: Dispatch<unstable_Access>;
+  setDialogOpen: Dispatch<boolean>;
+  warnOnSubmit: boolean;
+  savePermissions: () => void;
+}
+
+export function changeHandler({
   savePermissions,
+  setAccess,
+  setDialogOpen,
+  setSelectedAccess,
+  warnOnSubmit,
 }: ISaveHandler) {
-  return async (): Promise<void> => {
+  return async ({ target }: React.ChangeEvent): void => {
+    const element = target as HTMLInputElement;
+    const value = element.value as string;
+    const access = aclForAlias(value);
+
+    if (access) setAccess(access);
+    if (value) setSelectedAccess(value);
+
     if (warnOnSubmit) {
       setDialogOpen(true);
     } else {
       await savePermissions();
     }
   };
-}
-
-export function toggleOpen(
-  open: boolean,
-  setOpen: Dispatch<boolean>
-): () => void {
-  return () => setOpen(!open);
 }
 
 interface IPermissionForm {
@@ -179,19 +119,17 @@ export default function PermissionsForm({
 }: IPermissionForm): ReactElement | null {
   const { acl } = permission;
 
-  const classes = useStyles();
-  const [access, setAccess] = useState(acl);
-  const [formOpen, setFormOpen] = useState(false);
-  const icon = formOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />;
+  const [access, setAccess] = useState(acl as unstable_Access);
+  const [selectedAccess, setSelectedAccess] = useState(
+    displayPermissions(access)
+  );
   const { setMessage, setSeverity, setAlertOpen } = useContext(AlertContext);
   const [confirmationSetup, setConfirmationSetup] = useState(false);
   const { setTitle, setOpen, setContent, confirmed, setConfirmed } = useContext(
     ConfirmationDialogContext
   );
-  const unstableAccess = access as unstable_Access;
-
   const savePermissions = savePermissionsHandler({
-    access: unstableAccess,
+    access,
     onSave,
     setAlertOpen,
     setDialogOpen: setOpen,
@@ -199,34 +137,13 @@ export default function PermissionsForm({
     setSeverity,
   });
 
-  const handleSaveClick = saveHandler({
+  const handleChange = changeHandler({
     savePermissions,
+    setAccess,
     setDialogOpen: setOpen,
-    setAlertOpen,
+    setSelectedAccess,
     warnOnSubmit,
   });
-
-  const readChange = setPermissionHandler(
-    unstableAccess,
-    ACL_KEYS.READ,
-    setAccess
-  );
-  const writeChange = setPermissionHandler(
-    unstableAccess,
-    ACL_KEYS.WRITE,
-    setAccess
-  );
-  const appendChange = setPermissionHandler(
-    unstableAccess,
-    ACL_KEYS.APPEND,
-    setAccess
-  );
-  const controlChange = setPermissionHandler(
-    unstableAccess,
-    ACL_KEYS.CONTROL,
-    setAccess
-  );
-  const handleToggleClick = toggleOpen(formOpen, setFormOpen);
 
   useEffect(() => {
     if (confirmationSetup && !confirmed) return;
@@ -246,39 +163,26 @@ export default function PermissionsForm({
       savePermissions();
     }
   }, [
-    setTitle,
-    setContent,
-    confirmed,
-    setOpen,
-    setConfirmed,
-    savePermissions,
     confirmationSetup,
+    confirmed,
+    savePermissions,
     setConfirmationSetup,
+    setConfirmed,
+    setContent,
+    setOpen,
+    setTitle,
   ]);
 
   return (
-    // prettier-ignore
-    // This chooses typescript rules over prettier in a battle over adding parenthesis to JSX
-    <div className={classes.container}>
-      <Button
-        className={classes.summary}
-        onClick={handleToggleClick}
-        endIcon={icon}
+    <section>
+      <Select
+        labelId="demo-simple-select-label"
+        id="demo-simple-select"
+        value={selectedAccess}
+        onChange={handleChange}
       >
-        <span>{displayPermissions(unstableAccess)}</span>
-      </Button>
-      <section className={formOpen ? classes.selectionOpen : classes.selectionClosed}>
-        <List>
-          <PermissionCheckbox value={unstableAccess.read} classes={classes} label="read" onChange={readChange} />
-          <PermissionCheckbox value={unstableAccess.write} classes={classes} label="write" onChange={writeChange} />
-          <PermissionCheckbox value={unstableAccess.append} classes={classes} label="append" onChange={appendChange} />
-          <PermissionCheckbox value={unstableAccess.control} classes={classes} label="control" onChange={controlChange} />
-        </List>
-
-        <Button onClick={handleSaveClick} variant="contained">
-          Save
-        </Button>
-      </section>
-    </div>
+        {accessSelectOptions()}
+      </Select>
+    </section>
   );
 }
