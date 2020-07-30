@@ -852,7 +852,7 @@ exports[`PermissionsForm it returns null if control is false 1`] = `
       id="demo-simple-select"
       labelId="demo-simple-select-label"
       onChange={[Function]}
-      value="Append"
+      value="Edit"
     >
       <ForwardRef(Select)
         classes={
@@ -873,7 +873,7 @@ exports[`PermissionsForm it returns null if control is false 1`] = `
         id="demo-simple-select"
         labelId="demo-simple-select-label"
         onChange={[Function]}
-        value="Append"
+        value="Edit"
       >
         <WithStyles(ForwardRef(Input))
           inputComponent={
@@ -979,7 +979,7 @@ exports[`PermissionsForm it returns null if control is false 1`] = `
             }
           }
           onChange={[Function]}
-          value="Append"
+          value="Edit"
         >
           <ForwardRef(Input)
             classes={
@@ -1103,7 +1103,7 @@ exports[`PermissionsForm it returns null if control is false 1`] = `
               }
             }
             onChange={[Function]}
-            value="Append"
+            value="Edit"
           >
             <WithStyles(ForwardRef(InputBase))
               classes={
@@ -1230,7 +1230,7 @@ exports[`PermissionsForm it returns null if control is false 1`] = `
               multiline={false}
               onChange={[Function]}
               type="text"
-              value="Append"
+              value="Edit"
             >
               <ForwardRef(InputBase)
                 classes={
@@ -1361,7 +1361,7 @@ exports[`PermissionsForm it returns null if control is false 1`] = `
                 multiline={false}
                 onChange={[Function]}
                 type="text"
-                value="Append"
+                value="Edit"
               >
                 <div
                   className="MuiInputBase-root MuiInput-root MuiInput-underline"
@@ -1408,7 +1408,7 @@ exports[`PermissionsForm it returns null if control is false 1`] = `
                     onBlur={[Function]}
                     onChange={[Function]}
                     onFocus={[Function]}
-                    value="Append"
+                    value="Edit"
                     variant="standard"
                   >
                     <div
@@ -1423,7 +1423,7 @@ exports[`PermissionsForm it returns null if control is false 1`] = `
                       role="button"
                       tabIndex={0}
                     >
-                      Append
+                      Edit
                     </div>
                     <input
                       aria-hidden={true}
@@ -1431,7 +1431,7 @@ exports[`PermissionsForm it returns null if control is false 1`] = `
                       onAnimationStart={[Function]}
                       onChange={[Function]}
                       tabIndex={-1}
-                      value="Append"
+                      value="Edit"
                     />
                     <ForwardRef(ArrowDropDownIcon)
                       className="MuiSelect-icon"
@@ -1492,7 +1492,7 @@ exports[`PermissionsForm it returns null if control is false 1`] = `
                           role="button"
                           tabindex="0"
                         >
-                          Append
+                          Edit
                         </div>
                       }
                       id="menu-"
@@ -1523,7 +1523,7 @@ exports[`PermissionsForm it returns null if control is false 1`] = `
                             role="button"
                             tabindex="0"
                           >
-                            Append
+                            Edit
                           </div>
                         }
                         classes={
@@ -1556,7 +1556,7 @@ exports[`PermissionsForm it returns null if control is false 1`] = `
                               role="button"
                               tabindex="0"
                             >
-                              Append
+                              Edit
                             </div>
                           }
                           anchorOrigin={
@@ -1598,7 +1598,7 @@ exports[`PermissionsForm it returns null if control is false 1`] = `
                                 role="button"
                                 tabindex="0"
                               >
-                                Append
+                                Edit
                               </div>
                             }
                             anchorOrigin={

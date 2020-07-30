@@ -28,7 +28,6 @@ import { NormalizedPermission } from "../../src/lit-solid-helpers";
 import PermissionsForm, {
   savePermissionsHandler,
   changeHandler,
-  submitHandler,
 } from "./index";
 
 describe("PermissionsForm", () => {

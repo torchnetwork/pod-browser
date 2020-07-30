@@ -61,11 +61,6 @@ describe("ResourceSharing", () => {
         acl,
       },
     ];
-    const setTitle = jest.fn();
-    const setOpen = jest.fn();
-    const setContent = jest.fn();
-    const confirmed = false;
-    const setConfirmed = jest.fn();
 
     jest
       .spyOn(RouterFns, "useRouter")

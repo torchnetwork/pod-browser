@@ -68,8 +68,9 @@ export function savePermissionsHandler({
 }
 
 export function accessSelectOptions(): ReactElement[] {
-  return Object.values(ACCESS_MODES).map(({ alias }, i) => (
-    <MenuItem key={i} value={alias}>
+  // @ts-ignore
+  return Object.values(ACCESS_MODES).map(({ alias }) => (
+    <MenuItem key={alias} value={alias}>
       {alias}
     </MenuItem>
   ));
@@ -90,7 +91,7 @@ export function changeHandler({
   setSelectedAccess,
   warnOnSubmit,
 }: ISaveHandler) {
-  return async ({ target }: React.ChangeEvent): void => {
+  return async ({ target }: React.ChangeEvent): Promise<void> => {
     const element = target as HTMLInputElement;
     const value = element.value as string;
     const access = aclForAlias(value);
@@ -179,6 +180,7 @@ export default function PermissionsForm({
         labelId="demo-simple-select-label"
         id="demo-simple-select"
         value={selectedAccess}
+        // @ts-ignore
         onChange={handleChange}
       >
         {accessSelectOptions()}

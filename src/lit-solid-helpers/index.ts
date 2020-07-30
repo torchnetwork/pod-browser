@@ -66,12 +66,7 @@ export const ACCESS_KEYS = {
   CONTROL: "control",
 };
 
-interface IAccessMode {
-  alias: string;
-  acl: unstable_Access;
-}
-
-export const ACCESS_MODES: Record<string, IAccessMode> = {
+export const ACCESS_MODES: Record<string, unknown> = {
   NO_ACCESS: {
     alias: "No access",
     acl: {
@@ -162,11 +157,18 @@ export function displayTypes(types: string[]): string[] {
   return types?.length ? types.map((t: string): string => getTypeName(t)) : [];
 }
 
-export function aclForAlias(alias: string): unstable_Access {
+export function aclForAlias(alias: string): unstable_Access | undefined {
   const key = Object.keys(ACCESS_MODES).find(
+    // @ts-ignore
     (k) => ACCESS_MODES[k].alias === alias
   );
-  return ACCESS_MODES[key] && ACCESS_MODES[key].acl;
+
+  if (key && ACCESS_MODES[key]) {
+    // @ts-ignore
+    return ACCESS_MODES[key].acl;
+  }
+
+  return undefined;
 }
 
 export function displayPermissions(
@@ -176,13 +178,20 @@ export function displayPermissions(
     const stringKey = key as string;
     const foundMode = ACCESS_MODES[stringKey];
 
+    if (!foundMode) return false;
+
+    // @ts-ignore
+    const { read, write, append, control } = foundMode.acl;
+
     return (
-      foundMode.acl.read === permissions.read &&
-      foundMode.acl.write === permissions.write &&
-      foundMode.acl.append === permissions.append &&
-      foundMode.acl.control === permissions.control
+      read === permissions.read &&
+      write === permissions.write &&
+      append === permissions.append &&
+      control === permissions.control
     );
   });
+
+  // @ts-ignore
   return mode ? ACCESS_MODES[mode].alias : ACCESS_MODES.NO_ACCESS.alias;
 }
 
