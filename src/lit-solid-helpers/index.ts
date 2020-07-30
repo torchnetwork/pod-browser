@@ -66,6 +66,56 @@ export const ACL_KEYS = {
   CONTROL: "control",
 };
 
+export const ACL_ALIAS = {
+  READ: "Edit",
+  WRITE: "View",
+  APPEND: "Append",
+  CONTROL: "Control",
+};
+
+export const ACL = {
+  READ: {
+    alias: "View",
+    key: "read",
+    acl: {
+      read: true,
+      write: false,
+      append: false,
+      control: false,
+    },
+  },
+  WRITE: {
+    alias: "Edit",
+    key: "write",
+    acl: {
+      read: true,
+      write: true,
+      append: true,
+      control: false,
+    },
+  },
+  APPEND: {
+    alias: "Append",
+    key: "append",
+    acl: {
+      read: true,
+      write: false,
+      append: true,
+      control: false,
+    },
+  },
+  CONTROL: {
+    alias: "CONTROL",
+    key: "control",
+    acl: {
+      read: true,
+      write: true,
+      append: true,
+      control: true,
+    },
+  },
+};
+
 // TODO use ldp namespace when available
 export const namespace: Record<string, string> = {
   ...ldp,

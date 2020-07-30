@@ -42,6 +42,7 @@ import {
   displayPermissions,
   NormalizedPermission,
   ACL_KEYS,
+  ACL,
   IResponse,
 } from "../../src/lit-solid-helpers";
 import styles from "./styles";
@@ -180,7 +181,7 @@ export default function PermissionsForm({
   const { acl } = permission;
 
   const classes = useStyles();
-  const [access, setAccess] = useState(acl);
+  const [access, setAccess] = useState(acl as unstable_Access);
   const [formOpen, setFormOpen] = useState(false);
   const icon = formOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />;
   const { setMessage, setSeverity, setAlertOpen } = useContext(AlertContext);
@@ -188,10 +189,9 @@ export default function PermissionsForm({
   const { setTitle, setOpen, setContent, confirmed, setConfirmed } = useContext(
     ConfirmationDialogContext
   );
-  const unstableAccess = access as unstable_Access;
 
   const savePermissions = savePermissionsHandler({
-    access: unstableAccess,
+    access,
     onSave,
     setAlertOpen,
     setDialogOpen: setOpen,
@@ -206,26 +206,41 @@ export default function PermissionsForm({
     warnOnSubmit,
   });
 
-  const readChange = setPermissionHandler(
-    unstableAccess,
-    ACL_KEYS.READ,
-    setAccess
-  );
-  const writeChange = setPermissionHandler(
-    unstableAccess,
-    ACL_KEYS.WRITE,
-    setAccess
-  );
-  const appendChange = setPermissionHandler(
-    unstableAccess,
-    ACL_KEYS.APPEND,
-    setAccess
-  );
-  const controlChange = setPermissionHandler(
-    unstableAccess,
-    ACL_KEYS.CONTROL,
-    setAccess
-  );
+  const readChange = () => setAccess({ ...access, read: !access.read });
+  const writeChange = () => {
+    const write = !access.write;
+    const { read, append } = access;
+    setAccess({
+      ...access,
+      write,
+      read: write ? true : read,
+      append: write ? true : append,
+    });
+  };
+
+  const appendChange = () => {
+    const append = !access.append;
+    const { read } = access;
+    setAccess({
+      ...access,
+      append,
+      read: append ? true : read,
+    });
+  };
+
+  const controlChange = () => {
+    const control = !access.control;
+    const { read, write, append } = access;
+
+    setAccess({
+      ...access,
+      control,
+      read: control ? true : read,
+      write: control ? true : write,
+      append: control ? true : append,
+    });
+  };
+
   const handleToggleClick = toggleOpen(formOpen, setFormOpen);
 
   useEffect(() => {
@@ -265,14 +280,14 @@ export default function PermissionsForm({
         onClick={handleToggleClick}
         endIcon={icon}
       >
-        <span>{displayPermissions(unstableAccess)}</span>
+        <span>{displayPermissions(access)}</span>
       </Button>
       <section className={formOpen ? classes.selectionOpen : classes.selectionClosed}>
         <List>
-          <PermissionCheckbox value={unstableAccess.read} classes={classes} label="read" onChange={readChange} />
-          <PermissionCheckbox value={unstableAccess.write} classes={classes} label="write" onChange={writeChange} />
-          <PermissionCheckbox value={unstableAccess.append} classes={classes} label="append" onChange={appendChange} />
-          <PermissionCheckbox value={unstableAccess.control} classes={classes} label="control" onChange={controlChange} />
+          <PermissionCheckbox value={access.read} classes={classes} label={ACL.READ.alias} onChange={readChange} />
+          <PermissionCheckbox value={access.write} classes={classes} label={ACL.WRITE.alias} onChange={writeChange} />
+          <PermissionCheckbox value={access.append} classes={classes} label={ACL.APPEND.alias} onChange={appendChange} />
+          <PermissionCheckbox value={access.control} classes={classes} label={ACL.CONTROL.alias} onChange={controlChange} />
         </List>
 
         <Button onClick={handleSaveClick} variant="contained">
