@@ -35,7 +35,7 @@ import DetailsLoading from "../detailsLoading";
 import DetailsError from "../detailsError";
 import ResourceDetails from "../resourceDetails";
 import ResourceSharing from "../resourceSharing";
-import { useFetchResourceDetails } from "../../src/hooks/litPod";
+import { useFetchResourceDetails } from "../../src/hooks/solidClient";
 import { parseUrl, stripQueryParams } from "../../src/stringHelpers";
 
 const useStyles = makeStyles(styles);
@@ -79,20 +79,28 @@ export function Contents({ action, iri }: IContentsProps): ReactElement | null {
 }
 
 export default function DetailsContextMenu(): ReactElement | null {
-  const { menuOpen, setMenuOpen, action, iri } = useContext(DetailsMenuContext);
+  const { menuOpen, setMenuOpen } = useContext(DetailsMenuContext);
+
+  const { query } = useRouter();
+  const { action, resourceIri } = query;
+
   const classes = useStyles();
   const router = useRouter();
+
+  useEffect(() => {
+    setMenuOpen(!!(action && resourceIri));
+  }, [action, resourceIri, setMenuOpen]);
 
   const closeDrawer = async () => {
     setMenuOpen(false);
     const { asPath } = router;
     const pathname = stripQueryParams(asPath) || "/";
-    await router.replace({ pathname });
+    await router.replace("/resource/[iri]", pathname);
   };
 
   useEscKey(closeDrawer);
 
-  if (!iri) return null;
+  if (!resourceIri) return null;
 
   return (
     // prettier-ignore
@@ -106,7 +114,7 @@ export default function DetailsContextMenu(): ReactElement | null {
         <ChevronRightIcon />
       </IconButton>
       <div className={classes.drawerContent}>
-        <Contents action={action as string} iri={iri as string} />
+        <Contents action={action as string} iri={resourceIri as string} />
       </div>
     </Drawer>
   );

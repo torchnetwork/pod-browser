@@ -42,7 +42,7 @@ import {
   unstable_hasResourceAcl,
   unstable_saveAclFor,
   unstable_setAgentResourceAccess,
-} from "@solid/lit-pod";
+} from "@inrupt/solid-client";
 import { ldp, space } from "rdf-namespaces";
 import { parseUrl, isUrl } from "../stringHelpers";
 
@@ -306,7 +306,7 @@ export interface NormalizedFile extends NormalizedResource {
 export async function fetchFileWithAcl(iri: string): Promise<NormalizedFile> {
   const file = await unstable_fetchFile(iri);
   const {
-    resourceInfo: { unstable_permissions, contentType: type },
+    internal_resourceInfo: { unstable_permissions, contentType: type },
   } = file;
 
   const permissions = unstable_permissions

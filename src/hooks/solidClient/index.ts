@@ -30,7 +30,7 @@ import {
   unstable_fetchResourceInfoWithAcl,
   unstable_getAgentAccessAll,
   isContainer,
-} from "@solid/lit-pod";
+} from "@inrupt/solid-client";
 import { space } from "rdf-namespaces";
 import {
   fetchResourceWithAcl,
@@ -38,7 +38,7 @@ import {
   namespace,
   normalizePermissions,
   IResourceDetails,
-} from "../../lit-solid-helpers";
+} from "../../solidClientHelpers";
 
 export async function fetchContainerResourceIris(
   containerIri: string
@@ -68,7 +68,7 @@ export async function fetchResourceDetails(
   );
 
   let types = [] as string[];
-  const contentType = resourceInfo?.resourceInfo?.contentType;
+  const contentType = resourceInfo?.internal_resourceInfo?.contentType;
 
   if (contentType) types = [contentType];
   if (isContainer(resourceInfo)) types = ["Container"];

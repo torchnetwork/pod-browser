@@ -19,32 +19,10 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { shallow } from "enzyme";
-import { shallowToJson } from "enzyme-to-json";
+import React, { ReactElement } from "react";
 
-import PodList from "./index";
+import LoginPage from "../components/pages/login";
 
-describe("Pod list", () => {
-  test("Renders null if there are no pod iris", () => {
-    const iris = undefined;
-    const tree = shallow(<PodList podIris={iris} />);
-    expect(shallowToJson(tree)).toMatchSnapshot();
-  });
-
-  test("Renders a container if there is one pod iri", () => {
-    const iris = ["https://mypod.myhost.com"];
-    const tree = shallow(<PodList podIris={iris} />);
-
-    expect(shallowToJson(tree)).toMatchSnapshot();
-  });
-
-  test("Renders a table if there are multiple pod iris", () => {
-    const iris = [
-      "https://mypod.myhost.com",
-      "https://myotherpod.myotherhost.com",
-    ];
-
-    const tree = shallow(<PodList podIris={iris} />);
-    expect(shallowToJson(tree)).toMatchSnapshot();
-  });
-});
+export default function Login(): ReactElement {
+  return <LoginPage />;
+}
