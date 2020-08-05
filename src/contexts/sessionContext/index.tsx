@@ -19,33 +19,20 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { createContext, ReactElement } from "react";
-import useAuthenticatedProfile from "../../hooks/useAuthenticatedProfile";
-import usePodRoot from "../../hooks/usePodRoot";
+import { createContext } from "react";
+import {
+  Session,
+  getClientAuthenticationWithDependencies,
+} from "@inrupt/solid-client-authn-browser";
 
-export interface PodLocation {
-  baseUri?: string | null;
-  currentUri: string;
+export interface SessionContext {
+  session: Session;
+  isLoadingSession: boolean;
 }
 
-const PodLocationContext = createContext<PodLocation>({
-  currentUri: "",
+export default createContext<SessionContext>({
+  session: new Session({
+    clientAuthentication: getClientAuthenticationWithDependencies({}),
+  }),
+  isLoadingSession: true,
 });
-
-interface Props {
-  children: ReactElement | ReactElement[] | undefined;
-  currentUri: string;
-}
-
-function PodLocationProvider({ children, currentUri }: Props): ReactElement {
-  const profile = useAuthenticatedProfile();
-  const baseUri = usePodRoot(currentUri, profile);
-  return (
-    <PodLocationContext.Provider value={{ baseUri, currentUri }}>
-      {children}
-    </PodLocationContext.Provider>
-  );
-}
-
-export { PodLocationProvider };
-export default PodLocationContext;

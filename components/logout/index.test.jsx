@@ -19,40 +19,51 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React, { ReactElement, useContext } from "react";
-import { createStyles, makeStyles, StyleRules } from "@material-ui/styles";
-import { header, PrismTheme, useBem } from "@solid/lit-prism-patterns";
-import Link from "next/link";
+import { mount } from "enzyme";
+import { mountToJson } from "enzyme-to-json";
+
+import { clearLocalstorage, hardRedirect } from "../../src/windowHelpers";
+
 import SessionContext from "../../src/contexts/sessionContext";
-import UserMenu from "./userMenu";
-import styles from "./styles";
 
-const useStyles = makeStyles<PrismTheme>((theme) =>
-  createStyles(styles(theme) as StyleRules)
-);
+import LogOutButton from "./index";
 
-export default function Header(): ReactElement | null {
-  const { session } = useContext(SessionContext);
-  const bem = useBem(useStyles());
+jest.mock("../../src/windowHelpers");
 
-  return (
-    <header className={bem("header-banner")}>
-      <Link href="/">
-        <a className={bem("header-banner__logo")}>
-          <img
-            height={40}
-            src="/inrupt_logo-2020.svg"
-            className={bem("header-banner__logo-image")}
-            alt="Inrupt PodBrowser"
-          />
-        </a>
-      </Link>
-      {session.info.isLoggedIn ? (
-        <>
-          <div className={bem("header-banner__main-nav")} />
-          <UserMenu />
-        </>
-      ) : null}
-    </header>
-  );
-}
+describe("Logout button", () => {
+  test("Renders a logout button", () => {
+    const session = {
+      logout: jest.fn(),
+    };
+
+    const tree = mount(
+      <SessionContext.Provider value={{ session }}>
+        <LogOutButton>Log Out</LogOutButton>
+      </SessionContext.Provider>
+    );
+
+    expect(mountToJson(tree)).toMatchSnapshot();
+  });
+
+  test("Calls logout and redirects on click", async () => {
+    const session = {
+      logout: jest.fn(),
+    };
+
+    const tree = mount(
+      <SessionContext.Provider value={{ session }}>
+        <LogOutButton>Log Out</LogOutButton>
+      </SessionContext.Provider>
+    );
+
+    tree.simulate("click", { preventDefault: () => {} });
+
+    expect(session.logout).toHaveBeenCalled();
+
+    // Wait until promises resolve, then continue.
+    await session.logout();
+
+    expect(clearLocalstorage).toHaveBeenCalled();
+    expect(hardRedirect).toHaveBeenCalledWith("/login");
+  });
+});
