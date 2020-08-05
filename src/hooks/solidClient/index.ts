@@ -20,7 +20,7 @@
  */
 
 /* eslint-disable camelcase, @typescript-eslint/no-explicit-any */
-
+// @ts-nocheck
 import useSWR from "swr";
 import {
   fetchLitDataset,
@@ -50,10 +50,10 @@ export async function fetchContainerResourceIris(
 }
 
 export const GET_CONTAINER_RESOURCE_IRIS = "getContainerResourceIris";
+/* istanbul ignore next */
 export function useFetchContainerResourceIris(iri: string): any {
-  return useSWR<string[]>(
-    [iri, GET_CONTAINER_RESOURCE_IRIS],
-    fetchContainerResourceIris
+  return useSWR<string[]>([iri, GET_CONTAINER_RESOURCE_IRIS], () =>
+    fetchContainerResourceIris(iri)
   );
 }
 
@@ -78,17 +78,22 @@ export async function fetchResourceDetails(
     permissions,
     types,
     name,
+    dataset: resourceInfo,
   };
 }
 
 export const FETCH_RESOURCE_DETAILS = "fetchResourceDetails";
+/* istanbul ignore next */
 export function useFetchResourceDetails(iri: string): any {
-  return useSWR([iri, FETCH_RESOURCE_DETAILS], fetchResourceDetails);
+  return useSWR([iri, FETCH_RESOURCE_DETAILS], () => fetchResourceDetails(iri));
 }
 
 export const FETCH_RESOURCE_WITH_ACL = "fetchResourceWithAcl";
+/* istanbul ignore next */
 export function useFetchResourceWithAcl(iri: string): any {
-  return useSWR([iri, "fetchResourceWithAcl"], fetchResourceWithAcl);
+  return useSWR([iri, FETCH_RESOURCE_WITH_ACL], () =>
+    fetchResourceWithAcl(iri)
+  );
 }
 
 export async function fetchPodIrisFromWebId(webId: string): Promise<string[]> {
@@ -98,6 +103,9 @@ export async function fetchPodIrisFromWebId(webId: string): Promise<string[]> {
   return getIriAll(profile, space.storage);
 }
 export const FETCH_POD_IRIS_FROM_WEB_ID = "fetchPodIrisFromWebId";
+/* istanbul ignore next */
 export function useFetchPodIrisFromWebId(webId: string): any {
-  return useSWR([webId, FETCH_POD_IRIS_FROM_WEB_ID], fetchPodIrisFromWebId);
+  return useSWR([webId, FETCH_POD_IRIS_FROM_WEB_ID], () =>
+    fetchPodIrisFromWebId(webId)
+  );
 }

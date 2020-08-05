@@ -27,16 +27,13 @@ import {
   getIriAll,
   unstable_fetchResourceInfoWithAcl,
 } from "@inrupt/solid-client";
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import useSWR from "swr";
 import * as solidClientHelpers from "../../solidClientHelpers";
 import {
   fetchContainerResourceIris,
   fetchResourceDetails,
   fetchPodIrisFromWebId,
-  useFetchContainerResourceIris,
-  useFetchResourceDetails,
-  useFetchResourceWithAcl,
-  useFetchPodIrisFromWebId,
 } from "./index";
 
 jest.mock("@inrupt/solid-client");
@@ -185,49 +182,5 @@ describe("PodIrisFromWebId", () => {
     expect(fetchLitDataset).toHaveBeenCalled();
     expect(getThingOne).toHaveBeenCalled();
     expect(getIriAll).toHaveBeenCalled();
-  });
-});
-
-describe("useFetchContainerResourceIris", () => {
-  test("it wraps fetchContainerResourceIris in SWR", () => {
-    useFetchContainerResourceIris("iri");
-
-    expect(useSWR).toHaveBeenCalledWith(
-      ["iri", "getContainerResourceIris"],
-      fetchContainerResourceIris
-    );
-  });
-});
-
-describe("useFetchResourceDetails", () => {
-  test("it wraps fetchResourceDetails in SWR", () => {
-    useFetchResourceDetails("iri");
-
-    expect(useSWR).toHaveBeenCalledWith(
-      ["iri", "fetchResourceDetails"],
-      fetchResourceDetails
-    );
-  });
-});
-
-describe("useFetchResourceWithAcl", () => {
-  test("it wraps fetchResourceWithAcl in SWR", () => {
-    useFetchResourceWithAcl("iri");
-
-    expect(useSWR).toHaveBeenCalledWith(
-      ["iri", "fetchResourceWithAcl"],
-      solidClientHelpers.fetchResourceWithAcl
-    );
-  });
-});
-
-describe("useFetchPodIrisFromWebId", () => {
-  test("it wraps fetchPodIrisFromWebId in SWR", () => {
-    useFetchPodIrisFromWebId("iri");
-
-    expect(useSWR).toHaveBeenCalledWith(
-      ["iri", "fetchPodIrisFromWebId"],
-      fetchPodIrisFromWebId
-    );
   });
 });

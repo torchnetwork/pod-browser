@@ -19,41 +19,12 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { ReactElement } from "react";
-import { Divider } from "@material-ui/core";
-import { PrismTheme } from "@solid/lit-prism-patterns";
-import { makeStyles, createStyles } from "@material-ui/core/styles";
-import styles from "../resourceDetails/styles";
+import { mountToJson } from "../../__testUtils/mountWithTheme";
+import ResourceSharingLoading from "./index";
 
-const useStyles = makeStyles<PrismTheme>((theme) =>
-  createStyles(styles(theme))
-);
-
-interface IDetailsError {
-  name: string;
-  iri: string;
-  message: string;
-}
-
-function DetailsError({ name, iri, message }: IDetailsError): ReactElement {
-  const classes = useStyles();
-
-  return (
-    <>
-      <section className={classes.centeredSection}>
-        <h3 className={classes["content-h3"]} title={iri}>
-          {name}
-        </h3>
-      </section>
-
-      <Divider />
-
-      <section className={classes.centeredSection}>
-        <h5 className={classes["content-h5"]}>Error</h5>
-        <p>{message}</p>
-      </section>
-    </>
-  );
-}
-
-export default DetailsError;
+describe("ResourceSharingLoading", () => {
+  test("it renders the component", () => {
+    const tree = mountToJson(<ResourceSharingLoading name="test" iri="test" />);
+    expect(tree).toMatchSnapshot();
+  });
+});

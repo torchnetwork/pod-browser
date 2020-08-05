@@ -19,12 +19,12 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { ReactElement, useContext, useEffect } from "react";
+import { ReactElement, useContext, useEffect, Dispatch } from "react";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import { AlertProps } from "@material-ui/lab/Alert";
 import { Drawer, IconButton } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { useRouter } from "next/router";
+import { useRouter, NextRouter } from "next/router";
 import DetailsMenuContext, {
   DETAILS_CONTEXT_ACTIONS,
 } from "../../src/contexts/detailsMenuContext";
@@ -32,6 +32,7 @@ import AlertContext from "../../src/contexts/alertContext";
 import styles from "./styles";
 import useEscKey from "../../src/effects/useEscKey";
 import DetailsLoading from "../detailsLoading";
+import ResourceSharingLoading from "../resourceSharingLoading";
 import DetailsError from "../detailsError";
 import ResourceDetails from "../resourceDetails";
 import ResourceSharing from "../resourceSharing";
@@ -50,6 +51,12 @@ export function Contents({ action, iri }: IContentsProps): ReactElement | null {
   const { data, error } = useFetchResourceDetails(iri);
   const { setAlertOpen, setMessage, setSeverity } = useContext(AlertContext);
   const errorMessage = "There was an error fetching the details.";
+  const loadingComponent =
+    action === "details" ? (
+      <DetailsLoading name={pathname} iri={iri} />
+    ) : (
+      <ResourceSharingLoading name={pathname} iri={iri} />
+    );
 
   useEffect(() => {
     if (error) {
@@ -63,19 +70,41 @@ export function Contents({ action, iri }: IContentsProps): ReactElement | null {
     return <DetailsError message={errorMessage} name={pathname} iri={iri} />;
   }
 
-  if (!data) return <DetailsLoading name={pathname} iri={iri} />;
+  if (!data) return loadingComponent;
 
-  const { permissions } = data;
+  const { permissions, dataset } = data;
 
   switch (action) {
     case DETAILS_CONTEXT_ACTIONS.SHARING:
       return (
-        <ResourceSharing iri={iri} name={pathname} permissions={permissions} />
+        <ResourceSharing
+          iri={iri}
+          name={pathname}
+          permissions={permissions}
+          dataset={dataset}
+        />
       );
 
     default:
       return <ResourceDetails resource={{ ...data, name: pathname }} />;
   }
+}
+
+interface IHandleCloseDrawer {
+  setMenuOpen: Dispatch<boolean>;
+  router: NextRouter;
+}
+
+export function handleCloseDrawer({
+  setMenuOpen,
+  router,
+}: IHandleCloseDrawer): () => Promise<void> {
+  return async () => {
+    setMenuOpen(false);
+    const { asPath } = router;
+    const pathname = stripQueryParams(asPath) || "/";
+    await router.replace("/resource/[iri]", pathname);
+  };
 }
 
 export default function DetailsContextMenu(): ReactElement | null {
@@ -91,15 +120,9 @@ export default function DetailsContextMenu(): ReactElement | null {
     setMenuOpen(!!(action && resourceIri));
   }, [action, resourceIri, setMenuOpen]);
 
-  const closeDrawer = async () => {
-    setMenuOpen(false);
-    const { asPath } = router;
-    const pathname = stripQueryParams(asPath) || "/";
-    await router.replace("/resource/[iri]", pathname);
-  };
+  const closeDrawer = handleCloseDrawer({ setMenuOpen, router });
 
   useEscKey(closeDrawer);
-
   if (!resourceIri) return null;
 
   return (

@@ -21,6 +21,7 @@
 
 import * as ReactFns from "react";
 import * as RouterFns from "next/router";
+import * as SolidClientFns from "@inrupt/solid-client";
 import { mountToJson } from "../../__testUtils/mountWithTheme";
 import * as SolidClientHelperFns from "../../src/solidClientHelpers";
 import ResourceSharing, {
@@ -70,6 +71,23 @@ describe("ResourceSharing", () => {
     jest
       .spyOn(RouterFns, "useRouter")
       .mockReturnValueOnce({ pathname: "/pathname/", replace: jest.fn() });
+
+    jest.spyOn(SolidClientFns, "unstable_hasResourceAcl").mockReturnValue(true);
+
+    jest
+      .spyOn(SolidClientFns, "unstable_hasAccessibleAcl")
+      .mockReturnValue(true);
+
+    jest.spyOn(SolidClientFns, "unstable_getResourceAcl").mockReturnValueOnce();
+
+    jest
+      .spyOn(SolidClientFns, "unstable_getAgentDefaultAccessOne")
+      .mockReturnValueOnce({
+        read: true,
+        write: true,
+        append: true,
+        control: true,
+      });
 
     jest
       .spyOn(ReactFns, "useContext")
