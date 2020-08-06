@@ -25,13 +25,15 @@
 
 import { ReactElement, useContext, useMemo } from "react";
 import { useTable, useSortBy, UseSortByOptions } from "react-table";
-
 import { createStyles, makeStyles, StyleRules } from "@material-ui/styles";
+import { Box } from "@material-ui/core";
 import { PrismTheme, useBem } from "@solid/lit-prism-patterns";
 import clsx from "clsx";
+
 import DetailsContextMenu from "../detailsContextMenu";
 import ContainerTableRow from "../containerTableRow";
 import SortedTableCarat from "../sortedTableCarat";
+import AddFileButton from "../addFileButton";
 import { useRedirectIfLoggedOut } from "../../src/effects/auth";
 import { useFetchContainerResourceIris } from "../../src/hooks/solidClient";
 import { IResourceDetails, getIriPath } from "../../src/solidClientHelpers";
@@ -56,7 +58,7 @@ export default function Container(props: IPodList): ReactElement {
   const { menuOpen } = useContext(DetailsMenuContext);
 
   const { iri } = props;
-  const { data: resourceIris } = useFetchContainerResourceIris(iri);
+  const { data: resourceIris, mutate } = useFetchContainerResourceIris(iri);
   const loading = typeof resourceIris === "undefined";
 
   const bem = useBem(useStyles());
@@ -173,6 +175,11 @@ export default function Container(props: IPodList): ReactElement {
             })}
           </tbody>
         </table>
+
+        <Box mt={2}>
+          <AddFileButton onSave={mutate} />
+        </Box>
+
         <DetailsContextMenu />
       </div>
     </>
