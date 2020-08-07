@@ -844,12 +844,6 @@ font-display: block;",
       <section
         className="makeStyles-headerSection-3"
       >
-        <h3
-          className="makeStyles-content-h3-14"
-          title="test"
-        >
-          test
-        </h3>
         <WithStyles(ForwardRef(Button))
           onClick={[Function]}
           startIcon={<Memo(ChevronLeftIcon) />}
@@ -1006,6 +1000,12 @@ font-display: block;",
             </WithStyles(ForwardRef(ButtonBase))>
           </ForwardRef(Button)>
         </WithStyles(ForwardRef(Button))>
+        <h3
+          className="makeStyles-content-h3-14"
+          title="test"
+        >
+          test
+        </h3>
       </section>
       <WithStyles(ForwardRef(Divider))>
         <ForwardRef(Divider)

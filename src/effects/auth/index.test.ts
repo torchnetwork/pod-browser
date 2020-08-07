@@ -33,7 +33,7 @@ describe("auth effects", () => {
   describe("do nothing if session is still loading", () => {
     test("if the session is loading, don't attempt to redirect", async () => {
       await redirectBasedOnSessionState(
-        undefined,
+        false,
         true,
         SESSION_STATES.LOGGED_OUT,
         redirectLocation
@@ -45,14 +45,8 @@ describe("auth effects", () => {
 
   describe("redirect if logged out", () => {
     test("if there is not a session, redirect", async () => {
-      const session = {
-        info: {
-          isLoggedIn: false,
-        },
-      };
-
       await redirectBasedOnSessionState(
-        session,
+        false,
         false,
         SESSION_STATES.LOGGED_OUT,
         redirectLocation
@@ -62,14 +56,8 @@ describe("auth effects", () => {
     });
 
     test("if there is a session, do not redirect", async () => {
-      const session = {
-        info: {
-          isLoggedIn: true,
-        },
-      };
-
       await redirectBasedOnSessionState(
-        session,
+        true,
         false,
         SESSION_STATES.LOGGED_OUT,
         redirectLocation
@@ -81,14 +69,8 @@ describe("auth effects", () => {
 
   describe("redirect if logged in", () => {
     test("if there is a session, redirect", async () => {
-      const session = {
-        info: {
-          isLoggedIn: true,
-        },
-      };
-
       await redirectBasedOnSessionState(
-        session,
+        true,
         false,
         SESSION_STATES.LOGGED_IN,
         redirectLocation
@@ -98,14 +80,8 @@ describe("auth effects", () => {
     });
 
     test("if there is not a session, do not redirect", async () => {
-      const session = {
-        info: {
-          isLoggedIn: false,
-        },
-      };
-
       await redirectBasedOnSessionState(
-        session,
+        false,
         false,
         SESSION_STATES.LOGGED_IN,
         redirectLocation

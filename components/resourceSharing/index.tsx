@@ -270,6 +270,7 @@ export function handlePermissionUpdate({
   setThirdPartyPermissions,
   thirdPartyPermissions,
   webId,
+  fetch,
 }: IHandlePermissionUpdate) {
   return async (access: unstable_Access): Promise<IResponse> => {
     if (displayPermissions(access) === ACL.NONE.alias) {
@@ -277,7 +278,7 @@ export function handlePermissionUpdate({
         thirdPartyPermissions.filter((p) => p.webId !== webId)
       );
     }
-    return savePermissions({ iri, webId, access });
+    return savePermissions({ iri, webId, access, fetch });
   };
 }
 

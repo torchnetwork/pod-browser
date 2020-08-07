@@ -62,15 +62,16 @@ export default function ResourceSharingLoading({
   return (
     <>
       <section className={classes.headerSection}>
-        <h3 className={classes["content-h3"]} title={iri}>
-          {name}
-        </h3>
         <Button
           startIcon={<ChevronLeftIcon />}
           onClick={backToDetailsClick(router)}
         >
           Details
         </Button>
+
+        <h3 className={classes["content-h3"]} title={iri}>
+          {name}
+        </h3>
       </section>
 
       <Divider />

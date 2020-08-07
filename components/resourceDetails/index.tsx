@@ -34,8 +34,10 @@ import {
   Typography,
 } from "@material-ui/core";
 import ShareIcon from "@material-ui/icons/Share";
+import DeleteIcon from "@material-ui/icons/Delete";
 import { makeStyles } from "@material-ui/styles";
 import { PrismTheme } from "@solid/lit-prism-patterns";
+import { deleteFile } from "@inrupt/solid-client";
 import ResourceLink from "../resourceLink";
 import styles from "./styles";
 import { IResourceDetails } from "../../src/solidClientHelpers";
@@ -111,12 +113,32 @@ const SharingLink = React.forwardRef((linkProps, ref) => (
   />
 ));
 
+/* eslint react/jsx-props-no-spreading: 0 */
+/* eslint react/prop-types: 0 */
+const DeleteLink = React.forwardRef(
+  ({ resourceIri, onDelete, ...linkProps }, ref) => {
+    const { session } = useContext(SessionContext);
+
+    async function deleteResource() {
+      await deleteFile(resourceIri, { fetch: session.fetch });
+      onDelete();
+    }
+
+    /* eslint jsx-a11y/anchor-has-content: 0 */
+    return (
+      <a href="#delete" {...linkProps} ref={ref} onClick={deleteResource} />
+    );
+  }
+);
+
 interface IDetailsProps {
   resource: IResourceDetails;
+  onDelete: void;
 }
 
 export default function ResourceDetails({
   resource,
+  onDelete,
 }: IDetailsProps): ReactElement {
   const classes = useStyles();
   const { iri, name, types } = resource;
@@ -140,6 +162,18 @@ export default function ResourceDetails({
               <ShareIcon />
             </ListItemIcon>
             <ListItemText primary="Sharing &amp; App Permissions" />
+          </ListItem>
+
+          <ListItem
+            button
+            component={DeleteLink}
+            resourceIri={iri}
+            onDelete={onDelete}
+          >
+            <ListItemIcon>
+              <DeleteIcon />
+            </ListItemIcon>
+            <ListItemText primary="Delete File" />
           </ListItem>
         </List>
       </section>

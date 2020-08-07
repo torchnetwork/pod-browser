@@ -3003,7 +3003,9 @@ font-display: block;",
             </AddFileButton>
           </div>
         </Styled(MuiBox)>
-        <DetailsContextMenu />
+        <DetailsContextMenu
+          onUpdate={[Function]}
+        />
       </div>
     </Container>
   </ThemeProvider>
@@ -11606,34 +11608,7 @@ font-display: block;",
                 <td
                   className="makeStyles-table__body-cell-6218"
                 >
-                  <ResourceLink
-                    className="makeStyles-table__link-6223"
-                    containerIri="https://myaccount.mypodserver.com/inbox"
-                    resourceIri="https://myaccount.mypodserver.com/inbox"
-                  >
-                    <Link
-                      as={
-                        Object {
-                          "pathname": "/resource/https%3A%2F%2Fmyaccount.mypodserver.com%2Finbox",
-                        }
-                      }
-                      href={
-                        Object {
-                          "pathname": "/resource/[iri]",
-                        }
-                      }
-                      replace={true}
-                    >
-                      <a
-                        className="makeStyles-table__link-6223"
-                        href="/resource/https%3A%2F%2Fmyaccount.mypodserver.com%2Finbox"
-                        onClick={[Function]}
-                        onMouseEnter={[Function]}
-                      >
-                        /inbox
-                      </a>
-                    </Link>
-                  </ResourceLink>
+                  /inbox
                 </td>
                 <td
                   className="makeStyles-table__body-cell-6218"
@@ -11671,34 +11646,7 @@ font-display: block;",
                 <td
                   className="makeStyles-table__body-cell-6218"
                 >
-                  <ResourceLink
-                    className="makeStyles-table__link-6223"
-                    containerIri="https://myaccount.mypodserver.com/private"
-                    resourceIri="https://myaccount.mypodserver.com/private"
-                  >
-                    <Link
-                      as={
-                        Object {
-                          "pathname": "/resource/https%3A%2F%2Fmyaccount.mypodserver.com%2Fprivate",
-                        }
-                      }
-                      href={
-                        Object {
-                          "pathname": "/resource/[iri]",
-                        }
-                      }
-                      replace={true}
-                    >
-                      <a
-                        className="makeStyles-table__link-6223"
-                        href="/resource/https%3A%2F%2Fmyaccount.mypodserver.com%2Fprivate"
-                        onClick={[Function]}
-                        onMouseEnter={[Function]}
-                      >
-                        /private
-                      </a>
-                    </Link>
-                  </ResourceLink>
+                  /private
                 </td>
                 <td
                   className="makeStyles-table__body-cell-6218"
@@ -11736,34 +11684,7 @@ font-display: block;",
                 <td
                   className="makeStyles-table__body-cell-6218"
                 >
-                  <ResourceLink
-                    className="makeStyles-table__link-6223"
-                    containerIri="https://myaccount.mypodserver.com/note.txt"
-                    resourceIri="https://myaccount.mypodserver.com/note.txt"
-                  >
-                    <Link
-                      as={
-                        Object {
-                          "pathname": "/resource/https%3A%2F%2Fmyaccount.mypodserver.com%2Fnote.txt",
-                        }
-                      }
-                      href={
-                        Object {
-                          "pathname": "/resource/[iri]",
-                        }
-                      }
-                      replace={true}
-                    >
-                      <a
-                        className="makeStyles-table__link-6223"
-                        href="/resource/https%3A%2F%2Fmyaccount.mypodserver.com%2Fnote.txt"
-                        onClick={[Function]}
-                        onMouseEnter={[Function]}
-                      >
-                        /note.txt
-                      </a>
-                    </Link>
-                  </ResourceLink>
+                  /note.txt
                 </td>
                 <td
                   className="makeStyles-table__body-cell-6218"
@@ -11919,7 +11840,9 @@ font-display: block;",
             </AddFileButton>
           </div>
         </Styled(MuiBox)>
-        <DetailsContextMenu />
+        <DetailsContextMenu
+          onUpdate={[Function]}
+        />
       </div>
     </Container>
   </ThemeProvider>

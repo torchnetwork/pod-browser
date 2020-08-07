@@ -21,7 +21,6 @@
 
 import { useEffect, useContext } from "react";
 import Router from "next/router";
-import { Session } from "@inrupt/solid-client-authn-browser";
 import SessionContext from "../../contexts/sessionContext";
 
 // TODO figure out typescript enums
@@ -31,7 +30,7 @@ export const SESSION_STATES = {
 };
 
 export async function redirectBasedOnSessionState(
-  session: Session,
+  sessionIsLoggedIn: boolean,
   isLoadingSession: boolean,
   redirectIfSessionState: string,
   location: string
@@ -41,14 +40,14 @@ export async function redirectBasedOnSessionState(
   }
 
   if (
-    session.info.isLoggedIn &&
+    sessionIsLoggedIn &&
     redirectIfSessionState === SESSION_STATES.LOGGED_IN
   ) {
     await Router.push(location);
   }
 
   if (
-    !session.info.isLoggedIn &&
+    !sessionIsLoggedIn &&
     redirectIfSessionState === SESSION_STATES.LOGGED_OUT
   ) {
     await Router.push(location);
@@ -61,12 +60,12 @@ export function useRedirectIfLoggedOut(location = "/login"): void {
 
   useEffect(() => {
     redirectBasedOnSessionState(
-      session,
+      session.info.isLoggedIn,
       isLoadingSession,
       SESSION_STATES.LOGGED_OUT,
       location
     );
-  }, [session, isLoadingSession, location]);
+  });
 }
 
 export function useRedirectIfLoggedIn(location = "/"): void {
@@ -74,10 +73,10 @@ export function useRedirectIfLoggedIn(location = "/"): void {
 
   useEffect(() => {
     redirectBasedOnSessionState(
-      session,
+      session.info.isLoggedIn,
       isLoadingSession,
       SESSION_STATES.LOGGED_IN,
       location
     );
-  }, [session, isLoadingSession, location]);
+  });
 }

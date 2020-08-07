@@ -29,8 +29,9 @@ import { createStyles, makeStyles, StyleRules } from "@material-ui/styles";
 import { Box } from "@material-ui/core";
 import { PrismTheme, useBem } from "@solid/lit-prism-patterns";
 import clsx from "clsx";
+import { useRouter } from "next/router";
 
-import DetailsContextMenu from "../detailsContextMenu";
+import DetailsContextMenu, { handleCloseDrawer } from "../detailsContextMenu";
 import ContainerTableRow from "../containerTableRow";
 import SortedTableCarat from "../sortedTableCarat";
 import AddFileButton from "../addFileButton";
@@ -55,13 +56,14 @@ interface IPodList {
 export default function Container(props: IPodList): ReactElement {
   useRedirectIfLoggedOut();
 
-  const { menuOpen } = useContext(DetailsMenuContext);
+  const { menuOpen, setMenuOpen } = useContext(DetailsMenuContext);
 
   const { iri } = props;
   const { data: resourceIris, mutate } = useFetchContainerResourceIris(iri);
   const loading = typeof resourceIris === "undefined";
 
   const bem = useBem(useStyles());
+  const router = useRouter();
 
   const columns = useMemo(
     () => [
@@ -180,7 +182,14 @@ export default function Container(props: IPodList): ReactElement {
           <AddFileButton onSave={mutate} />
         </Box>
 
-        <DetailsContextMenu />
+        <DetailsContextMenu
+          onUpdate={() => {
+            mutate();
+            handleCloseDrawer({ setMenuOpen, router })().catch((e) => {
+              throw e;
+            });
+          }}
+        />
       </div>
     </>
   );
