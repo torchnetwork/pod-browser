@@ -19,33 +19,21 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { shallow } from "enzyme";
-import { shallowToJson } from "enzyme-to-json";
-import Router from "next/router";
-import auth from "solid-auth-client";
+import React from "react";
 
-import LogOutButton from "./index";
+import { createStyles, makeStyles } from "@material-ui/styles";
+import { useBem } from "@solid/lit-prism-patterns";
+import ProviderLogin from "./provider";
+import styles from "./styles";
 
-jest.mock("next/router");
-jest.mock("solid-auth-client");
+const useStyles = makeStyles((theme) => createStyles(styles(theme)));
 
-describe("Logout button", () => {
-  test("Renders a logout button", () => {
-    const tree = shallow(<LogOutButton />);
-    expect(shallowToJson(tree)).toMatchSnapshot();
-  });
+export default function Login() {
+  const bem = useBem(useStyles());
 
-  test("Calls logout and redirects on click", async () => {
-    (auth.logout as jest.Mock).mockResolvedValue(null);
-    (Router.push as jest.Mock).mockResolvedValue(null);
-
-    const tree = shallow(<LogOutButton />);
-    tree.simulate("click", { preventDefault: () => {} });
-
-    // Simulate an await before continuing.
-    await auth.logout();
-
-    expect(Router.push).toHaveBeenCalledWith("/login");
-    expect(auth.logout).toHaveBeenCalled();
-  });
-});
+  return (
+    <div className={bem("login-form")}>
+      <ProviderLogin />
+    </div>
+  );
+}

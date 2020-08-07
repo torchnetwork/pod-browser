@@ -90,13 +90,17 @@ export default function ContainerTableRow({ resource }: Props): ReactElement {
       </td>
 
       <td className={bem("table__body-cell")}>
-        <ResourceLink
-          containerIri={iri}
-          resourceIri={iri}
-          className={bem("table__link")}
-        >
-          {name}
-        </ResourceLink>
+        {isContainerIri(iri) ? (
+          <ResourceLink
+            containerIri={iri}
+            resourceIri={iri}
+            className={bem("table__link")}
+          >
+            {name}
+          </ResourceLink>
+        ) : (
+          name
+        )}
       </td>
 
       <td key={`${iri}-type`} className={bem("table__body-cell")}>

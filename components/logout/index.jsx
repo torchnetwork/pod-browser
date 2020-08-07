@@ -19,40 +19,39 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React, { ReactElement, useContext } from "react";
-import { createStyles, makeStyles, StyleRules } from "@material-ui/styles";
-import { header, PrismTheme, useBem } from "@solid/lit-prism-patterns";
-import Link from "next/link";
-import SessionContext from "../../src/contexts/sessionContext";
-import UserMenu from "./userMenu";
-import styles from "./styles";
+import { useContext } from "react";
+import T from "prop-types";
+import { hardRedirect, clearLocalstorage } from "../../src/windowHelpers";
+import SessionProvider from "../../src/contexts/sessionContext";
 
-const useStyles = makeStyles<PrismTheme>((theme) =>
-  createStyles(styles(theme) as StyleRules)
-);
+export function onLogOutClick(session) {
+  return async function logout(e) {
+    e.preventDefault();
+    await session.logout();
+    clearLocalstorage();
+    hardRedirect("/login");
+  };
+}
 
-export default function Header(): ReactElement | null {
-  const { session } = useContext(SessionContext);
-  const bem = useBem(useStyles());
+export default function LogOut({ children, className }) {
+  const { session } = useContext(SessionProvider);
 
   return (
-    <header className={bem("header-banner")}>
-      <Link href="/">
-        <a className={bem("header-banner__logo")}>
-          <img
-            height={40}
-            src="/inrupt_logo-2020.svg"
-            className={bem("header-banner__logo-image")}
-            alt="Inrupt PodBrowser"
-          />
-        </a>
-      </Link>
-      {session.info.isLoggedIn ? (
-        <>
-          <div className={bem("header-banner__main-nav")} />
-          <UserMenu />
-        </>
-      ) : null}
-    </header>
+    <button
+      onClick={onLogOutClick(session)}
+      className={className}
+      type="button"
+    >
+      {children}
+    </button>
   );
 }
+
+LogOut.propTypes = {
+  className: T.string,
+  children: T.node.isRequired,
+};
+
+LogOut.defaultProps = {
+  className: "",
+};

@@ -19,11 +19,11 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import * as ReactFns from "react";
 import * as RouterFns from "next/router";
 import * as SolidClientFns from "@inrupt/solid-client";
 import { mountToJson } from "../../__testUtils/mountWithTheme";
 import * as SolidClientHelperFns from "../../src/solidClientHelpers";
+import SessionContext from "../../src/contexts/sessionContext";
 import ResourceSharing, {
   AddedAgents,
   backToDetailsClick,
@@ -62,11 +62,13 @@ describe("ResourceSharing", () => {
         acl,
       },
     ];
-    const setTitle = jest.fn();
-    const setOpen = jest.fn();
-    const setContent = jest.fn();
-    const confirmed = false;
-    const setConfirmed = jest.fn();
+
+    const session = {
+      info: {
+        webId,
+      },
+      fetch: jest.fn(),
+    };
 
     jest
       .spyOn(RouterFns, "useRouter")
@@ -89,19 +91,10 @@ describe("ResourceSharing", () => {
         control: true,
       });
 
-    jest
-      .spyOn(ReactFns, "useContext")
-      .mockReturnValueOnce({ session: { webId } })
-      .mockReturnValueOnce({
-        setTitle,
-        setOpen,
-        setContent,
-        confirmed,
-        setConfirmed,
-      });
-
     const tree = mountToJson(
-      <ResourceSharing iri={iri} name={name} permissions={permissions} />
+      <SessionContext.Provider value={{ session }}>
+        <ResourceSharing iri={iri} name={name} permissions={permissions} />
+      </SessionContext.Provider>
     );
 
     expect(tree).toMatchSnapshot();
@@ -244,20 +237,27 @@ describe("AddedAgents", () => {
       detailText: "detailText",
     };
 
+    const session = {
+      fetch: jest.fn(),
+    };
+
     const tree = mountToJson(
-      <AddedAgents
-        addedAgents={addedAgents}
-        classes={classes}
-        setAddedAgents={setAddedAgents}
-        setThirdPartyPermissions={setThirdPartyPermissions}
-        thirdPartyPermissions={thirdPartyPermissions}
-      />
+      <SessionContext.Provider value={{ session }}>
+        <AddedAgents
+          addedAgents={addedAgents}
+          classes={classes}
+          setAddedAgents={setAddedAgents}
+          setThirdPartyPermissions={setThirdPartyPermissions}
+          thirdPartyPermissions={thirdPartyPermissions}
+          iri="https://test.url"
+        />
+      </SessionContext.Provider>
     );
 
     expect(tree).toMatchSnapshot();
   });
 
-  test("it returns null when addedAgents are null", () => {
+  test("it returns null when addedAgents is an empty array", () => {
     const setAddedAgents = jest.fn();
     const setThirdPartyPermissions = jest.fn();
     const thirdPartyPermissions = [];
@@ -267,36 +267,23 @@ describe("AddedAgents", () => {
       detailText: "detailText",
     };
 
-    const tree = AddedAgents({
-      addedAgents: null,
-      classes,
-      setAddedAgents,
-      setThirdPartyPermissions,
-      thirdPartyPermissions,
-    });
-
-    expect(tree).toBeNull();
-  });
-
-  test("it returns null when addedAgents are empty", () => {
-    const setAddedAgents = jest.fn();
-    const setThirdPartyPermissions = jest.fn();
-    const thirdPartyPermissions = [];
-    const classes = {
-      listItem: "listItem",
-      avatar: "avatar",
-      detailText: "detailText",
+    const session = {
+      fetch: jest.fn(),
     };
 
-    const tree = AddedAgents({
-      addedAgents: [],
-      classes,
-      setAddedAgents,
-      setThirdPartyPermissions,
-      thirdPartyPermissions,
-    });
+    const tree = mountToJson(
+      <SessionContext.Provider value={{ session }}>
+        <AddedAgents
+          addedAgents={[]}
+          classes={classes}
+          setAddedAgents={setAddedAgents}
+          setThirdPartyPermissions={setThirdPartyPermissions}
+          thirdPartyPermissions={thirdPartyPermissions}
+        />
+      </SessionContext.Provider>
+    );
 
-    expect(tree).toBeNull();
+    expect(tree).toMatchSnapshot();
   });
 });
 

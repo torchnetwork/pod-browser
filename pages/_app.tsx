@@ -28,7 +28,6 @@ import React, { ComponentType, ReactElement, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import Head from "next/head";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import auth from "solid-auth-client";
 
 import {
   createStyles,
@@ -42,13 +41,24 @@ import preset from "jss-preset-default";
 
 import { StyleRules } from "@material-ui/styles/withStyles";
 import { appLayout, useBem } from "@solid/lit-prism-patterns";
+
+// TODO temporary until solid-client-authn-browser works with NSS (NSS supports dpop)
+/*
+import {
+  Session,
+  getClientAuthenticationWithDependencies,
+} from "@inrupt/solid-client-authn-browser";
+ */
+import Session from "../src/solidAuthClientWrapper";
+
 import theme from "../src/theme";
-import UserContext, { ISession } from "../src/contexts/userContext";
+import SessionContext from "../src/contexts/sessionContext";
 import { AlertProvider } from "../src/contexts/alertContext";
 import { ConfirmationDialogProvider } from "../src/contexts/confirmationDialogContext";
 import Notification from "../components/notification";
 import ConfirmationDialog from "../components/confirmationDialog";
 import PodBrowserHeader from "../components/header";
+
 import "./styles.css";
 
 interface AppProps {
@@ -62,44 +72,52 @@ const useStyles = makeStyles(() =>
   createStyles(appLayout.styles(theme) as StyleRules)
 );
 
+// TODO temporary until solid-client-authn-browser works with NSS (NSS supports dpop)
+/*
+// Generate an app-level session.
+const session = new Session(
+  {
+    clientAuthentication: getClientAuthenticationWithDependencies({}),
+  },
+  "pod-browser"
+);
+ */
+const session = new Session();
+
+export function hasSolidAuthClientHash(): boolean {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  if (window.location.hash.indexOf("#access_token=") === 0) {
+    return true;
+  }
+
+  return false;
+}
+
 export default function App(props: AppProps): ReactElement {
   const { Component, pageProps } = props;
-
-  const [session, setSession] = useState<ISession | undefined>();
+  const bem = useBem(useStyles());
   const [isLoadingSession, setIsLoadingSession] = useState(true);
 
-  const bem = useBem(useStyles());
-
-  // Remove injected serverside JSS
   useEffect(() => {
+    // Remove injected serverside JSS
     const jssStyles = document.querySelector("#jss-server-side");
 
     if (jssStyles && jssStyles.parentElement) {
       jssStyles.parentElement.removeChild(jssStyles);
     }
+
+    session
+      .handleIncomingRedirect(window.location.href)
+      .then(() => {
+        setIsLoadingSession(false);
+      })
+      .catch((error: Error) => {
+        throw error;
+      });
   }, []);
-
-  useEffect(() => {
-    auth.trackSession(setSession).catch((e) => {
-      throw e;
-    });
-  }, []);
-
-  // Update the session when a page is loaded
-  useEffect(() => {
-    setIsLoadingSession(true);
-
-    // Remove the server-side injected CSS.
-    async function fetchSession(): Promise<void> {
-      const sessionStorage = await auth.currentSession();
-      setSession(sessionStorage);
-      setIsLoadingSession(false);
-    }
-
-    fetchSession().catch((e) => {
-      throw e;
-    });
-  }, [Component, pageProps, setSession, setIsLoadingSession]);
 
   return (
     <>
@@ -113,7 +131,12 @@ export default function App(props: AppProps): ReactElement {
 
       <StylesProvider jss={jss}>
         <ThemeProvider theme={theme}>
-          <UserContext.Provider value={{ session, isLoadingSession }}>
+          <SessionContext.Provider
+            value={{
+              session,
+              isLoadingSession,
+            }}
+          >
             <AlertProvider>
               <ConfirmationDialogProvider>
                 <CssBaseline />
@@ -128,7 +151,7 @@ export default function App(props: AppProps): ReactElement {
                 <ConfirmationDialog />
               </ConfirmationDialogProvider>
             </AlertProvider>
-          </UserContext.Provider>
+          </SessionContext.Provider>
         </ThemeProvider>
       </StylesProvider>
     </>

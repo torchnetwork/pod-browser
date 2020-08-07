@@ -20,17 +20,21 @@
  */
 
 import { createContext } from "react";
+import {
+  Session,
+  getClientAuthenticationWithDependencies,
+} from "@inrupt/solid-client-authn-browser";
 
-export interface ISession {
-  webId: string;
-}
+import SACSession from "../../solidAuthClientWrapper";
 
-export interface UserContext {
-  session: ISession | undefined; // TODO replace with SAF session context
+export interface SessionContext {
+  session: Session | SACSession;
   isLoadingSession: boolean;
 }
 
-export default createContext<UserContext>({
-  session: undefined,
+export default createContext<SessionContext>({
+  session: new Session({
+    clientAuthentication: getClientAuthenticationWithDependencies({}),
+  }),
   isLoadingSession: true,
 });

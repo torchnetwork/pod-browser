@@ -31,13 +31,11 @@ jest.mock("next/router");
 
 describe("Index page", () => {
   beforeEach(() => {
-    (useRouter as jest.Mock).mockImplementation(() => {
-      return {
-        query: {
-          iri: encodeURIComponent("https://mypod.myhost.com"),
-        },
-      };
-    });
+    (useRouter as jest.Mock).mockImplementation(() => ({
+      query: {
+        iri: encodeURIComponent("https://mypod.myhost.com"),
+      },
+    }));
   });
 
   test("Renders a logout button", () => {

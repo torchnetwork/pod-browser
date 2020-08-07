@@ -19,20 +19,49 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-export type ProviderEntity = {
-  label: string;
-  value: string;
-};
+import auth from "solid-auth-client";
 
-export default function getIdentityProviders(): Array<ProviderEntity> {
-  return [
-    {
-      label: "inrupt.net",
-      value: "https://inrupt.net/",
-    },
-    {
-      label: "dev.inrupt.net",
-      value: "https://dev.inrupt.net/",
-    },
-  ];
+/* eslint class-methods-use-this: 0 */
+
+export default class SessionWrapper {
+  login({ oidcIssuer }) {
+    return auth.login(oidcIssuer);
+  }
+
+  async logout() {
+    await auth.logout();
+    this.info = this.defaultInfo();
+  }
+
+  fetch(...args) {
+    return auth.fetch(...args);
+  }
+
+  // Quiet down eslint so that the interface more closely matches.
+  /* eslint no-unused-vars: 0 */
+  handleIncomingRedirect(location) {
+    return this.loadCurrentSession();
+  }
+
+  defaultInfo = () => ({
+    isLoggedIn: false,
+    webId: undefined,
+  });
+
+  loadCurrentSession = async () => {
+    const session = await auth.currentSession();
+
+    if (session) {
+      this.info = {
+        webId: session.webId,
+        isLoggedIn: true,
+      };
+    } else {
+      this.info = this.defaultInfo();
+    }
+  };
+
+  constructor() {
+    this.info = this.defaultInfo();
+  }
 }

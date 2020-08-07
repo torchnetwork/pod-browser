@@ -62,15 +62,16 @@ export default function ResourceSharingLoading({
   return (
     <>
       <section className={classes.headerSection}>
-        <h3 className={classes["content-h3"]} title={iri}>
-          {name}
-        </h3>
         <Button
           startIcon={<ChevronLeftIcon />}
           onClick={backToDetailsClick(router)}
         >
           Details
         </Button>
+
+        <h3 className={classes["content-h3"]} title={iri}>
+          {name}
+        </h3>
       </section>
 
       <Divider />
@@ -111,11 +112,8 @@ export default function ResourceSharingLoading({
           </ListItem>
 
           <ListItem key={1} className={classes.listItem}>
-            <ListItem key={0} className={classes.listItem}>
-              <Avatar className={classes.avatar} />
-
-              <Skeleton width={150} />
-            </ListItem>
+            <Avatar className={classes.avatar} />
+            <Skeleton width={150} />
           </ListItem>
         </List>
       </section>

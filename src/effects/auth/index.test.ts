@@ -20,7 +20,6 @@
  */
 
 import Router from "next/router";
-import { mock } from "jest-mock-extended";
 
 import { SESSION_STATES, redirectBasedOnSessionState } from "./index";
 
@@ -34,7 +33,7 @@ describe("auth effects", () => {
   describe("do nothing if session is still loading", () => {
     test("if the session is loading, don't attempt to redirect", async () => {
       await redirectBasedOnSessionState(
-        undefined,
+        false,
         true,
         SESSION_STATES.LOGGED_OUT,
         redirectLocation
@@ -47,7 +46,7 @@ describe("auth effects", () => {
   describe("redirect if logged out", () => {
     test("if there is not a session, redirect", async () => {
       await redirectBasedOnSessionState(
-        undefined,
+        false,
         false,
         SESSION_STATES.LOGGED_OUT,
         redirectLocation
@@ -58,7 +57,7 @@ describe("auth effects", () => {
 
     test("if there is a session, do not redirect", async () => {
       await redirectBasedOnSessionState(
-        mock(),
+        true,
         false,
         SESSION_STATES.LOGGED_OUT,
         redirectLocation
@@ -71,24 +70,24 @@ describe("auth effects", () => {
   describe("redirect if logged in", () => {
     test("if there is a session, redirect", async () => {
       await redirectBasedOnSessionState(
-        undefined,
+        true,
         false,
         SESSION_STATES.LOGGED_IN,
         redirectLocation
       );
 
-      expect(Router.push).not.toHaveBeenCalled();
+      expect(Router.push).toHaveBeenCalled();
     });
 
     test("if there is not a session, do not redirect", async () => {
       await redirectBasedOnSessionState(
-        mock(),
+        false,
         false,
         SESSION_STATES.LOGGED_IN,
         redirectLocation
       );
 
-      expect(Router.push).toHaveBeenCalledWith(redirectLocation);
+      expect(Router.push).not.toHaveBeenCalledWith(redirectLocation);
     });
   });
 });

@@ -867,34 +867,7 @@ font-display: block;",
             <td
               className="makeStyles-table__body-cell-1550"
             >
-              <ResourceLink
-                className="makeStyles-table__link-1555"
-                containerIri="https://example.com/example.ttl"
-                resourceIri="https://example.com/example.ttl"
-              >
-                <Link
-                  as={
-                    Object {
-                      "pathname": "/resource/https%3A%2F%2Fexample.com%2Fexample.ttl",
-                    }
-                  }
-                  href={
-                    Object {
-                      "pathname": "/resource/[iri]",
-                    }
-                  }
-                  replace={true}
-                >
-                  <a
-                    className="makeStyles-table__link-1555"
-                    href="/resource/https%3A%2F%2Fexample.com%2Fexample.ttl"
-                    onClick={[Function]}
-                    onMouseEnter={[Function]}
-                  >
-                    /example.ttl
-                  </a>
-                </Link>
-              </ResourceLink>
+              /example.ttl
             </td>
             <td
               className="makeStyles-table__body-cell-1550"
@@ -1779,34 +1752,7 @@ font-display: block;",
             <td
               className="makeStyles-table__body-cell-1550"
             >
-              <ResourceLink
-                className="makeStyles-table__link-1555"
-                containerIri="https://example.com/example.ttl"
-                resourceIri="https://example.com/example.ttl"
-              >
-                <Link
-                  as={
-                    Object {
-                      "pathname": "/resource/https%3A%2F%2Fexample.com%2Fexample.ttl",
-                    }
-                  }
-                  href={
-                    Object {
-                      "pathname": "/resource/[iri]",
-                    }
-                  }
-                  replace={true}
-                >
-                  <a
-                    className="makeStyles-table__link-1555"
-                    href="/resource/https%3A%2F%2Fexample.com%2Fexample.ttl"
-                    onClick={[Function]}
-                    onMouseEnter={[Function]}
-                  >
-                    /example.ttl
-                  </a>
-                </Link>
-              </ResourceLink>
+              /example.ttl
             </td>
             <td
               className="makeStyles-table__body-cell-1550"
@@ -2689,34 +2635,7 @@ font-display: block;",
             <td
               className="makeStyles-table__body-cell-1550"
             >
-              <ResourceLink
-                className="makeStyles-table__link-1555"
-                containerIri="https://example.com/example.ttl"
-                resourceIri="https://example.com/example.ttl"
-              >
-                <Link
-                  as={
-                    Object {
-                      "pathname": "/resource/https%3A%2F%2Fexample.com%2Fexample.ttl",
-                    }
-                  }
-                  href={
-                    Object {
-                      "pathname": "/resource/[iri]",
-                    }
-                  }
-                  replace={true}
-                >
-                  <a
-                    className="makeStyles-table__link-1555"
-                    href="/resource/https%3A%2F%2Fexample.com%2Fexample.ttl"
-                    onClick={[Function]}
-                    onMouseEnter={[Function]}
-                  >
-                    /example.ttl
-                  </a>
-                </Link>
-              </ResourceLink>
+              /example.ttl
             </td>
             <td
               className="makeStyles-table__body-cell-1550"

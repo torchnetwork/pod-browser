@@ -21,16 +21,20 @@
 
 // @ts-nocheck
 // react-table is super broken with sorting, so temporarily disable ts checking.
+/* eslint react/jsx-one-expression-per-line: 0 */
 
 import { ReactElement, useContext, useMemo } from "react";
 import { useTable, useSortBy, UseSortByOptions } from "react-table";
-
 import { createStyles, makeStyles, StyleRules } from "@material-ui/styles";
+import { Box } from "@material-ui/core";
 import { PrismTheme, useBem } from "@solid/lit-prism-patterns";
 import clsx from "clsx";
-import DetailsContextMenu from "../detailsContextMenu";
+import { useRouter } from "next/router";
+
+import DetailsContextMenu, { handleCloseDrawer } from "../detailsContextMenu";
 import ContainerTableRow from "../containerTableRow";
 import SortedTableCarat from "../sortedTableCarat";
+import AddFileButton from "../addFileButton";
 import { useRedirectIfLoggedOut } from "../../src/effects/auth";
 import { useFetchContainerResourceIris } from "../../src/hooks/solidClient";
 import { IResourceDetails, getIriPath } from "../../src/solidClientHelpers";
@@ -41,9 +45,9 @@ import Breadcrumbs from "../breadcrumbs";
 import ContainerToolbar from "../containerToolbar";
 import DetailsMenuContext from "../../src/contexts/detailsMenuContext";
 
-const useStyles = makeStyles<PrismTheme>((theme) => {
-  return createStyles(styles(theme) as StyleRules);
-});
+const useStyles = makeStyles<PrismTheme>((theme) =>
+  createStyles(styles(theme) as StyleRules)
+);
 
 interface IPodList {
   iri: string;
@@ -52,13 +56,14 @@ interface IPodList {
 export default function Container(props: IPodList): ReactElement {
   useRedirectIfLoggedOut();
 
-  const { menuOpen } = useContext(DetailsMenuContext);
+  const { menuOpen, setMenuOpen } = useContext(DetailsMenuContext);
 
   const { iri } = props;
-  const { data: resourceIris } = useFetchContainerResourceIris(iri);
+  const { data: resourceIris, mutate } = useFetchContainerResourceIris(iri);
   const loading = typeof resourceIris === "undefined";
 
   const bem = useBem(useStyles());
+  const router = useRouter();
 
   const columns = useMemo(
     () => [
@@ -172,7 +177,19 @@ export default function Container(props: IPodList): ReactElement {
             })}
           </tbody>
         </table>
-        <DetailsContextMenu />
+
+        <Box mt={2}>
+          <AddFileButton onSave={mutate} />
+        </Box>
+
+        <DetailsContextMenu
+          onUpdate={() => {
+            mutate();
+            handleCloseDrawer({ setMenuOpen, router })().catch((e) => {
+              throw e;
+            });
+          }}
+        />
       </div>
     </>
   );

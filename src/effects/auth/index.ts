@@ -21,8 +21,7 @@
 
 import { useEffect, useContext } from "react";
 import Router from "next/router";
-
-import UserContext, { ISession } from "../../contexts/userContext";
+import SessionContext from "../../contexts/sessionContext";
 
 // TODO figure out typescript enums
 export const SESSION_STATES = {
@@ -31,7 +30,7 @@ export const SESSION_STATES = {
 };
 
 export async function redirectBasedOnSessionState(
-  session: ISession | undefined,
+  sessionIsLoggedIn: boolean,
   isLoadingSession: boolean,
   redirectIfSessionState: string,
   location: string
@@ -40,38 +39,44 @@ export async function redirectBasedOnSessionState(
     return;
   }
 
-  if (session && redirectIfSessionState === SESSION_STATES.LOGGED_IN) {
+  if (
+    sessionIsLoggedIn &&
+    redirectIfSessionState === SESSION_STATES.LOGGED_IN
+  ) {
     await Router.push(location);
   }
 
-  if (!session && redirectIfSessionState === SESSION_STATES.LOGGED_OUT) {
+  if (
+    !sessionIsLoggedIn &&
+    redirectIfSessionState === SESSION_STATES.LOGGED_OUT
+  ) {
     await Router.push(location);
   }
 }
 
 /* eslint @typescript-eslint/no-floating-promises: 0 */
 export function useRedirectIfLoggedOut(location = "/login"): void {
-  const { session, isLoadingSession } = useContext(UserContext);
+  const { session, isLoadingSession } = useContext(SessionContext);
 
   useEffect(() => {
     redirectBasedOnSessionState(
-      session,
+      session.info.isLoggedIn,
       isLoadingSession,
       SESSION_STATES.LOGGED_OUT,
       location
     );
-  }, [session, isLoadingSession, location]);
+  });
 }
 
 export function useRedirectIfLoggedIn(location = "/"): void {
-  const { session, isLoadingSession } = useContext(UserContext);
+  const { session, isLoadingSession } = useContext(SessionContext);
 
   useEffect(() => {
     redirectBasedOnSessionState(
-      session,
+      session.info.isLoggedIn,
       isLoadingSession,
       SESSION_STATES.LOGGED_IN,
       location
     );
-  }, [session, isLoadingSession, location]);
+  });
 }

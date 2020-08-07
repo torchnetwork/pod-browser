@@ -20,6 +20,7 @@
  */
 
 import { ReactElement, useContext, useEffect, Dispatch } from "react";
+import T from "prop-types";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import { AlertProps } from "@material-ui/lab/Alert";
 import { Drawer, IconButton } from "@material-ui/core";
@@ -48,11 +49,17 @@ const useStyles = makeStyles<PrismTheme>((theme) => {
 interface IContentsProps {
   action: string;
   iri: string;
+  onUpdate: void;
 }
 
-export function Contents({ action, iri }: IContentsProps): ReactElement | null {
+export function Contents({
+  action,
+  iri,
+  onUpdate,
+}: IContentsProps): ReactElement | null {
   const { pathname } = parseUrl(iri);
   const { data, error } = useFetchResourceDetails(iri);
+
   const { setAlertOpen, setMessage, setSeverity } = useContext(AlertContext);
   const errorMessage = "There was an error fetching the details.";
   const loadingComponent =
@@ -90,7 +97,12 @@ export function Contents({ action, iri }: IContentsProps): ReactElement | null {
       );
 
     default:
-      return <ResourceDetails resource={{ ...data, name: pathname }} />;
+      return (
+        <ResourceDetails
+          resource={{ ...data, name: pathname }}
+          onDelete={onUpdate}
+        />
+      );
   }
 }
 
@@ -111,7 +123,15 @@ export function handleCloseDrawer({
   };
 }
 
-export default function DetailsContextMenu(): ReactElement | null {
+interface IDetailsContextMenu {
+  onUpdate: void;
+}
+
+/* eslint @typescript-eslint/explicit-module-boundary-types: 0 */
+export default function DetailsContextMenu(
+  props: IDetailsContextMenu
+): ReactElement | null {
+  const { onUpdate } = props;
   const { menuOpen, setMenuOpen } = useContext(DetailsMenuContext);
 
   const { query } = useRouter();
@@ -139,7 +159,15 @@ export default function DetailsContextMenu(): ReactElement | null {
       <IconButton className={bem("drawer__close-button")} onClick={closeDrawer}>
         <ChevronRightIcon />
       </IconButton>
-      <Contents action={action as string} iri={resourceIri as string} />
+      <Contents
+        action={action as string}
+        iri={resourceIri as string}
+        onUpdate={onUpdate}
+      />
     </Drawer>
   );
 }
+
+DetailsContextMenu.propTypes = {
+  onUpdate: T.func.isRequired,
+};
