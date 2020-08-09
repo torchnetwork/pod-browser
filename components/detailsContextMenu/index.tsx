@@ -21,24 +21,24 @@
 
 import { ReactElement, useContext, useEffect, Dispatch } from "react";
 import T from "prop-types";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import { AlertProps } from "@material-ui/lab/Alert";
-import { Drawer, IconButton } from "@material-ui/core";
+import { Drawer, Button, Divider } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { useRouter, NextRouter } from "next/router";
 import { PrismTheme, useBem } from "@solid/lit-prism-patterns";
 import { createStyles, StyleRules } from "@material-ui/styles";
+import CloseIcon from "@material-ui/icons/Close";
 import DetailsMenuContext, {
   DETAILS_CONTEXT_ACTIONS,
 } from "../../src/contexts/detailsMenuContext";
 import AlertContext from "../../src/contexts/alertContext";
 import styles from "./styles";
 import useEscKey from "../../src/effects/useEscKey";
-import DetailsLoading from "../detailsLoading";
-import ResourceSharingLoading from "../resourceSharingLoading";
-import DetailsError from "../detailsError";
+import DetailsLoading from "../resourceDetails/detailsLoading";
+import ResourceSharingLoading from "../resourceDetails/resourceSharing/resourceSharingLoading";
+import DetailsError from "../resourceDetails/detailsError";
 import ResourceDetails from "../resourceDetails";
-import ResourceSharing from "../resourceSharing";
+import ResourceSharing from "../resourceDetails/resourceSharing";
 import { useFetchResourceDetails } from "../../src/hooks/solidClient";
 import { parseUrl, stripQueryParams } from "../../src/stringHelpers";
 
@@ -64,7 +64,7 @@ export function Contents({
   const errorMessage = "There was an error fetching the details.";
   const loadingComponent =
     action === "details" ? (
-      <DetailsLoading name={pathname} iri={iri} />
+      <DetailsLoading name={pathname} iri={iri} onDelete={onUpdate} />
     ) : (
       <ResourceSharingLoading name={pathname} iri={iri} />
     );
@@ -137,7 +137,8 @@ export default function DetailsContextMenu(
   const { query } = useRouter();
   const { action, resourceIri } = query;
 
-  const bem = useBem(useStyles());
+  const classes = useStyles();
+  const bem = useBem(classes);
   const router = useRouter();
 
   useEffect(() => {
@@ -156,9 +157,14 @@ export default function DetailsContextMenu(
       open={menuOpen}
       classes={{ paper: bem("drawer__paper") }}
     >
-      <IconButton className={bem("drawer__close-button")} onClick={closeDrawer}>
-        <ChevronRightIcon />
-      </IconButton>
+      <div className={classes.drawerHeader}>
+        <Button startIcon={<CloseIcon />} onClick={closeDrawer}>
+          Close
+        </Button>
+      </div>
+
+      <Divider />
+
       <Contents
         action={action as string}
         iri={resourceIri as string}

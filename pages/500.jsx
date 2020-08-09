@@ -19,31 +19,18 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-module.exports = {
-  // Automatically clear mock calls and instances between every test
-  clearMocks: true,
+import Link from "next/link";
 
-  // The test environment that will be used for testing
-  testEnvironment: "jsdom",
-  setupFilesAfterEnv: ["<rootDir>jest/setupTests.js"],
-
-  testPathIgnorePatterns: ["/node_modules/", "/__testUtils/"],
-
-  collectCoverage: true,
-
-  coveragePathIgnorePatterns: [
-    "/node_modules/",
-    "/__testUtils/",
-    "styles.ts",
-    "/src/windowHelpers",
-  ],
-
-  coverageThreshold: {
-    global: {
-      branches: 89,
-      functions: 89,
-      lines: 95,
-      statements: 95,
-    },
-  },
-};
+export default function Custom404() {
+  return (
+    <>
+      <h1>500 - Unhandled server error</h1>
+      <p>
+        This error has been logged.
+        <Link href="/">
+          <a>Return to the home page.</a>
+        </Link>
+      </p>
+    </>
+  );
+}

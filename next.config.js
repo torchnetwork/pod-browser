@@ -19,18 +19,47 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { mountToJson } from "../../__testUtils/mountWithTheme";
-import DetailsError from "./index";
+const withSourceMaps = require("@zeit/next-source-maps")();
+const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 
-describe("DetailsError", () => {
-  test("Renders a details error view", () => {
-    const name = "name";
-    const message = "message";
-    const iri = "iri";
-    const tree = mountToJson(
-      <DetailsError name={name} message={message} iri={iri} />
-    );
+const {
+  NEXT_PUBLIC_SENTRY_DSN: SENTRY_DSN,
+  VERCEL_GITHUB_COMMIT_SHA: COMMIT_SHA,
+  SENTRY_ORG,
+  SENTRY_PROJECT,
+  SENTRY_AUTH_TOKEN,
+  NODE_ENV,
+} = process.env;
 
-    expect(tree).toMatchSnapshot();
-  });
+process.env.SENTRY_DSN = SENTRY_DSN;
+
+/* eslint no-param-reassign: 0 */
+module.exports = withSourceMaps({
+  webpack(config, options) {
+    // If the environment is the browser, we should load sentry/react instead of
+    // sentry/node.
+    if (!options.isServer) {
+      config.resolve.alias["@sentry/node"] = "@sentry/react";
+    }
+
+    if (
+      SENTRY_DSN &&
+      SENTRY_ORG &&
+      SENTRY_PROJECT &&
+      SENTRY_AUTH_TOKEN &&
+      COMMIT_SHA &&
+      NODE_ENV === "production"
+    ) {
+      config.plugins.push(
+        new SentryWebpackPlugin({
+          include: ".next",
+          ignore: ["node_modules"],
+          urlPrefix: "~/_next",
+          release: COMMIT_SHA,
+        })
+      );
+    }
+
+    return config;
+  },
 });

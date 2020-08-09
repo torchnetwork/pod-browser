@@ -19,41 +19,18 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { ReactElement } from "react";
-import { Divider } from "@material-ui/core";
-import { PrismTheme } from "@solid/lit-prism-patterns";
-import { makeStyles, createStyles } from "@material-ui/core/styles";
-import styles from "../resourceDetails/styles";
+import Link from "next/link";
 
-const useStyles = makeStyles<PrismTheme>((theme) =>
-  createStyles(styles(theme))
-);
-
-interface IDetailsError {
-  name: string;
-  iri: string;
-  message: string;
-}
-
-function DetailsError({ name, iri, message }: IDetailsError): ReactElement {
-  const classes = useStyles();
-
+export default function Custom404() {
   return (
     <>
-      <section className={classes.centeredSection}>
-        <h3 className={classes["content-h3"]} title={iri}>
-          {name}
-        </h3>
-      </section>
+      <h1>404 - Page Not Found</h1>
 
-      <Divider />
-
-      <section className={classes.centeredSection}>
-        <h5 className={classes["content-h5"]}>Error</h5>
-        <p>{message}</p>
-      </section>
+      <p>
+        <Link href="/">
+          <a>Return to the home page.</a>
+        </Link>
+      </p>
     </>
   );
 }
-
-export default DetailsError;

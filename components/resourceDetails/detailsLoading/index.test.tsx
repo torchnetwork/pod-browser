@@ -21,7 +21,7 @@
 
 import * as RouterFns from "next/router";
 import DetailsLoading from "./index";
-import { mountToJson } from "../../__testUtils/mountWithTheme";
+import { mountToJson } from "../../../__testUtils/mountWithTheme";
 
 describe("DetailsLoading", () => {
   test("Renders a details error view", () => {

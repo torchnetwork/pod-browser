@@ -19,31 +19,41 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-module.exports = {
-  // Automatically clear mock calls and instances between every test
-  clearMocks: true,
+import { ReactElement } from "react";
+import { Divider } from "@material-ui/core";
+import { PrismTheme } from "@solid/lit-prism-patterns";
+import { makeStyles, createStyles } from "@material-ui/core/styles";
+import styles from "../styles";
 
-  // The test environment that will be used for testing
-  testEnvironment: "jsdom",
-  setupFilesAfterEnv: ["<rootDir>jest/setupTests.js"],
+const useStyles = makeStyles<PrismTheme>((theme) =>
+  createStyles(styles(theme))
+);
 
-  testPathIgnorePatterns: ["/node_modules/", "/__testUtils/"],
+interface IDetailsError {
+  name: string;
+  iri: string;
+  message: string;
+}
 
-  collectCoverage: true,
+function DetailsError({ name, iri, message }: IDetailsError): ReactElement {
+  const classes = useStyles();
 
-  coveragePathIgnorePatterns: [
-    "/node_modules/",
-    "/__testUtils/",
-    "styles.ts",
-    "/src/windowHelpers",
-  ],
+  return (
+    <>
+      <section className={classes.centeredSection}>
+        <h3 className={classes["content-h3"]} title={iri}>
+          {name}
+        </h3>
+      </section>
 
-  coverageThreshold: {
-    global: {
-      branches: 89,
-      functions: 89,
-      lines: 95,
-      statements: 95,
-    },
-  },
-};
+      <Divider />
+
+      <section className={classes.centeredSection}>
+        <h5 className={classes["content-h5"]}>Error</h5>
+        <p>{message}</p>
+      </section>
+    </>
+  );
+}
+
+export default DetailsError;

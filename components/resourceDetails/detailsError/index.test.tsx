@@ -19,31 +19,18 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-module.exports = {
-  // Automatically clear mock calls and instances between every test
-  clearMocks: true,
+import { mountToJson } from "../../../__testUtils/mountWithTheme";
+import DetailsError from "./index";
 
-  // The test environment that will be used for testing
-  testEnvironment: "jsdom",
-  setupFilesAfterEnv: ["<rootDir>jest/setupTests.js"],
+describe("DetailsError", () => {
+  test("Renders a details error view", () => {
+    const name = "name";
+    const message = "message";
+    const iri = "iri";
+    const tree = mountToJson(
+      <DetailsError name={name} message={message} iri={iri} />
+    );
 
-  testPathIgnorePatterns: ["/node_modules/", "/__testUtils/"],
-
-  collectCoverage: true,
-
-  coveragePathIgnorePatterns: [
-    "/node_modules/",
-    "/__testUtils/",
-    "styles.ts",
-    "/src/windowHelpers",
-  ],
-
-  coverageThreshold: {
-    global: {
-      branches: 89,
-      functions: 89,
-      lines: 95,
-      statements: 95,
-    },
-  },
-};
+    expect(tree).toMatchSnapshot();
+  });
+});
