@@ -59,6 +59,7 @@ import { ConfirmationDialogProvider } from "../src/contexts/confirmationDialogCo
 import Notification from "../components/notification";
 import ConfirmationDialog from "../components/confirmationDialog";
 import PodBrowserHeader from "../components/header";
+import PodBrowserFooter from "../components/footer";
 
 import "./styles.css";
 
@@ -154,6 +155,7 @@ export default function App(props: AppProps): ReactElement {
                   <main className={bem("app-layout__main")}>
                     <Component {...pageProps} />
                   </main>
+                  <PodBrowserFooter />
                 </div>
 
                 <Notification />
