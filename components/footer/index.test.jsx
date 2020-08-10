@@ -19,19 +19,12 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { Box } from "@material-ui/core";
+import { mountToJson } from "../../__testUtils/mountWithTheme";
+import Footer from "./index";
 
-export default function Footer() {
-  return (
-    <Box p={3} borderTop={1} borderColor="grey.500">
-      {"Copyright 2020 Inrupt, inc. "}
-      <a
-        href="https://inrupt.com/terms-of-service"
-        target="_blank"
-        rel="noreferrer"
-      >
-        Terms of Service
-      </a>
-    </Box>
-  );
-}
+describe("Footer", () => {
+  test("renders the footer", () => {
+    const tree = mountToJson(<Footer />);
+    expect(tree).toMatchSnapshot();
+  });
+});
