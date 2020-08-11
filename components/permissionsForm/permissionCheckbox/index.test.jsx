@@ -19,31 +19,20 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-module.exports = {
-  // Automatically clear mock calls and instances between every test
-  clearMocks: true,
+/* eslint-disable camelcase */
+import { mountToJson } from "../../../__testUtils/mountWithTheme";
+import PermissionCheckbox from "./index";
 
-  // The test environment that will be used for testing
-  testEnvironment: "jsdom",
-  setupFilesAfterEnv: ["<rootDir>jest/setupTests.js"],
+describe("PermissionCheckbox", () => {
+  test("it renders a permission checkbox", () => {
+    const onChange = jest.fn();
+    const label = "Read";
+    const value = true;
 
-  testPathIgnorePatterns: ["/node_modules/", "/__testUtils/"],
+    const tree = mountToJson(
+      <PermissionCheckbox value={value} label={label} onChange={onChange} />
+    );
 
-  collectCoverage: true,
-
-  coveragePathIgnorePatterns: [
-    "/node_modules/",
-    "/__testUtils/",
-    "styles.ts",
-    "/src/windowHelpers",
-  ],
-
-  coverageThreshold: {
-    global: {
-      branches: 89,
-      functions: 89,
-      lines: 90,
-      statements: 90,
-    },
-  },
-};
+    expect(tree).toMatchSnapshot();
+  });
+});

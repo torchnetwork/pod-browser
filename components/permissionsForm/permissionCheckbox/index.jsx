@@ -19,31 +19,49 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-module.exports = {
-  // Automatically clear mock calls and instances between every test
-  clearMocks: true,
+import T from "prop-types";
+import {
+  Checkbox,
+  FormControlLabel,
+  ListItem,
+  makeStyles,
+  createStyles,
+} from "@material-ui/core";
+import styles from "../styles";
 
-  // The test environment that will be used for testing
-  testEnvironment: "jsdom",
-  setupFilesAfterEnv: ["<rootDir>jest/setupTests.js"],
+const useStyles = makeStyles((theme) => createStyles(styles(theme)));
 
-  testPathIgnorePatterns: ["/node_modules/", "/__testUtils/"],
+function PermissionCheckbox({ value, label, onChange }) {
+  const classes = useStyles();
+  const name = label.toLowerCase();
 
-  collectCoverage: true,
+  return (
+    // prettier-ignore
+    <ListItem className={classes.listItem}>
+      <FormControlLabel
+        classes={{ label: classes.label }}
+        label={label}
+        control={(
+          <Checkbox
+            classes={{ root: classes.checkbox }}
+            checked={value}
+            name={name}
+            onChange={onChange}
+          />
+        )}
+      />
+    </ListItem>
+  );
+}
 
-  coveragePathIgnorePatterns: [
-    "/node_modules/",
-    "/__testUtils/",
-    "styles.ts",
-    "/src/windowHelpers",
-  ],
-
-  coverageThreshold: {
-    global: {
-      branches: 89,
-      functions: 89,
-      lines: 90,
-      statements: 90,
-    },
-  },
+PermissionCheckbox.propTypes = {
+  value: T.bool.isRequired,
+  label: T.string.isRequired,
+  onChange: T.func,
 };
+
+PermissionCheckbox.defaultProps = {
+  onChange: () => {},
+};
+
+export default PermissionCheckbox;

@@ -19,14 +19,13 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { ReactElement, useContext, useEffect, Dispatch } from "react";
+import { useContext, useEffect } from "react";
 import T from "prop-types";
-import { AlertProps } from "@material-ui/lab/Alert";
 import { Drawer, Button, Divider } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { useRouter, NextRouter } from "next/router";
-import { PrismTheme, useBem } from "@solid/lit-prism-patterns";
-import { createStyles, StyleRules } from "@material-ui/styles";
+import { useRouter } from "next/router";
+import { useBem } from "@solid/lit-prism-patterns";
+import { createStyles } from "@material-ui/styles";
 import CloseIcon from "@material-ui/icons/Close";
 import DetailsMenuContext, {
   DETAILS_CONTEXT_ACTIONS,
@@ -42,29 +41,19 @@ import ResourceSharing from "../resourceDetails/resourceSharing";
 import { useFetchResourceDetails } from "../../src/hooks/solidClient";
 import { parseUrl, stripQueryParams } from "../../src/stringHelpers";
 
-const useStyles = makeStyles<PrismTheme>((theme) => {
-  return createStyles(styles(theme) as StyleRules);
+const useStyles = makeStyles((theme) => {
+  return createStyles(styles(theme));
 });
 
-interface IContentsProps {
-  action: string;
-  iri: string;
-  onUpdate: void;
-}
-
-export function Contents({
-  action,
-  iri,
-  onUpdate,
-}: IContentsProps): ReactElement | null {
+function Contents({ action, iri, onUpdate }) {
   const { pathname } = parseUrl(iri);
   const { data, error } = useFetchResourceDetails(iri);
 
   const { setAlertOpen, setMessage, setSeverity } = useContext(AlertContext);
   const errorMessage = "There was an error fetching the details.";
 
-  function onDeleteError(e: Error) {
-    setSeverity("error" as AlertProps["severity"]);
+  function onDeleteError(e) {
+    setSeverity("error");
     setMessage(e.toString());
     setAlertOpen(true);
   }
@@ -83,7 +72,7 @@ export function Contents({
 
   useEffect(() => {
     if (error) {
-      setSeverity("error" as AlertProps["severity"]);
+      setSeverity("error");
       setMessage(errorMessage);
       setAlertOpen(true);
     }
@@ -95,7 +84,7 @@ export function Contents({
 
   if (!data) return loadingComponent;
 
-  const { permissions, dataset } = data;
+  const { permissions, defaultPermissions, dataset } = data;
 
   switch (action) {
     case DETAILS_CONTEXT_ACTIONS.SHARING:
@@ -104,6 +93,7 @@ export function Contents({
           iri={iri}
           name={pathname}
           permissions={permissions}
+          defaultPermissions={defaultPermissions}
           dataset={dataset}
         />
       );
@@ -119,15 +109,19 @@ export function Contents({
   }
 }
 
-interface IHandleCloseDrawer {
-  setMenuOpen: Dispatch<boolean>;
-  router: NextRouter;
-}
+Contents.propTypes = {
+  action: T.string.isRequired,
+  iri: T.string.isRequired,
+  onUpdate: T.func,
+};
 
-export function handleCloseDrawer({
-  setMenuOpen,
-  router,
-}: IHandleCloseDrawer): () => Promise<void> {
+Contents.defaultProps = {
+  onUpdate: () => {},
+};
+
+export { Contents };
+
+export function handleCloseDrawer({ setMenuOpen, router }) {
   return async () => {
     setMenuOpen(false);
     const { asPath } = router;
@@ -136,14 +130,8 @@ export function handleCloseDrawer({
   };
 }
 
-interface IDetailsContextMenu {
-  onUpdate: void;
-}
-
 /* eslint @typescript-eslint/explicit-module-boundary-types: 0 */
-export default function DetailsContextMenu(
-  props: IDetailsContextMenu
-): ReactElement | null {
+export default function DetailsContextMenu(props) {
   const { onUpdate } = props;
   const { menuOpen, setMenuOpen } = useContext(DetailsMenuContext);
 
@@ -178,11 +166,7 @@ export default function DetailsContextMenu(
 
       <Divider />
 
-      <Contents
-        action={action as string}
-        iri={resourceIri as string}
-        onUpdate={onUpdate}
-      />
+      <Contents action={action} iri={resourceIri} onUpdate={onUpdate} />
     </Drawer>
   );
 }

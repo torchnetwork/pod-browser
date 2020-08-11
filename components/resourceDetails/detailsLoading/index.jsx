@@ -19,10 +19,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-// @ts-nocheck
 // material-ui is broken and doesn't allow `ListItem` to accept `component`
 
-import React, { ReactElement } from "react";
+import React from "react";
 import {
   Typography,
   Divider,
@@ -30,28 +29,19 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  createStyles,
 } from "@material-ui/core";
+import { makeStyles } from "@material-ui/styles";
+import T from "prop-types";
 import ShareIcon from "@material-ui/icons/Share";
 import DeleteIcon from "@material-ui/icons/Delete";
 import Skeleton from "@material-ui/lab/Skeleton";
-import { PrismTheme } from "@solid/lit-prism-patterns";
-import { makeStyles, createStyles } from "@material-ui/core/styles";
-
 import { DETAILS_CONTEXT_ACTIONS } from "../../../src/contexts/detailsMenuContext";
 import ResourceLink from "../../resourceLink";
 import DeleteLink from "../deleteLink";
 import styles from "./styles";
 
-const useStyles = makeStyles<PrismTheme>((theme) =>
-  createStyles(styles(theme))
-);
-
-interface Props {
-  name?: string | null;
-  iri?: string | null;
-  onDelete: void;
-  onDeleteError: (Error) => void;
-}
+const useStyles = makeStyles((theme) => createStyles(styles(theme)));
 
 /* eslint react/jsx-props-no-spreading: 0 */
 const SharingLink = React.forwardRef((linkProps, ref) => (
@@ -62,12 +52,7 @@ const SharingLink = React.forwardRef((linkProps, ref) => (
   />
 ));
 
-function DetailsLoading({
-  name,
-  iri,
-  onDelete,
-  onDeleteError,
-}: Props): ReactElement {
+function DetailsLoading({ name, iri, onDelete, onDeleteError }) {
   const classes = useStyles();
 
   return (
@@ -127,9 +112,18 @@ function DetailsLoading({
   );
 }
 
+DetailsLoading.propTypes = {
+  iri: T.string,
+  name: T.string,
+  onDelete: T.func,
+  onDeleteError: T.func,
+};
+
 DetailsLoading.defaultProps = {
-  name: null,
   iri: null,
+  name: null,
+  onDelete: () => {},
+  onDeleteError: () => {},
 };
 
 export default DetailsLoading;
