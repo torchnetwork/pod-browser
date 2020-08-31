@@ -19,18 +19,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React from "react";
-import { Footer as PrismFooter } from "@inrupt/prism-react-components";
+import { createStyles, PrismTheme } from "@solid/lit-prism-patterns";
+import { Styles } from "jss";
 
-export default function Footer() {
-  const links = [
-    {
-      href: "https://inrupt.com/terms-of-service",
-      text: "Terms of Service",
-      rel: "noreferrer",
-      target: "_blank",
-    },
-  ];
-  const texts = [{ text: "Copyright 2020 Inrupt, inc." }];
-  return <PrismFooter texts={texts} links={links} />;
+export default function styles(theme: PrismTheme): Styles {
+  return createStyles(theme, ["pageHeader"]);
 }

@@ -19,16 +19,14 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { createStyles, PrismTheme } from "@solid/lit-prism-patterns";
-import { Styles } from "jss";
+import React from "react";
+import { mount } from "enzyme";
+import { mountToJson } from "enzyme-to-json";
+import ContainerDetailsButton from "./index";
 
-export default function styles(theme: PrismTheme): Styles {
-  return createStyles(theme, ["icons"], {
-    "container-toolbar": {
-      paddingBottom: theme.spacing(2), // to negate the padding that breadcrumbs must have
-    },
-    "container-toolbar__trigger": {
-      color: theme.palette.primary.main,
-    },
+describe("ContainerDetailsButton", () => {
+  test("Renders view", () => {
+    const tree = mount(<ContainerDetailsButton />);
+    expect(mountToJson(tree)).toMatchSnapshot();
   });
-}
+});

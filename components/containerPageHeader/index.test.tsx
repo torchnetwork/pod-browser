@@ -20,17 +20,13 @@
  */
 
 import React from "react";
-import { Footer as PrismFooter } from "@inrupt/prism-react-components";
+import { mount } from "enzyme";
+import { mountToJson } from "enzyme-to-json";
+import ContainerPageHeader from "./index";
 
-export default function Footer() {
-  const links = [
-    {
-      href: "https://inrupt.com/terms-of-service",
-      text: "Terms of Service",
-      rel: "noreferrer",
-      target: "_blank",
-    },
-  ];
-  const texts = [{ text: "Copyright 2020 Inrupt, inc." }];
-  return <PrismFooter texts={texts} links={links} />;
-}
+describe("ContainerPageHeader", () => {
+  test("Renders view", () => {
+    const tree = mount(<ContainerPageHeader mutate={() => null} />);
+    expect(mountToJson(tree)).toMatchSnapshot();
+  });
+});

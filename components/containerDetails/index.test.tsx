@@ -18,33 +18,24 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-import { PrismTheme } from "@solid/lit-prism-patterns";
 
-const styles = (theme: PrismTheme) => ({
-  "drawer__close-button": {
-    width: 50,
-    margin: "8px 0 0 -25px",
-    backgroundColor: theme.palette.background.default,
-    boxShadow: "1px 1px 3px #333",
-    "&:hover": {
-      backgroundColor: "#fff",
-    },
-  },
-  "drawer__paper": {
-    borderLeftStyle: "solid",
-    borderLeftWidth: theme.spacing(1),
-    borderLeftColor: theme.palette.grey["50"],
-    width: "95%",
-    [theme.breakpoints.up("sm")]: {
-      width: "50%",
-    },
-    [theme.breakpoints.up("md")]: {
-      width: "33.33%",
-    },
-    [theme.breakpoints.up("lg")]: {
-      width: "25%",
-    }
-  },
+import React from "react";
+import { mount } from "enzyme";
+import { mountToJson } from "enzyme-to-json";
+import * as RouterFns from "next/router";
+import ContainerDetails from "./index";
+
+describe("ContainerDetails", () => {
+  beforeEach(() =>
+    jest.spyOn(RouterFns, "useRouter").mockReturnValue({
+      asPath: "asPath",
+      replace: jest.fn(),
+      query: {},
+    } as never)
+  );
+
+  test("Renders view", () => {
+    const tree = mount(<ContainerDetails mutate={() => null} />);
+    expect(mountToJson(tree)).toMatchSnapshot();
+  });
 });
-
-export default styles;

@@ -19,46 +19,24 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { ReactElement } from "react";
-import { createStyles, makeStyles, StyleRules } from "@material-ui/styles";
-import { Grid } from "@material-ui/core";
-import { PrismTheme, useBem } from "@solid/lit-prism-patterns";
-import InfoIcon from "@material-ui/icons/Info";
-import AddFileButton from "../addFileButton";
-import styles from "./styles";
-
+import React, { ReactElement } from "react";
+import ResourceLink from "../resourceLink";
 import { DETAILS_CONTEXT_ACTIONS } from "../../src/contexts/detailsMenuContext";
 
-import ResourceLink from "../resourceLink";
-
-const useStyles = makeStyles<PrismTheme>((theme) =>
-  createStyles(styles(theme) as StyleRules)
-);
-
-interface IContainerToolbar {
-  onSave: () => void;
+interface Props {
+  // eslint-disable-next-line react/require-default-props
+  className?: string;
 }
 
-export default function ContainerToolbar(
-  props: IContainerToolbar
-): ReactElement | null {
-  const { onSave } = props;
-  const bem = useBem(useStyles());
-
+export default function ContainerDetailsButton({
+  className,
+}: Props): ReactElement {
   return (
-    <Grid container spacing={1} justify="flex-end" alignItems="center">
-      <Grid item>
-        <ResourceLink
-          action={DETAILS_CONTEXT_ACTIONS.DETAILS}
-          className={bem("container-toolbar__trigger")}
-        >
-          <InfoIcon />
-        </ResourceLink>
-      </Grid>
-
-      <Grid item>
-        <AddFileButton onSave={onSave} />
-      </Grid>
-    </Grid>
+    <ResourceLink
+      action={DETAILS_CONTEXT_ACTIONS.DETAILS}
+      className={className}
+    >
+      Folder Details
+    </ResourceLink>
   );
 }

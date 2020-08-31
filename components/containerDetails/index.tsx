@@ -19,24 +19,39 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import * as RouterFns from "next/router";
-import * as ReactFns from "react";
-import ContainerToolbar from "./index";
-import { mountToJson } from "../../__testUtils/mountWithTheme";
+import React, { ReactElement, ReactNode, useContext } from "react";
+import { DrawerContainer } from "@inrupt/prism-react-components";
+import { useRouter } from "next/router";
+import DetailsContextMenu, { handleCloseDrawer } from "../detailsContextMenu";
+import DetailsMenuContext from "../../src/contexts/detailsMenuContext";
 
-describe("Container toolbar view", () => {
-  test("Renders the toolbar", () => {
-    const currentUri = "iri";
+interface Props {
+  // eslint-disable-next-line react/require-default-props
+  children?: ReactNode;
+  mutate: () => void;
+}
 
-    jest.spyOn(RouterFns, "useRouter").mockReturnValueOnce({
-      asPath: "asPath",
-      pathname: "/pathname?action=details&iri=iri",
-      replace: jest.fn(),
-    });
+export default function ContainerDetails({
+  children,
+  mutate,
+}: Props): ReactElement {
+  const { menuOpen, setMenuOpen } = useContext(DetailsMenuContext);
+  const router = useRouter();
 
-    jest.spyOn(ReactFns, "useContext").mockReturnValueOnce({ currentUri });
+  const drawer = (
+    <DetailsContextMenu
+      onUpdate={() => {
+        mutate();
+        handleCloseDrawer({ setMenuOpen, router })().catch((e) => {
+          throw e;
+        });
+      }}
+    />
+  );
 
-    const tree = mountToJson(<ContainerToolbar />);
-    expect(tree).toMatchSnapshot();
-  });
-});
+  return (
+    <DrawerContainer drawer={drawer} open={menuOpen}>
+      {children}
+    </DrawerContainer>
+  );
+}

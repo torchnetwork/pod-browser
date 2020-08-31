@@ -23,14 +23,12 @@
 // react-table is super broken with sorting, so temporarily disable ts checking.
 /* eslint react/jsx-one-expression-per-line: 0 */
 
-import { ReactElement, useContext, useMemo } from "react";
+import React, { ReactElement, useMemo } from "react";
 import { useTable, useSortBy, UseSortByOptions } from "react-table";
 import { createStyles, makeStyles, StyleRules } from "@material-ui/styles";
 import { PrismTheme, useBem } from "@solid/lit-prism-patterns";
 import clsx from "clsx";
-import { useRouter } from "next/router";
 
-import DetailsContextMenu, { handleCloseDrawer } from "../detailsContextMenu";
 import ContainerTableRow from "../containerTableRow";
 import SortedTableCarat from "../sortedTableCarat";
 import { useRedirectIfLoggedOut } from "../../src/effects/auth";
@@ -43,8 +41,8 @@ import {
 import Spinner from "../spinner";
 import styles from "./styles";
 import Breadcrumbs from "../breadcrumbs";
-import ContainerToolbar from "../containerToolbar";
-import DetailsMenuContext from "../../src/contexts/detailsMenuContext";
+import PageHeader from "../containerPageHeader";
+import ContainerDetails from "../containerDetails";
 
 const useStyles = makeStyles<PrismTheme>((theme) =>
   createStyles(styles(theme) as StyleRules)
@@ -54,17 +52,13 @@ interface IPodList {
   iri: string;
 }
 
-export default function Container(props: IPodList): ReactElement {
+export default function Container({ iri }: IPodList): ReactElement {
   useRedirectIfLoggedOut();
 
-  const { menuOpen, setMenuOpen } = useContext(DetailsMenuContext);
-
-  const { iri } = props;
   const { data: resourceIris, mutate } = useFetchContainerResourceIris(iri);
   const loading = typeof resourceIris === "undefined";
 
   const bem = useBem(useStyles());
-  const router = useRouter();
 
   const columns = useMemo(
     () => [
@@ -121,18 +115,11 @@ export default function Container(props: IPodList): ReactElement {
   /* eslint react/jsx-props-no-spreading: 0 */
   return (
     <>
-      <div className={clsx(bem("container"))}>
-        <div className={bem("container-menu")}>
-          <Breadcrumbs />
-          <ContainerToolbar onSave={mutate} />
-        </div>
+      <PageHeader mutate={mutate} />
+      <div className={clsx(bem("container"), bem("container-breadcrumbs"))}>
+        <Breadcrumbs />
       </div>
-      <div
-        className={clsx(
-          bem("container"),
-          bem("container-view", menuOpen ? "menu-open" : null)
-        )}
-      >
+      <ContainerDetails mutate={mutate}>
         <table className={clsx(bem("table"))} {...getTableProps()}>
           <thead className={bem("table__header")}>
             {headerGroups.map((headerGroup) => (
@@ -161,7 +148,6 @@ export default function Container(props: IPodList): ReactElement {
               </tr>
             ))}
           </thead>
-
           <tbody className={bem("table__body")} {...getTableBodyProps()}>
             {!data || !data.length ? (
               <tr key="no-resources-found" className={bem("table__body-row")}>
@@ -178,16 +164,7 @@ export default function Container(props: IPodList): ReactElement {
             })}
           </tbody>
         </table>
-
-        <DetailsContextMenu
-          onUpdate={() => {
-            mutate();
-            handleCloseDrawer({ setMenuOpen, router })().catch((e) => {
-              throw e;
-            });
-          }}
-        />
-      </div>
+      </ContainerDetails>
     </>
   );
 }

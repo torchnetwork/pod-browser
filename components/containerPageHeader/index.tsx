@@ -19,18 +19,26 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React from "react";
-import { Footer as PrismFooter } from "@inrupt/prism-react-components";
+import React, { ReactElement } from "react";
+import { PageHeader as PrismPageHeader } from "@inrupt/prism-react-components";
+import ContainerDetails from "../containerDetailsButton";
+import AddFileButton from "../addFileButton";
 
-export default function Footer() {
-  const links = [
-    {
-      href: "https://inrupt.com/terms-of-service",
-      text: "Terms of Service",
-      rel: "noreferrer",
-      target: "_blank",
-    },
-  ];
-  const texts = [{ text: "Copyright 2020 Inrupt, inc." }];
-  return <PrismFooter texts={texts} links={links} />;
+interface Props {
+  mutate: () => void;
+}
+
+export default function PageHeader({ mutate }: Props): ReactElement {
+  const pageHeaderAction = PrismPageHeader.actionClassName();
+
+  const containerDetails = <ContainerDetails className={pageHeaderAction} />;
+  const addFileButton = (
+    <AddFileButton onSave={mutate} className={pageHeaderAction} />
+  );
+  return (
+    <PrismPageHeader
+      title="Files"
+      actions={[containerDetails, addFileButton]}
+    />
+  );
 }
