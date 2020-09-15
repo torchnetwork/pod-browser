@@ -27,6 +27,9 @@ import PodLocationContext from "../../src/contexts/podLocationContext";
 import AlertContext from "../../src/contexts/alertContext";
 import ConfirmationDialogContext from "../../src/contexts/confirmationDialogContext";
 
+const TESTCAFE_ID_UPLOAD_BUTTON = "upload-file-button";
+const TESTCAFE_ID_UPLOAD_INPUT = "upload-file-input";
+
 export function handleSaveResource({
   fetch,
   currentUri,
@@ -199,9 +202,14 @@ export default function AddFileButton({ className, onSave, resourceList }) {
 
   return (
     // eslint-disable-next-line jsx-a11y/label-has-associated-control
-    <label disabled={isUploading} className={className}>
+    <label
+      data-testid={TESTCAFE_ID_UPLOAD_BUTTON}
+      disabled={isUploading}
+      className={className}
+    >
       {isUploading ? "Uploading..." : "Upload File"}
       <input
+        data-testid={TESTCAFE_ID_UPLOAD_INPUT}
         type="file"
         style={{ display: "none" }}
         onClick={(e) => {

@@ -44,6 +44,7 @@ exports[`ContainerPageHeader Renders view 1`] = `
           <ResourceLink
             action="details"
             className="makeStyles-page-header__action-5"
+            data-testid="folder-details-button"
           >
             <Link
               as={
@@ -68,6 +69,7 @@ exports[`ContainerPageHeader Renders view 1`] = `
             >
               <a
                 className="makeStyles-page-header__action-5"
+                data-testid="folder-details-button"
                 href="/resource/[iri]?action=details&resourceIri="
                 onClick={[Function]}
                 onMouseEnter={[Function]}
@@ -84,7 +86,7 @@ exports[`ContainerPageHeader Renders view 1`] = `
         >
           <button
             className="makeStyles-page-header__action-5"
-            id="add-folder-button"
+            data-testid="add-folder-button"
             onClick={[Function]}
             type="button"
           >
@@ -150,10 +152,12 @@ exports[`ContainerPageHeader Renders view 1`] = `
         >
           <label
             className="makeStyles-page-header__action-5"
+            data-testid="upload-file-button"
             disabled={false}
           >
             Upload File
             <input
+              data-testid="upload-file-input"
               onChange={[Function]}
               onClick={[Function]}
               style={

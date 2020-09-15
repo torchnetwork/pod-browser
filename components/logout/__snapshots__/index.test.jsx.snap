@@ -6,6 +6,7 @@ exports[`Logout button Renders a logout button 1`] = `
 >
   <button
     className=""
+    data-testid="logout-button"
     onClick={[Function]}
     type="button"
   >

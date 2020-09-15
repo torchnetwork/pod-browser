@@ -4,6 +4,7 @@ exports[`ContainerDetailsButton Renders view 1`] = `
 <ContainerDetailsButton>
   <ResourceLink
     action="details"
+    data-testid="folder-details-button"
   >
     <Link
       as={
@@ -27,6 +28,7 @@ exports[`ContainerDetailsButton Renders view 1`] = `
       replace={true}
     >
       <a
+        data-testid="folder-details-button"
         href="/resource/[iri]?action=details&resourceIri="
         onClick={[Function]}
         onMouseEnter={[Function]}

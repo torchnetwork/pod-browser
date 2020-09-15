@@ -2,6 +2,7 @@
 
 exports[`Delete link it renders a delete link 1`] = `
 <a
+  data-testid="delete-button"
   href="#delete"
   onClick={[Function]}
 />

@@ -1807,6 +1807,7 @@ font-display: block;",
                   <ResourceLink
                     action="details"
                     className="PodBrowser-page-header__action"
+                    data-testid="folder-details-button"
                   >
                     <Link
                       as={
@@ -1831,6 +1832,7 @@ font-display: block;",
                     >
                       <a
                         className="PodBrowser-page-header__action"
+                        data-testid="folder-details-button"
                         href="/resource/[iri]?action=details&resourceIri="
                         onClick={[Function]}
                         onMouseEnter={[Function]}
@@ -1847,7 +1849,7 @@ font-display: block;",
                 >
                   <button
                     className="PodBrowser-page-header__action"
-                    id="add-folder-button"
+                    data-testid="add-folder-button"
                     onClick={[Function]}
                     type="button"
                   >
@@ -1913,10 +1915,12 @@ font-display: block;",
                 >
                   <label
                     className="PodBrowser-page-header__action"
+                    data-testid="upload-file-button"
                     disabled={false}
                   >
                     Upload File
                     <input
+                      data-testid="upload-file-input"
                       onChange={[Function]}
                       onClick={[Function]}
                       style={
@@ -3963,6 +3967,7 @@ font-display: block;",
                   <ResourceLink
                     action="details"
                     className="PodBrowser-page-header__action"
+                    data-testid="folder-details-button"
                   >
                     <Link
                       as={
@@ -3987,6 +3992,7 @@ font-display: block;",
                     >
                       <a
                         className="PodBrowser-page-header__action"
+                        data-testid="folder-details-button"
                         href="/resource/[iri]?action=details&resourceIri="
                         onClick={[Function]}
                         onMouseEnter={[Function]}
@@ -4024,7 +4030,7 @@ font-display: block;",
                 >
                   <button
                     className="PodBrowser-page-header__action"
-                    id="add-folder-button"
+                    data-testid="add-folder-button"
                     onClick={[Function]}
                     type="button"
                   >
@@ -4111,10 +4117,12 @@ font-display: block;",
                 >
                   <label
                     className="PodBrowser-page-header__action"
+                    data-testid="upload-file-button"
                     disabled={false}
                   >
                     Upload File
                     <input
+                      data-testid="upload-file-input"
                       onChange={[Function]}
                       onClick={[Function]}
                       style={
