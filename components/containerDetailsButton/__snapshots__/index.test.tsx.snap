@@ -1,10 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ContainerDetailsButton Renders view 1`] = `
-<ContainerDetailsButton>
+<ContainerDetailsButton
+  className={null}
+>
   <ResourceLink
     action="details"
+    className={null}
+    containerIri={null}
     data-testid="folder-details-button"
+    ref={null}
+    resourceIri={null}
   >
     <Link
       as={
@@ -28,6 +34,7 @@ exports[`ContainerDetailsButton Renders view 1`] = `
       replace={true}
     >
       <a
+        className={null}
         data-testid="folder-details-button"
         href="/resource/[iri]?action=details&resourceIri="
         onClick={[Function]}

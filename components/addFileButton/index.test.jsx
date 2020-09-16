@@ -19,6 +19,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import React from "react";
 import { mount } from "enzyme";
 import { mountToJson } from "enzyme-to-json";
 import { act } from "react-dom/test-utils";
@@ -99,9 +100,10 @@ describe("handleSaveResource", () => {
   test("it returns a handler that saves the resource", async () => {
     const fileContents = "file contents";
 
+    const fileName = "myfile with space.txt";
     const file = new Blob([fileContents], {
       type: "text/plain",
-      name: "myfile.txt",
+      name: fileName,
     });
 
     const currentUri = "https://www.mypodbrowser.com/";
@@ -123,12 +125,22 @@ describe("handleSaveResource", () => {
       setSeverity,
     });
 
+    overwriteFile.mockResolvedValue({
+      internal_resourceInfo: {
+        sourceIri: encodeURIComponent(fileName),
+      },
+    });
+
     await handler(file);
 
     expect(overwriteFile).toHaveBeenCalledWith(newFilePath, file, {
       type: file.type,
       fetch,
     });
+    expect(setSeverity).toHaveBeenCalledWith("success");
+    expect(setMessage).toHaveBeenCalledWith(
+      `Your file has been saved to ${fileName}`
+    );
     expect(setAlertOpen).toHaveBeenCalledWith(true);
   });
 });

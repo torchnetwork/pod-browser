@@ -19,6 +19,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+const tsConfig = require("./tsconfig.json");
+
 module.exports = {
   // Automatically clear mock calls and instances between every test
   clearMocks: true,
@@ -29,6 +31,19 @@ module.exports = {
 
   testPathIgnorePatterns: ["/node_modules/", "/__testUtils/"],
 
+  transform: {
+    "^.+\\.(js|jsx|ts|tsx)$": "ts-jest",
+    "^.+\\.ttl$": "jest-raw-loader",
+  },
+
+  // ts config
+  globals: {
+    "ts-jest": {
+      tsConfig: { ...tsConfig.compilerOptions, jsx: "react" },
+    },
+  },
+
+  // Coverage configs
   collectCoverage: true,
 
   coveragePathIgnorePatterns: [

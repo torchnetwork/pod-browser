@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Container view Renders a spinner if data is loading 1`] = `
-<WithTheme
+<Component
   theme={
     Object {
       "breakpoints": Object {
@@ -918,11 +918,11 @@ font-display: block;",
       </Container>
     </ThemeProvider>
   </StylesProvider>
-</WithTheme>
+</Component>
 `;
 
 exports[`Container view Renders a table view without data 1`] = `
-<WithTheme
+<Component
   theme={
     Object {
       "breakpoints": Object {
@@ -1764,7 +1764,8 @@ font-display: block;",
       <Container
         iri="https://mypod.myhost.com/public"
       >
-        <PageHeader
+        <ContainerPageHeader
+          mutate={[Function]}
           resourceList={Array []}
         >
           <PageHeader
@@ -1807,7 +1808,10 @@ font-display: block;",
                   <ResourceLink
                     action="details"
                     className="PodBrowser-page-header__action"
+                    containerIri={null}
                     data-testid="folder-details-button"
+                    ref={null}
+                    resourceIri={null}
                   >
                     <Link
                       as={
@@ -1935,7 +1939,7 @@ font-display: block;",
               </div>
             </div>
           </PageHeader>
-        </PageHeader>
+        </ContainerPageHeader>
         <ContainerDetails>
           <DrawerContainer
             drawer={
@@ -2942,6 +2946,7 @@ font-display: block;",
                          
                         <SortedTableCarat
                           sorted={false}
+                          sortedDesc={null}
                         />
                       </td>
                       <td
@@ -2961,6 +2966,7 @@ font-display: block;",
                          
                         <SortedTableCarat
                           sorted={false}
+                          sortedDesc={null}
                         />
                       </td>
                       <td
@@ -2980,6 +2986,7 @@ font-display: block;",
                          
                         <SortedTableCarat
                           sorted={false}
+                          sortedDesc={null}
                         />
                       </td>
                     </tr>
@@ -3011,11 +3018,11 @@ font-display: block;",
       </Container>
     </ThemeProvider>
   </StylesProvider>
-</WithTheme>
+</Component>
 `;
 
 exports[`Container view Renders a table with data 1`] = `
-<WithTheme
+<Component
   theme={
     Object {
       "breakpoints": Object {
@@ -3857,7 +3864,8 @@ font-display: block;",
       <Container
         iri="https://mypod.myhost.com/public"
       >
-        <PageHeader
+        <ContainerPageHeader
+          mutate={[Function]}
           resourceList={
             Array [
               Object {
@@ -3963,7 +3971,10 @@ font-display: block;",
                   <ResourceLink
                     action="details"
                     className="PodBrowser-page-header__action"
+                    containerIri={null}
                     data-testid="folder-details-button"
+                    ref={null}
+                    resourceIri={null}
                   >
                     <Link
                       as={
@@ -4133,7 +4144,7 @@ font-display: block;",
               </div>
             </div>
           </PageHeader>
-        </PageHeader>
+        </ContainerPageHeader>
         <ContainerDetails>
           <DrawerContainer
             drawer={
@@ -11833,6 +11844,7 @@ font-display: block;",
                          
                         <SortedTableCarat
                           sorted={false}
+                          sortedDesc={null}
                         />
                       </td>
                       <td
@@ -11852,6 +11864,7 @@ font-display: block;",
                          
                         <SortedTableCarat
                           sorted={false}
+                          sortedDesc={null}
                         />
                       </td>
                       <td
@@ -11871,6 +11884,7 @@ font-display: block;",
                          
                         <SortedTableCarat
                           sorted={false}
+                          sortedDesc={null}
                         />
                       </td>
                     </tr>
@@ -12011,5 +12025,5 @@ font-display: block;",
       </Container>
     </ThemeProvider>
   </StylesProvider>
-</WithTheme>
+</Component>
 `;

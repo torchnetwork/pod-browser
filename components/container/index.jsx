@@ -19,10 +19,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-// react-table is super broken with sorting, so temporarily disable ts checking.
-/* eslint react/jsx-one-expression-per-line: 0 */
-
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import T from "prop-types";
 import { useTable, useSortBy } from "react-table";
 import { createStyles, makeStyles } from "@material-ui/styles";
@@ -43,7 +40,7 @@ import ContainerDetails from "../containerDetails";
 
 const useStyles = makeStyles((theme) => createStyles(styles(theme)));
 
-function Container({ iri }) {
+export default function Container({ iri }) {
   useRedirectIfLoggedOut();
   const encodedIri = encodeURI(iri);
 
@@ -87,6 +84,7 @@ function Container({ iri }) {
     }));
   }, [resourceIris]);
 
+  // TODO fix typescript errors below.
   const {
     getTableProps,
     getTableBodyProps,
@@ -165,5 +163,3 @@ function Container({ iri }) {
 Container.propTypes = {
   iri: T.string.isRequired,
 };
-
-export default Container;

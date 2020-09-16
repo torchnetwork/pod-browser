@@ -19,10 +19,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-// @ts-nocheck
 /* eslint-disable camelcase */
 
-import { useContext } from "react";
+import React, { useContext } from "react";
 import {
   Avatar,
   createStyles,
