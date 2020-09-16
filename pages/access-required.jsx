@@ -19,48 +19,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/* istanbul ignore file */
-import React, { createContext, useState } from "react";
-import T from "prop-types";
+import React from "react";
+import AccessRequiredPage from "../components/pages/access-required";
 
-export const defaultAlertContext = {
-  alertOpen: false,
-  message: "",
-  severity: "success",
-  setAlertOpen: () => false,
-  setMessage: () => "",
-  setSeverity: () => "success",
-};
-const AlertContext = createContext(defaultAlertContext);
-
-function AlertProvider({ children }) {
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [message, setMessage] = useState("");
-  const [severity, setSeverity] = useState("success");
-
-  return (
-    <AlertContext.Provider
-      value={{
-        alertOpen,
-        message,
-        severity,
-        setAlertOpen,
-        setMessage,
-        setSeverity,
-      }}
-    >
-      {children}
-    </AlertContext.Provider>
-  );
+export default function AccessRequired() {
+  return <AccessRequiredPage />;
 }
-
-AlertProvider.propTypes = {
-  children: T.node,
-};
-
-AlertProvider.defaultProps = {
-  children: null,
-};
-
-export { AlertProvider };
-export default AlertContext;

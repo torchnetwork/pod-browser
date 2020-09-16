@@ -19,10 +19,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-// material-ui is broken and doesn't allow `ListItem` to accept `component`
-
 import React, { useContext } from "react";
-import T from "prop-types";
 import {
   Button,
   createStyles,
@@ -36,6 +33,7 @@ import {
 import ShareIcon from "@material-ui/icons/Share";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { makeStyles } from "@material-ui/styles";
+import T from "prop-types";
 import ResourceLink from "../resourceLink";
 import styles from "./styles";
 import { parseUrl } from "../../src/stringHelpers";
@@ -119,7 +117,7 @@ const SharingLink = React.forwardRef((linkProps, ref) => (
   />
 ));
 
-function ResourceDetails({ resource, onDelete, onDeleteError }) {
+export default function ResourceDetails({ resource, onDelete, onDeleteError }) {
   const classes = useStyles();
   const { iri, name, types } = resource;
   const type = displayType(types);
@@ -217,5 +215,3 @@ ResourceDetails.defaultProps = {
   onDelete: () => {},
   onDeleteError: () => {},
 };
-
-export default ResourceDetails;

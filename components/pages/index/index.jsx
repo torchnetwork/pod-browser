@@ -28,7 +28,7 @@ import { useRedirectIfLoggedOut } from "../../../src/effects/auth";
 
 import { resourceHref } from "../../resourceLink";
 
-export default function Home(): null {
+export default function Home() {
   useRedirectIfLoggedOut();
 
   const router = useRouter();
