@@ -24,8 +24,8 @@
 import {
   addStringNoLocale,
   addUrl,
-  getStringNoLocale,
   getStringNoLocaleAll,
+  getThing,
   getUrl,
   getUrlAll,
   setThing,
@@ -142,20 +142,12 @@ export async function getPeople(containerIri, fetch) {
     .filter(({ error: e }) => !e)
     .map(({ response }) => response)
     .map(({ dataset, iri: webId }) => {
-      const nickname =
-        getStringNoLocale(dataset, vcard.nickname) ||
-        getStringNoLocale(dataset, foaf.nick);
-      const name =
-        getStringNoLocale(dataset, vcard.fn) ||
-        getStringNoLocale(dataset, foaf.name);
       const avatar = getUrl(dataset, vcard.hasPhoto);
-
-      return {
-        avatar,
-        name,
-        nickname,
-        webId,
-      };
+      return addStringNoLocale(
+        getThing(dataset, webId),
+        vcard.hasPhoto,
+        avatar
+      );
     });
 
   return respond(profiles);

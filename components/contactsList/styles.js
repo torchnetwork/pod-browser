@@ -19,10 +19,16 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { createStyles } from "@solid/lit-prism-patterns";
+import { createStyles, table } from "@solid/lit-prism-patterns";
 
 const styles = (theme) => {
-  return createStyles(theme, ["container", "table"], {
+  const tableStyles = table.styles(theme);
+  return createStyles(theme, ["container", "table", "icons"], {
+    table: {
+      "& tbody td": {
+        "&:first-child": tableStyles["table__body-cell--width-preview"],
+      },
+    },
     "container-view": {
       marginTop: theme.spacing(1),
     },
