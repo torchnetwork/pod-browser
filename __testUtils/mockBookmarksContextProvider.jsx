@@ -19,13 +19,32 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { createStyles, PrismTheme } from "@solid/lit-prism-patterns";
+import React from "react";
+import T from "prop-types";
+import BookmarksContext, {
+  defaultBookmarksContext,
+} from "../src/contexts/bookmarksContext";
 
-const styles = (theme: PrismTheme) =>
-  createStyles(theme, ["icons", "table"], {
-    "table__icon": {
-      marginLeft: "0.5em",
-    },
-  });
+export default function mockBookmarksContextProvider(
+  value = defaultBookmarksContext
+) {
+  function BookmarksContextProvider({ children }) {
+    return (
+      <BookmarksContext.Provider
+        value={{ ...defaultBookmarksContext, ...value }}
+      >
+        {children}
+      </BookmarksContext.Provider>
+    );
+  }
 
-export default styles;
+  BookmarksContextProvider.propTypes = {
+    children: T.node,
+  };
+
+  BookmarksContextProvider.defaultProps = {
+    children: null,
+  };
+
+  return BookmarksContextProvider;
+}

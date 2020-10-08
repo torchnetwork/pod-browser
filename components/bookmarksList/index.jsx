@@ -19,10 +19,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import clsx from "clsx";
-import Link from "next/link";
-import { Avatar, createStyles } from "@material-ui/core";
+import { createStyles, TextField } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { useBem } from "@solid/lit-prism-patterns";
 import {
@@ -31,94 +30,100 @@ import {
   Table as PrismTable,
 } from "@inrupt/prism-react-components";
 import { Table, TableColumn } from "@inrupt/solid-ui-react";
-import { vcard } from "rdf-namespaces";
+import { getThingAll } from "@inrupt/solid-client";
+import { dct } from "rdf-namespaces";
+import BookmarksContext from "../../src/contexts/bookmarksContext";
+import Bookmark from "../bookmark";
+import ResourceLink from "../resourceLink";
 import SortedTableCarat from "../sortedTableCarat";
 import Spinner from "../spinner";
 import styles from "./styles";
-
-import { useRedirectIfLoggedOut } from "../../src/effects/auth";
-import useAddressBook from "../../src/hooks/useAddressBook";
-import usePeople from "../../src/hooks/usePeople";
-import ContactsListSearch from "./contactsListSearch";
-import { SearchProvider } from "../../src/contexts/searchContext";
+import { RECALLS_PROPERTY_IRI } from "../../src/solidClientHelpers/bookmarks";
 
 const useStyles = makeStyles((theme) => createStyles(styles(theme)));
 
-function ContactsList() {
-  useRedirectIfLoggedOut();
+const bookmarkBody = ({ value }) => {
+  return <Bookmark iri={value} />;
+};
 
+const titleBody = ({ row, value, className }) => {
+  const bookmarkedResourceIri = row.original.col0;
+  return (
+    <ResourceLink
+      containerIri={bookmarkedResourceIri}
+      resourceIri={bookmarkedResourceIri}
+      className={className}
+    >
+      {value}
+    </ResourceLink>
+  );
+};
+
+function BookmarksList() {
+  const { bookmarks } = useContext(BookmarksContext);
   const tableClass = PrismTable.useTableClass("table", "inherits");
   const classes = useStyles();
   const bem = useBem(classes);
-  const actionClass = PageHeader.usePageHeaderActionClassName();
-  const [search, setSearch] = useState("");
+  const tableLinkClassName = bem("table__link");
+  const [search, setSearch] = useState();
 
-  const [addressBook, addressBookError] = useAddressBook();
-  const [people, peopleError] = usePeople(addressBook);
-  const isLoading =
-    (!addressBook && !addressBookError) || (!people && !peopleError);
+  const isLoading = !bookmarks;
 
   if (isLoading) return <Spinner />;
-  if (addressBookError) return addressBookError;
-  if (peopleError) return peopleError;
-
-  const formattedNamePredicate = vcard.fn;
-  const hasPhotoPredicate = vcard.hasPhoto;
-
-  // format things for the data table
-  const contacts = people.map((p) => ({
-    thing: p,
-    dataset: addressBook,
-  }));
+  const { dataset } = bookmarks;
+  const bookmarksList = getThingAll(dataset).map((b) => {
+    return {
+      thing: b,
+      dataset,
+    };
+  });
 
   return (
-    <SearchProvider setSearch={setSearch}>
-      <PageHeader
-        title="Contacts"
-        actions={[
-          <Link href="/contacts/add">
-            <a className={actionClass}>Add new contact</a>
-          </Link>,
-        ]}
-      >
-        <ContactsListSearch people={people} />
+    <>
+      <PageHeader title="Bookmarks">
+        <TextField
+          classes={{
+            root: classes.search,
+          }}
+          InputProps={{
+            className: classes.searchInput,
+          }}
+          margin="dense"
+          variant="outlined"
+          onChange={(e) => setSearch(e.target.value)}
+        />
       </PageHeader>
       <Container>
         <Table
-          things={contacts}
+          things={bookmarksList}
           className={clsx(tableClass, bem("table"))}
           filter={search}
           ascIndicator={<SortedTableCarat sorted />}
           descIndicator={<SortedTableCarat sorted sortedDesc />}
         >
           <TableColumn
-            property={hasPhotoPredicate}
+            property={RECALLS_PROPERTY_IRI}
+            dataType="url"
             header=""
-            datatype="url"
-            body={({ value }) => {
-              return (
-                <Avatar
-                  className={bem("avatar")}
-                  alt="Contact avatar"
-                  src={value}
-                />
-              );
-            }}
+            body={bookmarkBody}
           />
           <TableColumn
-            property={formattedNamePredicate}
+            property={dct.title}
             header="Name"
-            filterable
+            className={tableLinkClassName}
+            // eslint-disable-next-line prettier/prettier
+            body={({ row, value }) => titleBody({ row, value, className: tableLinkClassName })}
             sortable
+            filterable
           />
         </Table>
       </Container>
-    </SearchProvider>
+    </>
   );
 }
 
-ContactsList.propTypes = {};
+BookmarksList.propTypes = {};
 
-ContactsList.defaultProps = {};
+BookmarksList.defaultProps = {};
 
-export default ContactsList;
+export default BookmarksList;

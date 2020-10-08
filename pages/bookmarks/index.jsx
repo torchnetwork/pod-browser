@@ -19,13 +19,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { createStyles, PrismTheme } from "@solid/lit-prism-patterns";
+import BookmarksPage from "../../components/pages/bookmarks";
 
-const styles = (theme: PrismTheme) =>
-  createStyles(theme, ["icons", "table"], {
-    "table__icon": {
-      marginLeft: "0.5em",
-    },
-  });
-
-export default styles;
+export default function Contacts() {
+  return <BookmarksPage />;
+}

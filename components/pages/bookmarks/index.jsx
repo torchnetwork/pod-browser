@@ -19,13 +19,16 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { createStyles, PrismTheme } from "@solid/lit-prism-patterns";
+import { BookmarksContextProvider } from "../../../src/contexts/bookmarksContext";
+import { useRedirectIfLoggedOut } from "../../../src/effects/auth";
+import BookmarksList from "../../bookmarksList";
 
-const styles = (theme: PrismTheme) =>
-  createStyles(theme, ["icons", "table"], {
-    "table__icon": {
-      marginLeft: "0.5em",
-    },
-  });
+export default function BookmarksPage() {
+  useRedirectIfLoggedOut();
 
-export default styles;
+  return (
+    <BookmarksContextProvider>
+      <BookmarksList />
+    </BookmarksContextProvider>
+  );
+}

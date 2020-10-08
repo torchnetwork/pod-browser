@@ -19,13 +19,23 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { createStyles, PrismTheme } from "@solid/lit-prism-patterns";
+import { createStyles, table } from "@solid/lit-prism-patterns";
 
-const styles = (theme: PrismTheme) =>
-  createStyles(theme, ["icons", "table"], {
-    "table__icon": {
-      marginLeft: "0.5em",
+const styles = (theme) => {
+  const tableStyles = table.styles(theme);
+  return createStyles(theme, ["table", "icons"], {
+    table: {
+      "& tbody td": {
+        "&:first-child": tableStyles["table__body-cell--width-preview"],
+      },
+    },
+    search: {
+      width: 450,
+    },
+    searchInput: {
+      backgroundColor: theme.palette.background.default,
     },
   });
+};
 
 export default styles;
