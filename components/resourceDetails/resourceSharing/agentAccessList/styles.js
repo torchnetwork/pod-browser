@@ -19,13 +19,12 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React from "react";
-import { mountToJson } from "../../../../__testUtils/mountWithTheme";
-import ResourceSharingLoading from "./index";
-
-describe("ResourceSharingLoading", () => {
-  test("it renders the component", () => {
-    const tree = mountToJson(<ResourceSharingLoading name="test" iri="test" />);
-    expect(tree).toMatchSnapshot();
-  });
+export default () => ({
+  listItem: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    paddingRight: 0,
+    paddingLeft: 0,
+  },
 });

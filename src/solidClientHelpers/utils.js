@@ -27,11 +27,14 @@ import {
   getDatetime,
   getDecimal,
   getInteger,
+  getSourceUrl,
+  getThing,
   getUrlAll,
   setThing,
+  hasResourceInfo,
 } from "@inrupt/solid-client";
-import camelCase from "camelcase";
-import { ldp } from "rdf-namespaces";
+import { ldp, rdf } from "rdf-namespaces";
+
 import { parseUrl } from "../stringHelpers";
 
 const typeNameMap = Object.keys(ldp).reduce((acc, key) => {
@@ -80,14 +83,6 @@ export const namespace = {
   ConfigurationFile: "http://www.w3.org/ns/pim/space#ConfigurationFile",
 };
 
-export function vocabularyLabel(url) {
-  const parts = parseUrl(url);
-  if (parts.hash) {
-    return camelCase(parts.hash.replace(/#/, ""));
-  }
-  return url;
-}
-
 export function isContainerIri(iri) {
   return iri.charAt(iri.length - 1) === "/";
 }
@@ -95,6 +90,20 @@ export function isContainerIri(iri) {
 export function getIriPath(iri) {
   const { pathname } = parseUrl(iri);
   return pathname.replace(/\/?$/, "");
+}
+
+export function getTypes(dataset) {
+  if (hasResourceInfo(dataset)) {
+    const thing = getThing(dataset, getSourceUrl(dataset));
+    return getUrlAll(thing, rdf.type);
+  }
+  return [];
+}
+
+export function datasetIsContainer(dataset) {
+  return (
+    getTypes(dataset).find((type) => type.match(/container/i)) !== undefined
+  );
 }
 
 export function getTypeName(rawType) {

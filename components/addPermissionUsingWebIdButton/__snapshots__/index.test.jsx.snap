@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DefaultPermissionForm it renders a DefaultPermissionForm 1`] = `
+exports[`AddPermissionUsingWebIdButton renders 1`] = `
 <Component
   theme={
     Object {
@@ -840,10 +840,86 @@ font-display: block;",
         }
       }
     >
-      <DefaultPermissionForm
-        iri="iri"
-        onSubmit={[Function]}
-      />
+      <m
+        dataset={
+          DatasetCore {
+            "internal_resourceInfo": Object {
+              "contentType": "text/turtle",
+              "isRawData": false,
+              "sourceIri": "http://example.com/dataset",
+            },
+            "quads": Set {},
+          }
+        }
+      >
+        <AddPermissionUsingWebIdButton
+          onLoading={[Function]}
+        >
+          <button
+            onClick={[Function]}
+            type="button"
+          >
+            Add with WebId
+          </button>
+          <WithStyles(ForwardRef(Popover))
+            anchorEl={null}
+            anchorOrigin={
+              Object {
+                "horizontal": "center",
+                "vertical": "bottom",
+              }
+            }
+            classes={
+              Object {
+                "paper": "PodBrowser-paper",
+              }
+            }
+            onClose={[Function]}
+            open={false}
+            transformOrigin={
+              Object {
+                "horizontal": "center",
+                "vertical": "top",
+              }
+            }
+          >
+            <ForwardRef(Popover)
+              anchorEl={null}
+              anchorOrigin={
+                Object {
+                  "horizontal": "center",
+                  "vertical": "bottom",
+                }
+              }
+              classes={
+                Object {
+                  "paper": "PodBrowser-paper PodBrowser-paper",
+                  "root": "PodBrowser-root",
+                }
+              }
+              onClose={[Function]}
+              open={false}
+              transformOrigin={
+                Object {
+                  "horizontal": "center",
+                  "vertical": "top",
+                }
+              }
+            >
+              <ForwardRef(Modal)
+                BackdropProps={
+                  Object {
+                    "invisible": true,
+                  }
+                }
+                className="PodBrowser-root"
+                onClose={[Function]}
+                open={false}
+              />
+            </ForwardRef(Popover)>
+          </WithStyles(ForwardRef(Popover))>
+        </AddPermissionUsingWebIdButton>
+      </m>
     </ThemeProvider>
   </StylesProvider>
 </Component>

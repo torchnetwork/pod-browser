@@ -32,7 +32,7 @@ import styles from "../styles";
 
 const useStyles = makeStyles((theme) => createStyles(styles(theme)));
 
-function PermissionCheckbox({ value, label, onChange }) {
+function PermissionCheckbox({ value, label, disabled, onChange }) {
   const classes = useStyles();
   const name = label.toLowerCase();
 
@@ -48,6 +48,7 @@ function PermissionCheckbox({ value, label, onChange }) {
             checked={value}
             name={name}
             onChange={onChange}
+            disabled={disabled}
           />
         )}
       />
@@ -56,12 +57,14 @@ function PermissionCheckbox({ value, label, onChange }) {
 }
 
 PermissionCheckbox.propTypes = {
+  disabled: T.bool,
   value: T.bool.isRequired,
   label: T.string.isRequired,
   onChange: T.func,
 };
 
 PermissionCheckbox.defaultProps = {
+  disabled: false,
   onChange: () => {},
 };
 

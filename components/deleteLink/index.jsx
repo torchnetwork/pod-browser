@@ -20,14 +20,17 @@
  */
 
 import React, { useContext, useEffect, useState } from "react";
+import T from "prop-types";
 import { deleteFile } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
-import AlertContext from "../../../src/contexts/alertContext";
-import ConfirmationDialogContext from "../../../src/contexts/confirmationDialogContext";
+import AlertContext from "../../src/contexts/alertContext";
+import ConfirmationDialogContext from "../../src/contexts/confirmationDialogContext";
 
 const TESTCAFE_ID_DELETE_BUTTON = "delete-button";
 
 export function handleConfirmation({
+  dialogId,
+  open,
   setOpen,
   setConfirmed,
   deleteResource,
@@ -36,7 +39,8 @@ export function handleConfirmation({
   setConfirmationSetup,
 }) {
   return (confirmationSetup, confirmed, name) => {
-    if (confirmationSetup && !confirmed) return;
+    if (open !== dialogId) return;
+    if (confirmationSetup && confirmed === null) return;
 
     setTitle("Confirm Delete");
     setContent(
@@ -45,9 +49,12 @@ export function handleConfirmation({
     setConfirmationSetup(true);
 
     if (confirmationSetup && confirmed) {
-      setOpen(false);
-      setConfirmed(false);
       deleteResource();
+    }
+
+    if (confirmationSetup && confirmed !== null) {
+      setConfirmed(null);
+      setOpen(null);
     }
   };
 }
@@ -75,55 +82,71 @@ export function handleDeleteResource({
   };
 }
 /* eslint react/jsx-props-no-spreading: 0 */
-/* eslint react/prop-types: 0 */
-export default React.forwardRef(
-  ({ name, resourceIri, onDelete, onDeleteError, ...linkProps }, ref) => {
-    const { session } = useSession();
-    const { setAlertOpen, setMessage, setSeverity } = useContext(AlertContext);
-    const { fetch } = session;
-    const [confirmationSetup, setConfirmationSetup] = useState(false);
+export default function DeleteLink({
+  name,
+  resourceIri,
+  onDelete,
+  ...linkProps
+}) {
+  const { fetch } = useSession();
+  const { setAlertOpen, setMessage, setSeverity } = useContext(AlertContext);
+  const [confirmationSetup, setConfirmationSetup] = useState(false);
+  const dialogId = `delete-resource-${resourceIri}`;
 
-    const {
-      confirmed,
-      setConfirmed,
-      setContent,
-      setOpen,
-      setTitle,
-    } = useContext(ConfirmationDialogContext);
+  const {
+    confirmed,
+    open,
+    setConfirmed,
+    setContent,
+    setOpen,
+    setTitle,
+  } = useContext(ConfirmationDialogContext);
 
-    const deleteResource = handleDeleteResource({
-      name,
-      resourceIri,
-      fetch,
-      onDelete,
-      onDeleteError,
-      setAlertOpen,
-      setMessage,
-      setSeverity,
-    });
-
-    const onConfirmation = handleConfirmation({
-      setOpen,
-      setConfirmed,
-      deleteResource,
-      setTitle,
-      setContent,
-      setConfirmationSetup,
-    });
-
-    useEffect(() => {
-      onConfirmation(confirmationSetup, confirmed, name);
-    }, [confirmationSetup, confirmed, onConfirmation, name]);
-
-    /* eslint jsx-a11y/anchor-has-content: 0 */
-    return (
-      <a
-        href="#delete"
-        data-testid={TESTCAFE_ID_DELETE_BUTTON}
-        {...linkProps}
-        ref={ref}
-        onClick={() => setOpen(true)}
-      />
-    );
+  function onDeleteError(e) {
+    setSeverity("error");
+    setMessage(e.toString());
+    setAlertOpen(true);
   }
-);
+
+  const deleteResource = handleDeleteResource({
+    name,
+    resourceIri,
+    fetch,
+    onDelete,
+    onDeleteError,
+    setAlertOpen,
+    setMessage,
+    setSeverity,
+  });
+
+  const onConfirmation = handleConfirmation({
+    dialogId,
+    open,
+    setOpen,
+    setConfirmed,
+    deleteResource,
+    setTitle,
+    setContent,
+    setConfirmationSetup,
+  });
+
+  useEffect(() => {
+    onConfirmation(confirmationSetup, confirmed, name);
+  }, [confirmationSetup, confirmed, onConfirmation, name]);
+
+  /* eslint jsx-a11y/anchor-has-content: 0 */
+  return (
+    <a
+      href="#delete"
+      data-testid={TESTCAFE_ID_DELETE_BUTTON}
+      {...linkProps}
+      onClick={() => setOpen(dialogId)}
+    />
+  );
+}
+
+DeleteLink.propTypes = {
+  name: T.string.isRequired,
+  resourceIri: T.string.isRequired,
+  onDelete: T.func.isRequired,
+};

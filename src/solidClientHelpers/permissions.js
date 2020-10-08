@@ -22,16 +22,22 @@
 /* eslint-disable camelcase */
 import {
   createAcl,
-  getSolidDatasetWithAcl,
   getResourceAcl,
   hasAccessibleAcl,
   hasResourceAcl,
   saveAclFor,
   setAgentDefaultAccess,
   setAgentResourceAccess,
+  createAclFromFallbackAcl,
+  hasFallbackAcl,
+  getAgentAccessAll,
+  getAgentDefaultAccessAll,
+  getFallbackAcl,
+  getSourceUrl,
+  getResourceInfoWithAcl,
 } from "@inrupt/solid-client";
 import { isUrl } from "../stringHelpers";
-import { createResponder, chain } from "./utils";
+import { createResponder, chain, isContainerIri } from "./utils";
 import { fetchProfile } from "./profile";
 
 export const ACL = {
@@ -89,16 +95,6 @@ export const ACL = {
 
 export const PERMISSIONS = ["read", "write", "append", "control"];
 
-export function parseStringAcl(access) {
-  return PERMISSIONS.reduce(
-    (acc, key) => ({
-      ...acc,
-      [key]: access.includes(key),
-    }),
-    {}
-  );
-}
-
 export function defineAcl(dataset, webId, access = ACL.CONTROL.acl) {
   const aclDataset = chain(
     createAcl(dataset),
@@ -128,93 +124,44 @@ export function displayPermissions(permissions) {
   return "Custom";
 }
 
-export function permissionsFromWacAllowHeaders(wacAllow) {
-  if (!wacAllow) return [];
-  const permissions = wacAllow.split(",");
-  return permissions.reduce((acc, permission) => {
-    const [webId, stringAcl] = permission.split("=");
-    const acl = parseStringAcl(stringAcl);
-    const alias = displayPermissions(acl);
-
-    return [
-      ...acc,
-      {
-        webId,
-        alias,
-        acl,
-        profile: { webId, name: webId },
-      },
-    ];
-  }, []);
-}
-
-export function isUserOrMatch(webId, id) {
-  return webId === "user" || webId === id;
-}
-
-export function getUserPermissions(id, permissions) {
-  if (!permissions) return null;
-
-  const permission = permissions.find(({ webId }) => isUserOrMatch(webId, id));
-
-  return permission || null;
-}
-
-export function getThirdPartyPermissions(id, permissions) {
-  if (!permissions) return [];
-  return permissions.filter(({ webId }) => !isUserOrMatch(webId, id));
-}
-
-export async function savePermissions({ iri, webId, access, fetch }) {
+export async function saveAllPermissions(datasetWithAcl, webId, access, fetch) {
   const { respond, error } = createResponder();
-  const dataset = await getSolidDatasetWithAcl(iri, { fetch });
 
-  if (!dataset) return error("dataset is empty");
-
-  if (!hasResourceAcl(dataset)) {
-    return error("dataset does not have resource ACL");
-  }
-
-  if (!hasAccessibleAcl(dataset)) {
+  if (!hasAccessibleAcl(datasetWithAcl)) {
     return error("dataset does not have accessible ACL");
   }
 
-  const aclDataset = getResourceAcl(dataset);
+  let aclDataset;
+  if (hasResourceAcl(datasetWithAcl)) {
+    aclDataset = getResourceAcl(datasetWithAcl);
+  } else if (hasFallbackAcl(datasetWithAcl)) {
+    aclDataset = createAclFromFallbackAcl(datasetWithAcl);
+  } else {
+    return error("unable to access ACL");
+  }
+
   if (!aclDataset) return error("aclDataset is empty");
 
-  const updatedAcl = setAgentResourceAccess(aclDataset, webId, access);
+  const datasetUri = getSourceUrl(datasetWithAcl);
+  const updatedAcl = chain(
+    setAgentResourceAccess(aclDataset, webId, access),
+    (acl) =>
+      isContainerIri(datasetUri)
+        ? setAgentDefaultAccess(acl, webId, access) // will only apply default permissions if dataset is a container
+        : acl
+  );
   if (!updatedAcl) return error("updatedAcl is empty");
 
-  const response = await saveAclFor(dataset, updatedAcl, { fetch });
+  const response = await saveAclFor(datasetWithAcl, updatedAcl, { fetch });
   if (!response) return error("response is empty");
 
-  return respond(response);
-}
-
-export async function saveDefaultPermissions({ iri, webId, access, fetch }) {
-  const { respond, error } = createResponder();
-  const dataset = await getSolidDatasetWithAcl(iri, { fetch });
+  // TODO: Can optimize once saveAclFor returns the resource dataset instead of the acl dataset
+  const dataset = await getResourceInfoWithAcl(getSourceUrl(datasetWithAcl), {
+    fetch,
+  });
   if (!dataset) return error("dataset is empty");
 
-  if (!hasResourceAcl(dataset)) {
-    return error("dataset does not have resource ACL");
-  }
-
-  if (!hasAccessibleAcl(dataset)) {
-    return error("dataset does not have accessible ACL");
-  }
-
-  const aclDataset = getResourceAcl(dataset);
-  if (!aclDataset) return error("aclDataset is empty");
-
-  const updatedAcl = setAgentDefaultAccess(aclDataset, webId, access);
-
-  if (!updatedAcl) return error("updatedAcl is empty");
-
-  const response = await saveAclFor(dataset, updatedAcl, { fetch });
-  if (!response) return error("response is empty");
-
-  return respond(response);
+  return respond(dataset);
 }
 
 export async function normalizePermissions(
@@ -236,5 +183,39 @@ export async function normalizePermissions(
           webId,
         };
       })
+  );
+}
+
+export async function getPermissions(datasetWithAcl, fetch) {
+  if (hasResourceAcl(datasetWithAcl)) {
+    const accessModeList = getAgentAccessAll(datasetWithAcl);
+    return normalizePermissions(accessModeList, fetch);
+  }
+  if (hasAccessibleAcl(datasetWithAcl)) {
+    const fallbackAcl = getFallbackAcl(datasetWithAcl);
+    const accessModeList = getAgentDefaultAccessAll(fallbackAcl);
+    return normalizePermissions(accessModeList, fetch);
+  }
+  throw new Error(`No access to ACL for ${getSourceUrl(datasetWithAcl)}`);
+}
+
+export function createAccessMap(
+  read = false,
+  write = false,
+  append = false,
+  control = false
+) {
+  return {
+    [ACL.READ.key]: read,
+    [ACL.WRITE.key]: write,
+    [ACL.APPEND.key]: append,
+    [ACL.CONTROL.key]: control,
+  };
+}
+
+export function isEmptyAccess(accessMap) {
+  return Object.values(accessMap).reduce(
+    (memo, access) => memo && !access,
+    true
   );
 }
