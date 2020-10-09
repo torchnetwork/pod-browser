@@ -30,7 +30,7 @@ import {
   PageHeader,
   Table as PrismTable,
 } from "@inrupt/prism-react-components";
-import { Table, TableColumn } from "@inrupt/solid-ui-react";
+import { DatasetContext, Table, TableColumn } from "@inrupt/solid-ui-react";
 import { vcard } from "rdf-namespaces";
 import SortedTableCarat from "../sortedTableCarat";
 import Spinner from "../spinner";
@@ -41,6 +41,7 @@ import useAddressBook from "../../src/hooks/useAddressBook";
 import usePeople from "../../src/hooks/usePeople";
 import ContactsListSearch from "./contactsListSearch";
 import { SearchProvider } from "../../src/contexts/searchContext";
+import ContactLink from "./contactLink";
 
 const useStyles = makeStyles((theme) => createStyles(styles(theme)));
 
@@ -110,6 +111,9 @@ function ContactsList() {
             header="Name"
             filterable
             sortable
+            body={({ value }) => (
+              <ContactLink name={value} className={bem("table__link")} />
+            )}
           />
         </Table>
       </Container>
