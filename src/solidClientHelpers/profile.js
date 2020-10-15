@@ -21,11 +21,11 @@
 
 import {
   getSolidDataset,
-  getIriAll,
   getStringNoLocale,
   getThing,
   getUrl,
   asUrl,
+  getUrlAll,
 } from "@inrupt/solid-client";
 import { space, vcard, foaf } from "rdf-namespaces";
 
@@ -35,26 +35,30 @@ export function displayProfileName({ nickname, name, webId }) {
   return webId;
 }
 
-export function getProfileFromPersonDataset(dataset) {
+export function getProfileFromPersonDataset(profileThing) {
   return {
-    avatar: getUrl(dataset, vcard.hasPhoto),
+    avatar: getUrl(profileThing, vcard.hasPhoto),
     name:
-      getStringNoLocale(dataset, vcard.fn) ||
-      getStringNoLocale(dataset, foaf.name),
+      getStringNoLocale(profileThing, vcard.fn) ||
+      getStringNoLocale(profileThing, foaf.name),
     nickname:
-      getStringNoLocale(dataset, vcard.nickname) ||
-      getStringNoLocale(dataset, foaf.nick),
-    webId: asUrl(dataset),
+      getStringNoLocale(profileThing, vcard.nickname) ||
+      getStringNoLocale(profileThing, foaf.nick),
+    webId: asUrl(profileThing),
+  };
+}
+
+export function packageProfile(webId, dataset) {
+  const profile = getThing(dataset, webId);
+  return {
+    ...getProfileFromPersonDataset(profile),
+    webId,
+    dataset,
+    pods: getUrlAll(profile, space.storage),
   };
 }
 
 export async function fetchProfile(webId, fetch) {
   const dataset = await getSolidDataset(webId, { fetch });
-  const profile = getThing(dataset, webId);
-  return {
-    ...getProfileFromPersonDataset(dataset),
-    webId,
-    dataset,
-    pods: getIriAll(profile, space.storage),
-  };
+  return packageProfile(webId, dataset);
 }

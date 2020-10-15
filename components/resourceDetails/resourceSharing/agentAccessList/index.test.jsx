@@ -32,6 +32,12 @@ const datasetUrl = "http://example.com/dataset";
 const dataset = mockSolidDatasetFrom(datasetUrl);
 const { ACL } = permissionHelpers;
 const webId = "webId";
+const permission = {
+  webId,
+  alias: ACL.CONTROL.alias,
+  acl: ACL.CONTROL.acl,
+  profile: { webId },
+};
 
 describe("AgentAccessList", () => {
   let session;
@@ -60,14 +66,7 @@ describe("AgentAccessList", () => {
   });
 
   it("renders a list of permissions", () => {
-    permissionHelpers.getPermissions.mockResolvedValue([
-      {
-        webId,
-        alias: ACL.CONTROL.alias,
-        acl: ACL.CONTROL.acl,
-        profile: { webId },
-      },
-    ]);
+    permissionHelpers.getPermissions.mockResolvedValue([permission]);
     expect(
       mountToJson(
         <SessionProvider>

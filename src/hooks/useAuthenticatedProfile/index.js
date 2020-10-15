@@ -19,27 +19,10 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { useEffect, useState } from "react";
 import { useSession } from "@inrupt/solid-ui-react";
-import { fetchProfile } from "../../solidClientHelpers/profile";
+import useFetchProfile from "../useFetchProfile";
 
 export default function useAuthenticatedProfile() {
-  const [profile, setProfile] = useState(null);
   const { session } = useSession();
-  const { info } = session;
-
-  useEffect(() => {
-    if (!info.isLoggedIn) return;
-
-    // TODO get rid of all this webId casting everywhere this is gross
-    const { webId = "" } = info;
-
-    fetchProfile(webId, session.fetch)
-      .then((loadedProfile) => setProfile(loadedProfile))
-      .catch((err) => {
-        throw err;
-      });
-  }, [info, session.fetch]);
-
-  return profile;
+  return useFetchProfile(session.info?.webId);
 }

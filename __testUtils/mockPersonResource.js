@@ -21,57 +21,39 @@
 
 import { addStringNoLocale, addUrl, mockThingFrom } from "@inrupt/solid-client";
 import { vcard, foaf } from "rdf-namespaces";
+import { chain } from "../src/solidClientHelpers/utils";
+import { packageProfile } from "../src/solidClientHelpers/profile";
 
-const person1WebIdUrl = "http://example.com/alice#me";
-const person1Name = "Alice";
-const person1Nick = "A";
-const person1Photo = "http://example.com/alice.jpg";
+export const aliceWebIdUrl = "http://example.com/alice#me";
+export const aliceName = "Alice";
+export const aliceNick = "A";
+export const alicePhoto = "http://example.com/alice.jpg";
 
 export function mockPersonDatasetAlice() {
-  const person1 = mockThingFrom(person1WebIdUrl);
-  const person1WithName = addStringNoLocale(person1, vcard.fn, person1Name);
-  const person1WithNick = addStringNoLocale(
-    person1WithName,
-    vcard.nickname,
-    person1Nick
+  return chain(
+    mockThingFrom(aliceWebIdUrl),
+    (t) => addStringNoLocale(t, vcard.fn, aliceName),
+    (t) => addStringNoLocale(t, vcard.nickname, aliceNick),
+    (t) => addUrl(t, vcard.hasPhoto, alicePhoto)
   );
-  const person1WithPhoto = addUrl(
-    person1WithNick,
-    vcard.hasPhoto,
-    person1Photo
-  );
-  return person1WithPhoto;
 }
 
 export function mockProfileAlice() {
-  return {
-    name: person1Name,
-    nickname: person1Nick,
-    avatar: person1Photo,
-    webId: person1WebIdUrl,
-  };
+  return packageProfile(aliceWebIdUrl, mockPersonDatasetAlice());
 }
 
-const person2WebIdUrl = "http://example.com/bob#me";
-const person2Name = "Bob";
-const person2Nick = "B";
+export const bobWebIdUrl = "http://example.com/bob#me";
+export const bobName = "Bob";
+export const bobNick = "B";
 
 export function mockPersonDatasetBob() {
-  const person2 = mockThingFrom(person2WebIdUrl);
-  const person2WithName = addStringNoLocale(person2, foaf.name, person2Name);
-  const person2WithNick = addStringNoLocale(
-    person2WithName,
-    foaf.nick,
-    person2Nick
+  return chain(
+    mockThingFrom(bobWebIdUrl),
+    (t) => addStringNoLocale(t, foaf.name, bobName),
+    (t) => addStringNoLocale(t, foaf.nick, bobNick)
   );
-  return person2WithNick;
 }
 
 export function mockProfileBob() {
-  return {
-    name: person2Name,
-    nickname: person2Nick,
-    avatar: null,
-    webId: person2WebIdUrl,
-  };
+  return packageProfile(bobWebIdUrl, mockPersonDatasetBob());
 }

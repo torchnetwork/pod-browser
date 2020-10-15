@@ -19,42 +19,21 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React, { ReactElement } from "react";
-import { createStyles, makeStyles, StyleRules } from "@material-ui/styles";
-import { header, PrismTheme, useBem } from "@solid/lit-prism-patterns";
 import { useSession } from "@inrupt/solid-ui-react";
-import Link from "next/link";
-import UserMenu from "./userMenu";
-import PodIndicator from "./podIndicator";
-import styles from "./styles";
+import useSWR from "swr";
+import { getSolidDataset, getThing, getUrlAll } from "@inrupt/solid-client";
+import { space } from "rdf-namespaces";
 
-const useStyles = makeStyles<PrismTheme>((theme) =>
-  createStyles(styles(theme) as StyleRules)
-);
+async function fetchPodIrisFromWebId(webId, fetch) {
+  const profileDoc = await getSolidDataset(webId, { fetch });
+  const profile = getThing(profileDoc, webId);
+  return getUrlAll(profile, space.storage);
+}
 
-const TESTCAFE_ID_HEADER_LOGO = "header-banner-logo";
-
-export default function Header(): ReactElement | null {
+export const FETCH_POD_IRIS_FROM_WEB_ID = "fetchPodIrisFromWebId";
+export default function usePodIrisFromWebId(webId) {
   const { session } = useSession();
-  const bem = useBem(useStyles());
-  const classes = useStyles();
-
-  return (
-    <header className={bem("header-banner")}>
-      <div className={classes.logoIndicatorContainer}>
-        <Link href="/">
-          <a data-testid={TESTCAFE_ID_HEADER_LOGO}>
-            <img
-              height={40}
-              src="/inrupt_logo-2020.svg"
-              className={bem("header-banner__logo-image")}
-              alt="Inrupt PodBrowser"
-            />
-          </a>
-        </Link>
-        {session.info.isLoggedIn ? <PodIndicator /> : null}
-      </div>
-      {session.info.isLoggedIn ? <UserMenu /> : null}
-    </header>
+  return useSWR([webId, FETCH_POD_IRIS_FROM_WEB_ID], () =>
+    fetchPodIrisFromWebId(webId, session.fetch)
   );
 }

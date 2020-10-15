@@ -19,27 +19,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/* eslint-disable camelcase */
-import {
-  getSolidDataset,
-  saveSolidDatasetAt,
-  getFile,
-  getSolidDatasetWithAcl,
-  getAgentAccessAll,
-} from "@inrupt/solid-client";
-import camelCase from "camelcase";
-import { parseUrl, isUrl, hasHash, stripHash } from "../stringHelpers";
-import { createResponder, isContainerIri, normalizeDataset } from "./utils";
-import { displayPermissions } from "./permissions";
-
-export function labelOrUrl(url) {
-  if (hasHash(url)) {
-    const { hash } = parseUrl(url);
-    const label = camelCase(stripHash(hash));
-    return label === "this" ? "root" : label;
-  }
-  return url;
-}
+import { getSolidDataset, saveSolidDatasetAt } from "@inrupt/solid-client";
+import { parseUrl } from "../stringHelpers";
+import { createResponder, isContainerIri } from "./utils";
 
 export function getResourceName(iri) {
   let { pathname } = parseUrl(iri);
@@ -49,19 +31,6 @@ export function getResourceName(iri) {
   const encodedURISegment =
     pathname.match(/(?!\/)(?:.(?!\/))+$/)?.toString() || "";
   return decodeURIComponent(encodedURISegment);
-}
-
-export function normalizePermissions(permissions) {
-  if (!permissions) return [];
-
-  return Object.keys(permissions)
-    .filter(isUrl)
-    .map((webId) => {
-      const acl = permissions[webId];
-      const alias = displayPermissions(acl);
-
-      return { acl, alias, webId };
-    });
 }
 
 export async function getResource(iri, fetch) {
@@ -75,69 +44,6 @@ export async function getResource(iri, fetch) {
   } catch (e) {
     return error(e.message);
   }
-}
-
-export async function getResourceWithPermissions(iri, fetch) {
-  const { respond, error } = createResponder();
-
-  try {
-    const dataset = await getSolidDatasetWithAcl(iri, { fetch });
-    const access = getAgentAccessAll(dataset);
-    const permissions = normalizePermissions(access);
-
-    return respond({ dataset, iri, permissions });
-  } catch (e) {
-    return error(e.message);
-  }
-}
-
-export async function fetchFileWithAcl(iri, fetch) {
-  const file = await getFile(iri, { fetch });
-  const {
-    internal_resourceInfo: { permissions: filePermissions, contentType: type },
-  } = file;
-
-  const permissions = filePermissions
-    ? [
-        {
-          webId: "user",
-          alias: displayPermissions(filePermissions.user),
-          profile: { webId: "user" },
-          acl: filePermissions?.user,
-        },
-        {
-          webId: "public",
-          alias: displayPermissions(filePermissions.public),
-          profile: { webId: "public" },
-          acl: filePermissions?.public,
-        },
-      ]
-    : [];
-  const types = type ? [type] : [];
-
-  return {
-    iri,
-    permissions,
-    types,
-    file,
-  };
-}
-
-export async function fetchResourceWithAcl(
-  iri,
-  fetch,
-  normalizePermissionsFn = normalizePermissions
-) {
-  const dataset = await getSolidDatasetWithAcl(iri, { fetch });
-  const access = getAgentAccessAll(dataset);
-  const permissions = access
-    ? await normalizePermissionsFn(access, fetch)
-    : undefined;
-
-  return {
-    permissions,
-    ...normalizeDataset(dataset, iri),
-  };
 }
 
 export async function saveResource({ dataset, iri }, fetch) {

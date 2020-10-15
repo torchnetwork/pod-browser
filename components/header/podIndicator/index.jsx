@@ -19,55 +19,108 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import clsx from "clsx";
 import { createStyles, makeStyles } from "@material-ui/styles";
 import { useRouter } from "next/router";
 import { useBem } from "@solid/lit-prism-patterns";
-import { foaf, vcard } from "rdf-namespaces";
-import { getStringNoLocale } from "@inrupt/solid-client";
+import Popover from "@material-ui/core/Popover";
+import { Form, Input } from "@inrupt/prism-react-components";
+import Skeleton from "@material-ui/lab/Skeleton";
 import usePodOwnerProfile from "../../../src/hooks/usePodOwnerProfile";
-
 import styles from "./styles";
+import { resourceHref } from "../../../src/navigator";
+import { normalizeContainerUrl } from "../../../src/stringHelpers";
+
+const TESTCAFE_ID_POD_NAVIGATE_INPUT = "pod-navigate-input";
+const TESTCAFE_ID_POD_NAVIGATE_TRIGGER = "pod-indicator-prompt";
 
 const useStyles = makeStyles((theme) => createStyles(styles(theme)));
 
+export const clickHandler = (setAnchorEl) => (event) =>
+  setAnchorEl(event.currentTarget);
+
+export const closeHandler = (setAnchorEl) => () => setAnchorEl(null);
+
+export const submitHandler = (handleClose, setUrl) => async (
+  event,
+  url,
+  router
+) => {
+  event.preventDefault();
+  if (url === "") {
+    return;
+  }
+  const containerUrl = normalizeContainerUrl(url);
+  await router.push("/resource/[iri]", resourceHref(containerUrl));
+  handleClose();
+  setUrl("");
+};
+
 export default function PodIndicator() {
   const classes = useStyles();
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [url, setUrl] = useState("");
   const router = useRouter();
   const bem = useBem(useStyles());
-  const decodedResourceUri = decodeURIComponent(router.query.iri);
-  const [podUri, setPodUri] = useState();
+  const { profile, error } = usePodOwnerProfile();
+  const loading = !profile && !error;
 
-  useEffect(() => {
-    if (decodedResourceUri === "undefined") {
-      return;
-    }
-    const originUri = decodedResourceUri && new URL(decodedResourceUri).origin;
-    const decodedPodUri = decodeURIComponent(originUri);
-    setPodUri(decodedPodUri);
-  }, [decodedResourceUri]);
-
-  const { profile: podOwner } = usePodOwnerProfile(podUri);
-  if (!podOwner) {
-    return null;
-  }
-
-  const podOwnerName =
-    getStringNoLocale(podOwner.dataset, vcard.fn) ||
-    getStringNoLocale(podOwner.dataset, foaf.name);
+  const open = Boolean(anchorEl);
+  const id = open ? "pod-navigator" : undefined;
+  const handleClick = clickHandler(setAnchorEl);
+  const handleClose = closeHandler(setAnchorEl);
+  const onSubmit = submitHandler(handleClose, setUrl);
 
   return (
     <div className={classes.indicator}>
       <label htmlFor="pod-indicator-prompt" className={classes.indicatorLabel}>
         <span>Pod: </span>
-        <button
-          data-testid="pod-indicator-prompt"
-          type="button"
-          className={clsx(bem("button", "prompt"), classes.indicatorPrompt)}
+        {loading ? (
+          <Skeleton width={100} style={{ display: "inline-block" }} />
+        ) : (
+          <button
+            data-testid={TESTCAFE_ID_POD_NAVIGATE_TRIGGER}
+            id="pod-indicator-prompt"
+            type="button"
+            aria-describedby={id}
+            onClick={handleClick}
+            className={clsx(bem("button", "prompt"), classes.indicatorPrompt)}
+          >
+            {profile ? profile.name : "Unknown"}
+          </button>
+        )}
+        <Popover
+          id={id}
+          classes={{
+            paper: classes.popover,
+          }}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "left",
+          }}
         >
-          {podOwnerName}
-        </button>
+          <Form onSubmit={(event) => onSubmit(event, url, router)}>
+            <Input
+              id="PodNavigator"
+              data-testid={TESTCAFE_ID_POD_NAVIGATE_INPUT}
+              label="Go to Pod"
+              value={url}
+              onChange={(event) => setUrl(event.target.value)}
+              placeholder="Enter Pod URI"
+              type="url"
+              pattern="https://.*"
+              title="Must start with https://"
+            />
+          </Form>
+        </Popover>
       </label>
     </div>
   );

@@ -24,13 +24,23 @@ import { mount } from "enzyme";
 import { useRouter } from "next/router";
 import { mountToJson as enzymeMountToJson } from "enzyme-to-json";
 import { WithTheme } from "../../../__testUtils/mountWithTheme";
-import PodIndicator from "./index";
+import PodIndicator, {
+  clickHandler,
+  closeHandler,
+  submitHandler,
+} from "./index";
 import {
   mockPersonDatasetAlice,
   mockPersonDatasetBob,
+  aliceWebIdUrl,
+  bobWebIdUrl,
 } from "../../../__testUtils/mockPersonResource";
 import usePodOwnerProfile from "../../../src/hooks/usePodOwnerProfile";
 import defaultTheme from "../../../src/theme";
+
+import { packageProfile } from "../../../src/solidClientHelpers/profile";
+import { resourceHref } from "../../../src/navigator";
+import { normalizeContainerUrl } from "../../../src/stringHelpers";
 
 jest.mock("next/router");
 jest.mock("../../../src/hooks/usePodOwnerProfile");
@@ -43,10 +53,11 @@ describe("PodIndicator", () => {
       },
     }));
   });
+
   test("it renders the pod indicator with the correct name with a formatted name", async () => {
     const userProfile = mockPersonDatasetAlice();
     usePodOwnerProfile.mockReturnValue({
-      profile: { dataset: userProfile, iri: "https://example.com" },
+      profile: packageProfile(aliceWebIdUrl, userProfile),
       error: null,
     });
     const tree = mount(
@@ -57,10 +68,11 @@ describe("PodIndicator", () => {
     expect(tree.html()).toContain("Alice");
     expect(enzymeMountToJson(tree)).toMatchSnapshot();
   });
+
   test("it renders the pod indicator with the correct name with a name", async () => {
     const userProfile = mockPersonDatasetBob();
     usePodOwnerProfile.mockReturnValue({
-      profile: { dataset: userProfile, iri: "https://example.com" },
+      profile: packageProfile(bobWebIdUrl, userProfile),
       error: null,
     });
     const tree = mount(
@@ -71,6 +83,7 @@ describe("PodIndicator", () => {
     expect(tree.html()).toContain("Bob");
     expect(enzymeMountToJson(tree)).toMatchSnapshot();
   });
+
   test("it returns null if there is no profile", async () => {
     usePodOwnerProfile.mockReturnValue({
       profile: null,
@@ -81,7 +94,57 @@ describe("PodIndicator", () => {
         <PodIndicator />
       </WithTheme>
     );
-    expect(tree.html()).toEqual("");
     expect(enzymeMountToJson(tree)).toMatchSnapshot();
+  });
+});
+
+describe("clickHandler", () => {
+  test("it sets up a click handler", () => {
+    const setAnchorEl = jest.fn();
+    const currentTarget = "test";
+    clickHandler(setAnchorEl)({ currentTarget });
+    expect(setAnchorEl).toHaveBeenCalledWith(currentTarget);
+  });
+});
+
+describe("closeHandler", () => {
+  test("it sets up a close handler", () => {
+    const setAnchorEl = jest.fn();
+    closeHandler(setAnchorEl)();
+    expect(setAnchorEl).toHaveBeenCalledWith(null);
+  });
+});
+
+describe("submitHandler", () => {
+  const url = "http://url.com";
+  let event;
+  let handleClose;
+  let setUrl;
+  const router = {};
+
+  beforeEach(() => {
+    event = { preventDefault: jest.fn() };
+    handleClose = jest.fn();
+    setUrl = jest.fn();
+    router.push = jest.fn();
+  });
+
+  test("it sets up a submit handler", async () => {
+    await submitHandler(handleClose, setUrl)(event, url, router);
+    expect(event.preventDefault).toHaveBeenCalledWith();
+    expect(router.push).toHaveBeenCalledWith(
+      "/resource/[iri]",
+      resourceHref(normalizeContainerUrl(url))
+    );
+    expect(handleClose).toHaveBeenCalledWith();
+    expect(setUrl).toHaveBeenCalledWith("");
+  });
+
+  it("should do nothing if no url is given", async () => {
+    await submitHandler(handleClose, setUrl)(event, "", router);
+    expect(event.preventDefault).toHaveBeenCalledWith();
+    expect(router.push).not.toHaveBeenCalled();
+    expect(handleClose).not.toHaveBeenCalled();
+    expect(setUrl).not.toHaveBeenCalled();
   });
 });
