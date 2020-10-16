@@ -21,31 +21,37 @@
 
 import { renderHook } from "@testing-library/react-hooks";
 import { mockSolidDatasetFrom } from "@inrupt/solid-client";
-import usePeople from "./index";
+import useProfiles from "./index";
 import mockSession from "../../../__testUtils/mockSession";
 import mockSessionContextProvider from "../../../__testUtils/mockSessionContextProvider";
-import { getPeople } from "../../addressBook";
+import { getProfiles } from "../../addressBook";
 
 jest.mock("../../addressBook");
 
-describe("usePeople", () => {
-  describe("with no address book", () => {
+describe("useProfiles", () => {
+  describe("with no people", () => {
     it("should return null", () => {
       const session = mockSession();
       const wrapper = mockSessionContextProvider(session);
-      const { result } = renderHook(() => usePeople(null), {
+      const { result } = renderHook(() => useProfiles(null), {
         wrapper,
       });
-      expect(result.current).toEqual([null, null]);
+      expect(result.current).toBeNull();
     });
   });
 
-  describe("with address book", () => {
+  describe("with people", () => {
     let session;
     let wrapper;
     const response = 42;
-    const addressBookUrl = "http://example.com/contacts/index.ttl";
-    const addressBook = mockSolidDatasetFrom(addressBookUrl);
+    const contactUrl1 =
+      "https://user.example.com/contacts/Person/1234/index.ttl";
+    const contactUrl2 =
+      "https://user.example.com/contacts/Person/5678/index.ttl";
+    const people = [
+      mockSolidDatasetFrom(contactUrl1),
+      mockSolidDatasetFrom(contactUrl2),
+    ];
 
     beforeEach(() => {
       session = mockSession();
@@ -53,22 +59,22 @@ describe("usePeople", () => {
     });
 
     it("should call getPeople", async () => {
-      getPeople.mockResolvedValue({ response });
+      getProfiles.mockResolvedValue(response);
 
-      const { waitForNextUpdate } = renderHook(() => usePeople(addressBook), {
+      const { waitForNextUpdate } = renderHook(() => useProfiles(people), {
         wrapper,
       });
 
       await waitForNextUpdate();
 
-      expect(getPeople).toHaveBeenCalledWith(addressBookUrl, session.fetch);
+      expect(getProfiles).toHaveBeenCalledWith(people, session.fetch);
     });
 
     it("should return response", async () => {
-      getPeople.mockResolvedValue({ response });
+      getProfiles.mockResolvedValue(response);
 
       const { result, waitForNextUpdate } = renderHook(
-        () => usePeople(addressBook),
+        () => useProfiles(people),
         {
           wrapper,
         }
@@ -76,23 +82,7 @@ describe("usePeople", () => {
 
       await waitForNextUpdate();
 
-      expect(result.current).toEqual([response, null]);
-    });
-
-    it("should return error", async () => {
-      const error = "Some error";
-      getPeople.mockResolvedValue({ error });
-
-      const { result, waitForNextUpdate } = renderHook(
-        () => usePeople(addressBook),
-        {
-          wrapper,
-        }
-      );
-
-      await waitForNextUpdate();
-
-      expect(result.current).toEqual([null, error]);
+      expect(result.current).toEqual(response);
     });
   });
 });

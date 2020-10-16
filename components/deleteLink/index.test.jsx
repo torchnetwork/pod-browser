@@ -20,67 +20,72 @@
  */
 
 import React from "react";
-import { shallow } from "enzyme";
+import { shallow, mount } from "enzyme";
 import { shallowToJson } from "enzyme-to-json";
-import { deleteFile } from "@inrupt/solid-client";
 
 import DeleteLink, { handleDeleteResource, handleConfirmation } from "./index";
+import mockConfirmationDialogContextProvider from "../../__testUtils/mockConfirmationDialogContextProvider";
 
 jest.mock("@inrupt/solid-client");
 
-const name = "Resource";
-const resourceIri = "iri";
+const confirmationTitle = "confirmationTitle";
+const confirmationContent = "confirmationContent";
+const dialogId = "dialogId";
+const successMessage = "successMessage";
 
 describe("Delete link", () => {
   test("it renders a delete link", () => {
     const tree = shallow(
-      <DeleteLink onDelete={jest.fn()} resourceIri={resourceIri} name={name} />
+      <DeleteLink
+        onDelete={jest.fn()}
+        confirmationTitle={confirmationTitle}
+        confirmationContent={confirmationContent}
+        dialogId={dialogId}
+        successMessage={successMessage}
+      />
     );
-
     expect(shallowToJson(tree)).toMatchSnapshot();
+  });
+  test("clicking on delete link calls setOpen with the correct id", () => {
+    const setOpen = jest.fn();
+    const ConfirmationDialogProvider = mockConfirmationDialogContextProvider({
+      open: dialogId,
+      setOpen,
+      setTitle: jest.fn(),
+      setContent: jest.fn(),
+      confirmed: null,
+    });
+    const tree = mount(
+      <ConfirmationDialogProvider>
+        <DeleteLink
+          onDelete={jest.fn()}
+          confirmationTitle={confirmationTitle}
+          confirmationContent={confirmationContent}
+          dialogId={dialogId}
+          successMessage={successMessage}
+        />
+      </ConfirmationDialogProvider>
+    );
+    const link = tree.find("a");
+    link.simulate("click");
+    expect(setOpen).toHaveBeenCalledWith(dialogId);
   });
 });
 
 describe("handleDeleteResource", () => {
-  test("it returns a handler that deletes the resource", async () => {
-    const fetch = jest.fn();
+  test("it returns a handler that calls the given onDelete", async () => {
     const onDelete = jest.fn();
     const onDeleteError = jest.fn();
     const setAlertOpen = jest.fn();
     const setMessage = jest.fn();
     const setSeverity = jest.fn();
     const handler = handleDeleteResource({
-      fetch,
-      name,
       onDelete,
       onDeleteError,
-      resourceIri,
       setAlertOpen,
       setMessage,
       setSeverity,
-    });
-
-    await handler();
-
-    expect(deleteFile).toHaveBeenCalledWith(resourceIri, { fetch });
-  });
-
-  test("it returns a handler that calls onDelete if successful", async () => {
-    const fetch = jest.fn();
-    const onDelete = jest.fn();
-    const onDeleteError = jest.fn();
-    const setAlertOpen = jest.fn();
-    const setMessage = jest.fn();
-    const setSeverity = jest.fn();
-    const handler = handleDeleteResource({
-      fetch,
-      name,
-      onDelete,
-      onDeleteError,
-      resourceIri,
-      setAlertOpen,
-      setMessage,
-      setSeverity,
+      successMessage,
     });
 
     await handler();
@@ -89,34 +94,28 @@ describe("handleDeleteResource", () => {
   });
 
   test("it returns a handler that shows an alert if successful", async () => {
-    const fetch = jest.fn();
     const onDelete = jest.fn();
     const onDeleteError = jest.fn();
     const setAlertOpen = jest.fn();
     const setMessage = jest.fn();
     const setSeverity = jest.fn();
     const handler = handleDeleteResource({
-      fetch,
-      name,
       onDelete,
       onDeleteError,
-      resourceIri,
       setAlertOpen,
       setMessage,
       setSeverity,
+      successMessage,
     });
 
     await handler();
 
     expect(setSeverity).toHaveBeenCalledWith("success");
-    expect(setMessage).toHaveBeenCalledWith(
-      "Resource was successfully deleted."
-    );
+    expect(setMessage).toHaveBeenCalledWith(successMessage);
     expect(setAlertOpen).toHaveBeenCalledWith(true);
   });
 
   test("it returns a handler that calls onError if not successful", async () => {
-    const fetch = jest.fn();
     const error = new Error("boom");
     const onDelete = jest.fn(() => {
       throw error;
@@ -126,18 +125,14 @@ describe("handleDeleteResource", () => {
     const setMessage = jest.fn();
     const setSeverity = jest.fn();
     const handler = handleDeleteResource({
-      fetch,
-      name,
       onDelete,
       onDeleteError,
-      resourceIri,
       setAlertOpen,
       setMessage,
       setSeverity,
     });
 
     await handler();
-
     expect(onDeleteError).toHaveBeenCalledWith(error);
   });
 });
@@ -148,7 +143,6 @@ describe("handleConfirmation", () => {
   const setTitle = jest.fn();
   const setContent = jest.fn();
   const setConfirmationSetup = jest.fn();
-  const dialogId = "handleConfirmation-dialog";
   const open = dialogId;
 
   const handler = handleConfirmation({
@@ -163,19 +157,26 @@ describe("handleConfirmation", () => {
   });
 
   test("it returns a handler that deletes the file when user confirms dialog", async () => {
-    await handler(true, true, name);
+    await handler(true, true, confirmationTitle, confirmationContent);
 
     expect(setOpen).toHaveBeenCalledWith(null);
     expect(deleteResource).toHaveBeenCalled();
     expect(setConfirmed).toHaveBeenCalledWith(null);
-    expect(setTitle).toHaveBeenCalled();
-    expect(setContent).toHaveBeenCalled();
+    expect(setTitle).toHaveBeenCalledWith(confirmationTitle);
+    expect(setContent).toHaveBeenCalledWith(<p>{confirmationContent}</p>);
     expect(setConfirmationSetup).toHaveBeenCalledWith(true);
   });
   test("it returns a handler that exits when user cancels the operation", async () => {
-    await handler(true, false, name);
+    await handler(true, false, confirmationTitle, confirmationContent);
 
     expect(deleteResource).not.toHaveBeenCalled();
     expect(setConfirmed).toHaveBeenCalledWith(null);
+  });
+  test("it returns a handler that exits when user starts confirmation but hasn't selected an option", async () => {
+    await handler(true, null, confirmationTitle, confirmationContent);
+
+    expect(deleteResource).not.toHaveBeenCalled();
+    expect(setTitle).not.toHaveBeenCalled();
+    expect(setContent).not.toHaveBeenCalled();
   });
 });

@@ -19,24 +19,20 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { createStyles, table } from "@solid/lit-prism-patterns";
+import React from "react";
+import { shallow } from "enzyme";
+import { shallowToJson } from "enzyme-to-json";
 
-const styles = (theme) => {
-  const tableStyles = table.styles(theme);
-  return createStyles(theme, ["table", "icons"], {
-    table: {
-      "& tbody td": {
-        "&:first-child": tableStyles["table__body-cell--width-preview"],
-      },
-    },
-    tableRow: {
-      cursor: "pointer",
-    },
-    avatar: {
-      width: "30px",
-      height: "30px",
-    },
+import DeleteContactLink from "./index";
+
+jest.mock("@inrupt/solid-client");
+
+describe("Delete contact link", () => {
+  test("it renders a delete contact link", () => {
+    const tree = shallow(
+      <DeleteContactLink onDelete={jest.fn()} name="Test" />
+    );
+
+    expect(shallowToJson(tree)).toMatchSnapshot();
   });
-};
-
-export default styles;
+});

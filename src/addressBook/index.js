@@ -25,11 +25,14 @@ import {
   addStringNoLocale,
   addUrl,
   asUrl,
+  deleteFile,
   getSourceUrl,
   getStringNoLocaleAll,
   getThing,
+  getThingAll,
   getUrl,
   getUrlAll,
+  removeThing,
   setThing,
 } from "@inrupt/solid-client";
 import { v4 as uuid } from "uuid";
@@ -139,6 +142,9 @@ export async function getPeople(containerIri, fetch) {
     .filter(({ error: e }) => !e)
     .map(({ response }) => response);
 
+  return respond(people);
+}
+export async function getProfiles(people, fetch) {
   const profileResponses = await Promise.all(
     people.map(({ dataset }) => {
       const url = getUrl(dataset, foaf.openid);
@@ -158,7 +164,7 @@ export async function getPeople(containerIri, fetch) {
       );
     });
 
-  return respond(profiles);
+  return profiles;
 }
 
 export async function saveNewAddressBook(
@@ -297,7 +303,10 @@ export function createContact(addressBookIri, contact) {
 
 export async function findContactInAddressBook(addressBookIri, webId, fetch) {
   const { response: people } = await getPeople(addressBookIri, fetch);
-  const existingContact = people.filter((person) => asUrl(person) === webId);
+  const profiles = await getProfiles(people, fetch);
+  const existingContact = profiles.filter(
+    (profile) => asUrl(profile) === webId
+  );
   return existingContact;
 }
 
@@ -341,4 +350,41 @@ export async function saveContact(addressBookIri, schema, fetch) {
 
   if (savePeopleError) return error(savePeopleError);
   return respond({ iri, contact, people });
+}
+
+export async function deleteContact(addressBookIri, contactToDelete, fetch) {
+  // TODO: get contact from people index once SOLIDOS-503 is resolved
+  const contactIri = contactToDelete.iri;
+  const peopleIri = joinPath(addressBookIri, "people.ttl");
+  const { response: peopleIndex, error: peopleError } = await getResource(
+    peopleIri,
+    fetch
+  );
+  if (peopleError) {
+    throw peopleError;
+  }
+  const peopleIndexThings = getThingAll(peopleIndex.dataset);
+  const peopleIndexEntryToRemove = peopleIndexThings.find((thing) =>
+    asUrl(thing).includes(contactIri)
+  );
+  const updatedPeopleIndex = removeThing(
+    peopleIndex.dataset,
+    peopleIndexEntryToRemove
+  );
+  const updatedPeopleIndexResponse = saveResource(
+    { dataset: updatedPeopleIndex, iri: peopleIri },
+    fetch
+  );
+
+  const contactContainerIri = contactIri.substring(
+    0,
+    contactIri.lastIndexOf("/") + 1
+  );
+
+  await deleteFile(contactIri, { fetch });
+  await deleteFile(contactContainerIri, { fetch });
+  const { error: savePeopleError } = await updatedPeopleIndexResponse;
+  if (savePeopleError) {
+    throw savePeopleError;
+  }
 }
