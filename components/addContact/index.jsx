@@ -40,9 +40,12 @@ const useStyles = makeStyles((theme) => createStyles(styles(theme)));
 export const EXISTING_WEBID_ERROR_MESSAGE =
   "That WebID is already in your contacts";
 export const NO_NAME_ERROR_MESSAGE = "That WebID does not have a name";
+export const FETCH_PROFILE_FAILED_ERROR_MESSAGE =
+  "Unable to retrieve a profile from the given WebID";
 
 export function handleSubmit({
   addressBook,
+  setAgentId,
   setIsLoading,
   alertError,
   alertSuccess,
@@ -52,32 +55,39 @@ export function handleSubmit({
     setIsLoading(true);
     const addressBookIri = getSourceUrl(addressBook);
 
-    const { name, webId } = await fetchProfile(iri, fetch);
+    try {
+      const { name, webId } = await fetchProfile(iri, fetch);
 
-    const existingContact = await findContactInAddressBook(
-      addressBookIri,
-      webId,
-      fetch
-    );
-
-    if (existingContact.length) {
-      alertError(EXISTING_WEBID_ERROR_MESSAGE);
-      setIsLoading(false);
-      return;
-    }
-
-    if (name) {
-      const contact = { webId, fn: name };
-      const { response, error } = await saveContact(
+      const existingContact = await findContactInAddressBook(
         addressBookIri,
-        contact,
+        webId,
         fetch
       );
 
-      if (error) alertError(error);
-      if (response) alertSuccess(`${contact.fn} was added to your contacts`);
-    } else {
-      alertError(NO_NAME_ERROR_MESSAGE);
+      if (existingContact.length) {
+        alertError(EXISTING_WEBID_ERROR_MESSAGE);
+        setIsLoading(false);
+        return;
+      }
+
+      if (name) {
+        const contact = { webId, fn: name };
+        const { response, error } = await saveContact(
+          addressBookIri,
+          contact,
+          fetch
+        );
+
+        if (error) alertError(error);
+        if (response) {
+          alertSuccess(`${contact.fn} was added to your contacts`);
+          setAgentId("");
+        }
+      } else {
+        alertError(NO_NAME_ERROR_MESSAGE);
+      }
+    } catch {
+      alertError(FETCH_PROFILE_FAILED_ERROR_MESSAGE);
     }
     setIsLoading(false);
   };
@@ -99,16 +109,20 @@ export default function AddContact() {
   );
   const [addressBook] = useAddressBook();
   const [isLoading, setIsLoading] = useState(false);
+  const [agentId, setAgentId] = useState("");
   if (!webId || isLoading) return <Spinner />;
 
   const onSubmit = handleSubmit({
     addressBook,
+    setAgentId,
     setIsLoading,
     alertError,
     alertSuccess,
     fetch,
     webId,
   });
+
+  const handleChange = (newValue) => setAgentId(newValue);
 
   return (
     <div className={containerClass}>
@@ -119,8 +133,10 @@ export default function AddContact() {
 
       <AgentSearchForm
         heading="Add contact using Web ID"
+        onChange={handleChange}
         onSubmit={onSubmit}
         buttonText="Add Contact"
+        value={agentId}
       />
     </div>
   );
