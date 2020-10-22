@@ -888,6 +888,11 @@ font-display: block;",
             >
               <Drawer
                 close={[Function]}
+                closeButtonProps={
+                  Object {
+                    "data-testid": "close-resource-drawer",
+                  }
+                }
                 open={true}
               >
                 <section
@@ -900,11 +905,13 @@ font-display: block;",
                       className="PodBrowser-drawer__article"
                     >
                       <Button
+                        data-testid="close-resource-drawer"
                         onClick={[Function]}
                         variant="text"
                       >
                         <button
                           className="PodBrowser-button PodBrowser-button--text"
+                          data-testid="close-resource-drawer"
                           onClick={[Function]}
                         >
                           <Icon
@@ -2439,6 +2446,11 @@ font-display: block;",
             >
               <Drawer
                 close={[Function]}
+                closeButtonProps={
+                  Object {
+                    "data-testid": "close-resource-drawer",
+                  }
+                }
                 open={true}
               >
                 <section
@@ -2451,11 +2463,13 @@ font-display: block;",
                       className="PodBrowser-drawer__article"
                     >
                       <Button
+                        data-testid="close-resource-drawer"
                         onClick={[Function]}
                         variant="text"
                       >
                         <button
                           className="PodBrowser-button PodBrowser-button--text"
+                          data-testid="close-resource-drawer"
                           onClick={[Function]}
                         >
                           <Icon
@@ -3933,6 +3947,11 @@ font-display: block;",
         >
           <Drawer
             close={[Function]}
+            closeButtonProps={
+              Object {
+                "data-testid": "close-resource-drawer",
+              }
+            }
             open={true}
           >
             <section
@@ -3945,11 +3964,13 @@ font-display: block;",
                   className="PodBrowser-drawer__article"
                 >
                   <Button
+                    data-testid="close-resource-drawer"
                     onClick={[Function]}
                     variant="text"
                   >
                     <button
                       className="PodBrowser-button PodBrowser-button--text"
+                      data-testid="close-resource-drawer"
                       onClick={[Function]}
                     >
                       <Icon
@@ -5482,6 +5503,11 @@ font-display: block;",
             >
               <Drawer
                 close={[Function]}
+                closeButtonProps={
+                  Object {
+                    "data-testid": "close-resource-drawer",
+                  }
+                }
                 open={true}
               >
                 <section
@@ -5494,11 +5520,13 @@ font-display: block;",
                       className="PodBrowser-drawer__article"
                     >
                       <Button
+                        data-testid="close-resource-drawer"
                         onClick={[Function]}
                         variant="text"
                       >
                         <button
                           className="PodBrowser-button PodBrowser-button--text"
+                          data-testid="close-resource-drawer"
                           onClick={[Function]}
                         >
                           <Icon

@@ -34,6 +34,8 @@ import {
 import { ExpandMore } from "@material-ui/icons";
 import DeleteContactLink from "../../deleteContactLink";
 
+const TESTCAFE_ID_CLOSE_CONTACTS_DRAWER = "close-contacts-drawer";
+
 export default function ContactsDrawer({
   open,
   onClose,
@@ -42,7 +44,11 @@ export default function ContactsDrawer({
 }) {
   const actionMenuBem = ActionMenu.useBem();
   return (
-    <Drawer open={open} close={onClose}>
+    <Drawer
+      open={open}
+      close={onClose}
+      closeButtonProps={{ "data-testid": TESTCAFE_ID_CLOSE_CONTACTS_DRAWER }}
+    >
       <Accordion defaultExpanded square>
         <AccordionSummary expandIcon={<ExpandMore />}>Actions</AccordionSummary>
         <AccordionDetails>

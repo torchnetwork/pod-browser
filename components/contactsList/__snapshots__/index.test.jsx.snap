@@ -29346,6 +29346,11 @@ font-display: block;",
                   >
                     <Drawer
                       close={[Function]}
+                      closeButtonProps={
+                        Object {
+                          "data-testid": "close-contacts-drawer",
+                        }
+                      }
                       open={false}
                     >
                       <section
@@ -29358,11 +29363,13 @@ font-display: block;",
                             className="PodBrowser-drawer__article"
                           >
                             <Button
+                              data-testid="close-contacts-drawer"
                               onClick={[Function]}
                               variant="text"
                             >
                               <button
                                 className="PodBrowser-button PodBrowser-button--text"
+                                data-testid="close-contacts-drawer"
                                 onClick={[Function]}
                               >
                                 <Icon

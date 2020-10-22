@@ -30,6 +30,8 @@ import { stripQueryParams } from "../../src/stringHelpers";
 import ResourceDetails from "../resourceDetails";
 import DetailsLoading from "../resourceDetails/detailsLoading";
 
+const TESTCAFE_ID_CLOSE_RESOURCE_DRAWER = "close-resource-drawer";
+
 export function handleCloseDrawer({ setMenuOpen, router }) {
   return async () => {
     setMenuOpen(false);
@@ -68,7 +70,11 @@ export default function ResourceDrawer({ onUpdate }) {
   const closeDrawer = handleCloseDrawer({ setMenuOpen, router });
 
   return (
-    <Drawer open={menuOpen} close={closeDrawer}>
+    <Drawer
+      open={menuOpen}
+      close={closeDrawer}
+      closeButtonProps={{ "data-testid": TESTCAFE_ID_CLOSE_RESOURCE_DRAWER }}
+    >
       {loading ? (
         <DetailsLoading iri={resourceIri} />
       ) : (
