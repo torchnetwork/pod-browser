@@ -19,16 +19,18 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import T from "prop-types";
 import { useRouter } from "next/router";
 import { Drawer } from "@inrupt/prism-react-components";
 import { DatasetProvider, useSession } from "@inrupt/solid-ui-react";
-import { getResourceInfoWithAcl } from "@inrupt/solid-client";
 import DetailsMenuContext from "../../src/contexts/detailsMenuContext";
 import { stripQueryParams } from "../../src/stringHelpers";
 import ResourceDetails from "../resourceDetails";
 import DetailsLoading from "../resourceDetails/detailsLoading";
+import useAccessControl from "../../src/hooks/useAccessControl";
+import { AccessControlProvider } from "../../src/contexts/accessControlContext";
+import useResourceInfo from "../../src/hooks/useResourceInfo";
 
 export function handleCloseDrawer({ setMenuOpen, router }) {
   return async () => {
@@ -42,39 +44,40 @@ export function handleCloseDrawer({ setMenuOpen, router }) {
 export default function ResourceDrawer({ onUpdate }) {
   const { menuOpen, setMenuOpen } = useContext(DetailsMenuContext);
   const { fetch } = useSession();
-  const [datasetWithAcl, setDatasetWithAcl] = useState(null);
-  const [loading, setLoading] = useState(true);
-
+  const router = useRouter();
   const {
     query: { action, resourceIri },
-  } = useRouter();
-
-  const router = useRouter();
+  } = router;
+  const encodedResourceIri = encodeURI(resourceIri);
+  const { data: resourceInfo, error: resourceError } = useResourceInfo(
+    encodedResourceIri
+  );
+  const { accessControl, error: accessControlError } = useAccessControl(
+    resourceInfo,
+    fetch
+  );
 
   useEffect(() => {
     setMenuOpen(!!(action && resourceIri));
   }, [action, resourceIri, setMenuOpen]);
 
-  useEffect(() => {
-    if (!resourceIri) return;
-    setLoading(true);
-    const encodedResourceIri = encodeURI(resourceIri);
-    getResourceInfoWithAcl(encodedResourceIri, { fetch }).then((dataset) => {
-      setDatasetWithAcl(dataset);
-      setLoading(false);
-    });
-  }, [fetch, resourceIri]);
+  if (accessControlError || resourceError) {
+    throw accessControlError || resourceError;
+  }
 
   const closeDrawer = handleCloseDrawer({ setMenuOpen, router });
+  const loading = !accessControl || !resourceInfo;
 
   return (
     <Drawer open={menuOpen} close={closeDrawer}>
       {loading ? (
         <DetailsLoading iri={resourceIri} />
       ) : (
-        <DatasetProvider dataset={datasetWithAcl}>
-          <ResourceDetails onDelete={onUpdate} />
-        </DatasetProvider>
+        <AccessControlProvider accessControl={accessControl}>
+          <DatasetProvider dataset={resourceInfo}>
+            <ResourceDetails onDelete={onUpdate} />
+          </DatasetProvider>
+        </AccessControlProvider>
       )}
     </Drawer>
   );

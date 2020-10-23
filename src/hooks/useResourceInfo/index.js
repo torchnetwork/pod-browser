@@ -19,33 +19,16 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React, { createContext } from "react";
-import T from "prop-types";
-import useAuthenticatedProfile from "../../hooks/useAuthenticatedProfile";
-import usePodRootUri from "../../hooks/usePodRootUri";
+import { getResourceInfo } from "@inrupt/solid-client";
+import { useSession } from "@inrupt/solid-ui-react";
+import useSWR from "swr";
 
-const PodLocationContext = createContext({
-  currentUri: "",
-});
+export const GET_RESOURCE_INFO = "getResourceInfo";
+export default function useResourceInfo(iri) {
+  const { fetch } = useSession();
 
-function PodLocationProvider({ children, currentUri }) {
-  const { data: profile } = useAuthenticatedProfile();
-  const baseUri = usePodRootUri(currentUri, profile);
-  return (
-    <PodLocationContext.Provider value={{ baseUri, currentUri }}>
-      {children}
-    </PodLocationContext.Provider>
+  return useSWR(
+    iri && iri !== "undefined" ? [iri, GET_RESOURCE_INFO] : null,
+    () => getResourceInfo(iri, { fetch })
   );
 }
-
-PodLocationProvider.propTypes = {
-  children: T.node,
-  currentUri: T.string.isRequired,
-};
-
-PodLocationProvider.defaultProps = {
-  children: null,
-};
-
-export { PodLocationProvider };
-export default PodLocationContext;

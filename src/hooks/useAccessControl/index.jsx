@@ -19,33 +19,31 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React, { createContext } from "react";
-import T from "prop-types";
-import useAuthenticatedProfile from "../../hooks/useAuthenticatedProfile";
-import usePodRootUri from "../../hooks/usePodRootUri";
+import { useEffect, useState } from "react";
+import { getAccessControl } from "../../accessControl";
+import usePoliciesContainer from "../usePoliciesContainer";
 
-const PodLocationContext = createContext({
-  currentUri: "",
-});
+export default function useAccessControl(resourceInfo, fetch) {
+  const [accessControl, setAccessControl] = useState(null);
+  const { policiesContainer, error: policiesError } = usePoliciesContainer();
+  const [error, setError] = useState(policiesError || null);
 
-function PodLocationProvider({ children, currentUri }) {
-  const { data: profile } = useAuthenticatedProfile();
-  const baseUri = usePodRootUri(currentUri, profile);
-  return (
-    <PodLocationContext.Provider value={{ baseUri, currentUri }}>
-      {children}
-    </PodLocationContext.Provider>
-  );
+  useEffect(() => {
+    if (!resourceInfo || policiesError) {
+      setAccessControl(null);
+      setError(policiesError || null);
+      return;
+    }
+    getAccessControl(resourceInfo, policiesContainer, fetch)
+      .then((response) => {
+        setAccessControl(response);
+        setError(null);
+      })
+      .catch((accessControlError) => {
+        setAccessControl(null);
+        setError(accessControlError);
+      });
+  }, [fetch, policiesContainer, policiesError, resourceInfo]);
+
+  return { accessControl, error };
 }
-
-PodLocationProvider.propTypes = {
-  children: T.node,
-  currentUri: T.string.isRequired,
-};
-
-PodLocationProvider.defaultProps = {
-  children: null,
-};
-
-export { PodLocationProvider };
-export default PodLocationContext;

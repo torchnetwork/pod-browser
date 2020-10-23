@@ -19,33 +19,28 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React, { createContext } from "react";
-import T from "prop-types";
-import useAuthenticatedProfile from "../../hooks/useAuthenticatedProfile";
-import usePodRootUri from "../../hooks/usePodRootUri";
+import { hasAccessibleAcl } from "@inrupt/solid-client";
+import WacAccessControlStrategy from "./wac";
+import { hasLinkedAcr } from "./acp/mockedClientApi";
+import AcpAccessControlStrategy from "./acp";
 
-const PodLocationContext = createContext({
-  currentUri: "",
-});
+export const noAccessPolicyError =
+  "No available access policy for this resource";
 
-function PodLocationProvider({ children, currentUri }) {
-  const { data: profile } = useAuthenticatedProfile();
-  const baseUri = usePodRootUri(currentUri, profile);
-  return (
-    <PodLocationContext.Provider value={{ baseUri, currentUri }}>
-      {children}
-    </PodLocationContext.Provider>
-  );
+export function hasAccess(resourceInfo) {
+  return hasAccessibleAcl(resourceInfo) || hasLinkedAcr(resourceInfo);
 }
 
-PodLocationProvider.propTypes = {
-  children: T.node,
-  currentUri: T.string.isRequired,
-};
-
-PodLocationProvider.defaultProps = {
-  children: null,
-};
-
-export { PodLocationProvider };
-export default PodLocationContext;
+export async function getAccessControl(resourceInfo, policiesContainer, fetch) {
+  if (hasAccessibleAcl(resourceInfo)) {
+    return WacAccessControlStrategy.init(resourceInfo, fetch);
+  }
+  if (hasLinkedAcr(resourceInfo)) {
+    return AcpAccessControlStrategy.init(
+      resourceInfo,
+      policiesContainer,
+      fetch
+    );
+  }
+  throw new Error(noAccessPolicyError);
+}

@@ -21,31 +21,25 @@
 
 import React, { createContext } from "react";
 import T from "prop-types";
-import useAuthenticatedProfile from "../../hooks/useAuthenticatedProfile";
-import usePodRootUri from "../../hooks/usePodRootUri";
 
-const PodLocationContext = createContext({
-  currentUri: "",
-});
+const defaultValues = {
+  accessControl: null,
+};
+const AccessControlContext = createContext(defaultValues);
 
-function PodLocationProvider({ children, currentUri }) {
-  const { data: profile } = useAuthenticatedProfile();
-  const baseUri = usePodRootUri(currentUri, profile);
+function AccessControlProvider({ children, accessControl }) {
   return (
-    <PodLocationContext.Provider value={{ baseUri, currentUri }}>
+    <AccessControlContext.Provider value={{ accessControl }}>
       {children}
-    </PodLocationContext.Provider>
+    </AccessControlContext.Provider>
   );
 }
 
-PodLocationProvider.propTypes = {
-  children: T.node,
-  currentUri: T.string.isRequired,
+AccessControlProvider.propTypes = {
+  children: T.node.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  accessControl: T.object.isRequired,
 };
 
-PodLocationProvider.defaultProps = {
-  children: null,
-};
-
-export { PodLocationProvider };
-export default PodLocationContext;
+export { AccessControlProvider };
+export default AccessControlContext;

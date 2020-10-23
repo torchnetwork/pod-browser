@@ -19,33 +19,39 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React, { createContext } from "react";
-import T from "prop-types";
-import useAuthenticatedProfile from "../../hooks/useAuthenticatedProfile";
-import usePodRootUri from "../../hooks/usePodRootUri";
+import useSWR from "swr";
+import * as solidClientFns from "@inrupt/solid-client";
+import { renderHook } from "@testing-library/react-hooks";
+import useResourceInfo, { GET_RESOURCE_INFO } from "./index";
 
-const PodLocationContext = createContext({
-  currentUri: "",
+jest.mock("swr");
+
+describe("useResourceInfo", () => {
+  const iri = "iri";
+
+  beforeEach(() => {
+    useSWR.mockReturnValue(42);
+    jest.spyOn(solidClientFns, "getResourceInfo").mockReturnValue(1337);
+  });
+
+  it("caches using SWR", () => {
+    expect(renderHook(() => useResourceInfo(iri)).result.current).toBe(42);
+    expect(useSWR).toHaveBeenCalledWith(
+      [iri, GET_RESOURCE_INFO],
+      expect.any(Function)
+    );
+  });
+
+  it("fetches data using getResourceInfo", () => {
+    renderHook(() => useResourceInfo(iri));
+    expect(useSWR.mock.calls[0][1]()).toBe(1337);
+    expect(solidClientFns.getResourceInfo).toHaveBeenCalledWith(iri, {
+      fetch: expect.any(Function),
+    });
+  });
+
+  it("handles string undefined being passed as iri", () => {
+    renderHook(() => useResourceInfo("undefined"));
+    expect(useSWR).toHaveBeenCalledWith(null, expect.any(Function));
+  });
 });
-
-function PodLocationProvider({ children, currentUri }) {
-  const { data: profile } = useAuthenticatedProfile();
-  const baseUri = usePodRootUri(currentUri, profile);
-  return (
-    <PodLocationContext.Provider value={{ baseUri, currentUri }}>
-      {children}
-    </PodLocationContext.Provider>
-  );
-}
-
-PodLocationProvider.propTypes = {
-  children: T.node,
-  currentUri: T.string.isRequired,
-};
-
-PodLocationProvider.defaultProps = {
-  children: null,
-};
-
-export { PodLocationProvider };
-export default PodLocationContext;

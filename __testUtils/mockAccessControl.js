@@ -19,33 +19,11 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React, { createContext } from "react";
-import T from "prop-types";
-import useAuthenticatedProfile from "../../hooks/useAuthenticatedProfile";
-import usePodRootUri from "../../hooks/usePodRootUri";
-
-const PodLocationContext = createContext({
-  currentUri: "",
-});
-
-function PodLocationProvider({ children, currentUri }) {
-  const { data: profile } = useAuthenticatedProfile();
-  const baseUri = usePodRootUri(currentUri, profile);
-  return (
-    <PodLocationContext.Provider value={{ baseUri, currentUri }}>
-      {children}
-    </PodLocationContext.Provider>
-  );
+export default function mockAccessControl(
+  { permissions } = { permissions: [] }
+) {
+  return {
+    getPermissions: async () => Promise.resolve(permissions),
+    savePermissionsForAgent: async () => ({ response: {} }),
+  };
 }
-
-PodLocationProvider.propTypes = {
-  children: T.node,
-  currentUri: T.string.isRequired,
-};
-
-PodLocationProvider.defaultProps = {
-  children: null,
-};
-
-export { PodLocationProvider };
-export default PodLocationContext;

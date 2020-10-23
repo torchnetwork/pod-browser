@@ -19,34 +19,36 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import { useEffect, useState } from "react";
 import { useSession } from "@inrupt/solid-ui-react";
-import { useEffect } from "react";
-import Router from "next/router";
 import useAuthenticatedProfile from "../useAuthenticatedProfile";
-import usePodRootUri from "../usePodRootUri";
+import { getPoliciesContainerUrl } from "../../accessControl/acp";
+import { getOrCreateContainer } from "../../solidClientHelpers/resource";
 import useResourceInfo from "../useResourceInfo";
-import { hasAccess } from "../../accessControl";
+import { hasLinkedAcr } from "../../accessControl/acp/mockedClientApi";
 
-export default function useRedirectIfNoControlAccessToOwnPod(
-  resourceUrl,
-  location = "/access-required"
-) {
-  const { fetch, sessionRequestInProgress } = useSession();
+export default function usePoliciesContainer() {
+  const [policiesContainer, setPoliciesContainer] = useState();
+  const { fetch } = useSession();
   const { data: profile } = useAuthenticatedProfile();
-  const podRootUri = usePodRootUri(resourceUrl, profile);
-  const profilePodUri =
-    podRootUri && profile
-      ? profile.pods.find((pod) => pod === podRootUri)
-      : null;
-  const { data: profilePod } = useResourceInfo(profilePodUri);
+  const podRootUri = profile?.pods[0];
+  const { data: podRoot, error: podRootError } = useResourceInfo(podRootUri);
+  const [error, setError] = useState(podRootError || null);
 
   useEffect(() => {
-    if (sessionRequestInProgress || !profile || !profilePod) {
+    if (!profile || podRootError || !podRoot || !hasLinkedAcr(podRoot)) {
+      setPoliciesContainer(null);
+      setError(podRootError || null);
       return;
     }
-    if (hasAccess(profilePod)) {
-      return;
-    }
-    Router.push(location);
-  }, [sessionRequestInProgress, profile, location, fetch, profilePod]);
+    const policiesUri = getPoliciesContainerUrl(podRootUri);
+    getOrCreateContainer(policiesUri, fetch).then(
+      ({ response, error: createError }) => {
+        setPoliciesContainer(response || null);
+        setError(createError || null);
+      }
+    );
+  }, [fetch, podRoot, podRootError, podRootUri, profile]);
+
+  return { policiesContainer, error };
 }

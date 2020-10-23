@@ -22,17 +22,26 @@
 import React from "react";
 import * as RouterFns from "next/router";
 
-import * as solidClientFns from "@inrupt/solid-client";
+import { mockSolidDatasetFrom } from "@inrupt/solid-client";
 import mockSession from "../../__testUtils/mockSession";
 import mockSessionContextProvider from "../../__testUtils/mockSessionContextProvider";
 import ResourceDrawer, { handleCloseDrawer } from "./index";
 import { mountToJson } from "../../__testUtils/mountWithTheme";
 import mockDetailsContextMenuProvider from "../../__testUtils/mockDetailsContextMenuProvider";
+import useResourceInfo from "../../src/hooks/useResourceInfo";
+import useAccessControl from "../../src/hooks/useAccessControl";
+import mockAccessControl from "../../__testUtils/mockAccessControl";
+
+jest.mock("../../src/hooks/useResourceInfo");
+jest.mock("../../src/hooks/useAccessControl");
 
 const iri = "/iri/";
 const iriWithSpaces = "/iri with spaces/";
 
 describe("ResourceDrawer view", () => {
+  const resourceInfo = mockSolidDatasetFrom(iri);
+
+  let accessControl;
   let fetch;
   let session;
   let SessionProvider;
@@ -42,6 +51,7 @@ describe("ResourceDrawer view", () => {
     fetch = jest.fn();
     session = mockSession({ fetch });
     SessionProvider = mockSessionContextProvider(session);
+    accessControl = mockAccessControl();
 
     jest.spyOn(RouterFns, "useRouter").mockReturnValue({
       asPath: "/pathname/",
@@ -51,6 +61,9 @@ describe("ResourceDrawer view", () => {
         action: "details",
       },
     });
+
+    useAccessControl.mockReturnValue({ accessControl });
+    useResourceInfo.mockReturnValue({ data: resourceInfo });
 
     DetailsMenuContext = mockDetailsContextMenuProvider({
       menuOpen: true,
@@ -113,20 +126,29 @@ describe("ResourceDrawer view", () => {
     expect(tree).toMatchSnapshot();
   });
 
-  it("fetches dataset with acl", () => {
-    jest
-      .spyOn(solidClientFns, "getResourceInfoWithAcl")
-      .mockResolvedValueOnce("datasetWithAcl");
-
-    const tree = mountToJson(
+  it("uses resource dataset", () => {
+    mountToJson(
       <SessionProvider>
         <DetailsMenuContext>
           <ResourceDrawer />
         </DetailsMenuContext>
       </SessionProvider>
     );
-    expect(tree).toMatchSnapshot();
-    expect(solidClientFns.getResourceInfoWithAcl).toHaveBeenCalled();
+    expect(useResourceInfo).toHaveBeenCalledWith(encodeURI(iri));
+  });
+
+  it("uses access control", () => {
+    mountToJson(
+      <SessionProvider>
+        <DetailsMenuContext>
+          <ResourceDrawer />
+        </DetailsMenuContext>
+      </SessionProvider>
+    );
+    expect(useAccessControl).toHaveBeenCalledWith(
+      resourceInfo,
+      expect.any(Function)
+    );
   });
 });
 

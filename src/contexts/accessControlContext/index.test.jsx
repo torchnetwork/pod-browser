@@ -19,28 +19,24 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { useEffect, useState } from "react";
+import React, { useContext } from "react";
+import { mount } from "enzyme";
+import AccessControlContext, { AccessControlProvider } from "./index";
 
-function normalizeBaseUri(baseUri) {
-  return baseUri[baseUri.length - 1] === "/" ? baseUri : `${baseUri}/`;
+function ChildComponent() {
+  const { accessControl } = useContext(AccessControlContext);
+  return <div id="AccessControl">{accessControl.toString()}</div>;
 }
 
-export default function usePodRoot(location, profile) {
-  const [rootUri, setRootUri] = useState(null);
-  useEffect(() => {
-    if (!location || location === "undefined") {
-      setRootUri(null);
-      return;
-    }
-    const profilePod = (profile ? profile.pods || [] : []).find((pod) =>
-      location.startsWith(pod)
+describe("AccessControlContext", () => {
+  test("it provides accessControl", () => {
+    const accessControl = "accessControl";
+    const component = mount(
+      <AccessControlProvider accessControl={{ toString: () => accessControl }}>
+        <ChildComponent />
+      </AccessControlProvider>
     );
-    if (profilePod) {
-      setRootUri(normalizeBaseUri(profilePod));
-      return;
-    }
-    const { origin } = new URL(location);
-    setRootUri(normalizeBaseUri(origin));
-  }, [location, profile]);
-  return rootUri;
-}
+
+    expect(component.find("#AccessControl").text()).toEqual(accessControl);
+  });
+});

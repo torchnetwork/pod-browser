@@ -19,33 +19,28 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React, { createContext } from "react";
-import T from "prop-types";
-import useAuthenticatedProfile from "../../hooks/useAuthenticatedProfile";
-import usePodRootUri from "../../hooks/usePodRootUri";
+import { useEffect, useState } from "react";
 
-const PodLocationContext = createContext({
-  currentUri: "",
-});
-
-function PodLocationProvider({ children, currentUri }) {
-  const { data: profile } = useAuthenticatedProfile();
-  const baseUri = usePodRootUri(currentUri, profile);
-  return (
-    <PodLocationContext.Provider value={{ baseUri, currentUri }}>
-      {children}
-    </PodLocationContext.Provider>
-  );
+function normalizeBaseUri(baseUri) {
+  return baseUri[baseUri.length - 1] === "/" ? baseUri : `${baseUri}/`;
 }
 
-PodLocationProvider.propTypes = {
-  children: T.node,
-  currentUri: T.string.isRequired,
-};
-
-PodLocationProvider.defaultProps = {
-  children: null,
-};
-
-export { PodLocationProvider };
-export default PodLocationContext;
+export default function usePodRootUri(location, profile) {
+  const [rootUri, setRootUri] = useState(null);
+  useEffect(() => {
+    if (!location || location === "undefined") {
+      setRootUri(null);
+      return;
+    }
+    const profilePod = (profile ? profile.pods || [] : []).find((pod) =>
+      location.startsWith(pod)
+    );
+    if (profilePod) {
+      setRootUri(normalizeBaseUri(profilePod));
+      return;
+    }
+    const { origin } = new URL(location);
+    setRootUri(normalizeBaseUri(origin));
+  }, [location, profile]);
+  return rootUri;
+}
