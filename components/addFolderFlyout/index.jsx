@@ -21,36 +21,20 @@
 
 import React, { useContext, useState } from "react";
 import PropTypes from "prop-types";
-import { createContainerAt } from "@inrupt/solid-client";
+import { createContainerAt, getSourceUrl } from "@inrupt/solid-client";
 import { makeStyles } from "@material-ui/core/styles";
 import { useSession } from "@inrupt/solid-ui-react";
-import {
-  Popover,
-  Button,
-  Typography,
-  FormControl,
-  Input,
-  InputLabel,
-} from "@material-ui/core";
+import { createStyles, Popover } from "@material-ui/core";
+import { Button, Form, Input } from "@inrupt/prism-react-components";
 import PodLocationContext from "../../src/contexts/podLocationContext";
 import AlertContext from "../../src/contexts/alertContext";
+import styles from "../addPermissionUsingWebIdButton/styles";
 
 const TESTCAFE_ID_ADD_FOLDER_BUTTON = "add-folder-button";
 const TESTCAFE_ID_FOLDER_NAME_INPUT = "folder-name-input";
 const TESTCAFE_ID_CREATE_FOLDER_FLYOUT_BUTTON = "create-folder-flyout-button";
 
-const useStyles = makeStyles((theme) => {
-  return {
-    typography: {
-      padding: theme.spacing(2),
-      display: "flex",
-      flexDirection: "column",
-    },
-    folderInput: {
-      padding: theme.spacing(2, 0),
-    },
-  };
-});
+const useStyles = makeStyles((theme) => createStyles(styles(theme)));
 
 export function determineFinalUrl(folders, currentUri, name) {
   let currentName = name;
@@ -82,8 +66,13 @@ export function handleFolderSubmit({
   setMessage,
   setAlertOpen,
   handleClose,
+  setFolderName,
 }) {
-  return async () => {
+  return async (event) => {
+    event.preventDefault();
+    if (!name) {
+      return;
+    }
     try {
       const url = determineFinalUrl(folders, currentUri, name);
       const response = await createContainerAt(url, options);
@@ -92,23 +81,17 @@ export function handleFolderSubmit({
       setSeverity("success");
       setMessage(
         `Your folder has been created at ${decodeURIComponent(
-          response.internal_resourceInfo.sourceIri
+          getSourceUrl(response)
         )}`
       );
       setAlertOpen(true);
+      setFolderName("");
       handleClose();
     } catch (error) {
       setSeverity("error");
       setMessage(error.toString());
       setAlertOpen(true);
     }
-  };
-}
-
-export function handleCreateFolderClick({ setFolderName, onSubmit }) {
-  return () => {
-    setFolderName("");
-    onSubmit();
   };
 }
 
@@ -153,9 +136,9 @@ export default function AddFolderFlyout({ onSave, className, resourceList }) {
     setMessage,
     setAlertOpen,
     handleClose,
+    setFolderName,
   });
 
-  const onClick = handleCreateFolderClick({ setFolderName, onSubmit });
   const onChange = handleChange(setFolderName);
 
   return (
@@ -173,6 +156,7 @@ export default function AddFolderFlyout({ onSave, className, resourceList }) {
         data-testid={id}
         open={open}
         anchorEl={anchorEl}
+        classes={classes}
         onClose={handleClose}
         anchorOrigin={{
           vertical: "bottom",
@@ -183,24 +167,21 @@ export default function AddFolderFlyout({ onSave, className, resourceList }) {
           horizontal: "center",
         }}
       >
-        <Typography className={classes.typography}>
-          <FormControl className={classes.folderInput}>
-            <InputLabel htmlFor="folder-input">Folder name</InputLabel>
-            <Input
-              data-testid={TESTCAFE_ID_FOLDER_NAME_INPUT}
-              onChange={onChange}
-              value={folderName}
-            />
-          </FormControl>
+        <Form onSubmit={(event) => onSubmit(event)}>
+          <Input
+            data-testid={TESTCAFE_ID_FOLDER_NAME_INPUT}
+            id="folder-input"
+            label="Folder name"
+            onChange={onChange}
+            value={folderName}
+          />
           <Button
             data-testid={TESTCAFE_ID_CREATE_FOLDER_FLYOUT_BUTTON}
-            variant="contained"
-            onClick={onClick}
-            disabled={folderName === ""}
+            type="submit"
           >
             Create Folder
           </Button>
-        </Typography>
+        </Form>
       </Popover>
     </>
   );

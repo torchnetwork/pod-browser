@@ -19,38 +19,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-const smallFontSize = {
-  fontSize: "0.75rem",
-};
-
 export default (theme) => ({
-  container: {
-    display: "block",
-    position: "relative",
-  },
-  listItem: {
-    paddingBottom: 0,
-    paddingTop: 0,
-  },
-  selectionClosed: {
-    display: "none",
-  },
-  selectionOpen: {
-    display: "block",
-  },
-  summary: {
-    listStyle: "none",
-    display: "flex",
-    flexWrap: "nowrap",
-    alignItems: "center",
-    justifyContent: "space-between",
-    textTransform: "inherit",
-    fontSize: theme.typography.body.fontSize,
-    maxWidth: "95%",
-    padding: theme.spacing(1.5, 2),
-  },
-  label: smallFontSize,
-  checkbox: {
-    padding: 0,
+  paper: {
+    padding: theme.spacing(2),
   },
 });
