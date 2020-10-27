@@ -45,7 +45,10 @@ const styles = (theme) =>
     },
     popover: {
       padding: theme.spacing(2, 2, 0),
-      width: 450,
+      maxWidth: "100vw",
+      [theme.breakpoints.up("sm")]: {
+        width: 450,
+      },
     },
   });
 
