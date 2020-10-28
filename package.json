@@ -32,7 +32,7 @@
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.56",
     "@sentry/node": "^5.23.0",
-    "@sentry/react": "^5.24.2",
+    "@sentry/react": "^5.25.0",
     "@solid/lit-prism-patterns": "0.10.1",
     "@solid/lit-prism-theme-sdk-default": "0.10.1",
     "@zeit/next-source-maps": "0.0.4-canary.1",
