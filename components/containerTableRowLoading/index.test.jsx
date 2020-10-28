@@ -20,18 +20,15 @@
  */
 
 import React from "react";
-import Link from "next/link";
+import { shallow } from "enzyme";
+import { shallowToJson } from "enzyme-to-json";
+import ContainerTableRowSkeleton from "./index";
 
-export default function Custom404() {
-  return (
-    <>
-      <h1>500 - Unhandled server error</h1>
-      <p>
-        This error has been logged.
-        <Link href="/">
-          <a>Return to the home page.</a>
-        </Link>
-      </p>
-    </>
-  );
-}
+describe("ContainerTableRowSkeleton", () => {
+  test("Renders a ContainerTableRowSkeleton", () => {
+    const tree = shallow(
+      <ContainerTableRowSkeleton iri="https://example.com/resource" />
+    );
+    expect(shallowToJson(tree)).toMatchSnapshot();
+  });
+});

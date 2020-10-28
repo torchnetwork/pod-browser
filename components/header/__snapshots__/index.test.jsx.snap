@@ -1230,7 +1230,6 @@ font-display: block;",
                               },
                               "render": [Function],
                             },
-                            "displayName": "WithStyles(ForwardRef(Backdrop))",
                             "options": Object {
                               "defaultTheme": Object {
                                 "breakpoints": Object {

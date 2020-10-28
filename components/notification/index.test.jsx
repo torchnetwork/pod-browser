@@ -19,10 +19,14 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React, { ReactElement } from "react";
+import React from "react";
+import { shallow } from "enzyme";
+import { shallowToJson } from "enzyme-to-json";
+import Notification from "./index";
 
-import LoginPage from "../components/pages/login";
-
-export default function Login(): ReactElement {
-  return <LoginPage />;
-}
+describe("Notification", () => {
+  test("Renders a Notification", () => {
+    const tree = shallow(<Notification />);
+    expect(shallowToJson(tree)).toMatchSnapshot();
+  });
+});

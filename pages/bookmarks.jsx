@@ -20,18 +20,8 @@
  */
 
 import React from "react";
-import Link from "next/link";
+import BookmarksPage from "../components/pages/bookmarks";
 
-export default function Custom404() {
-  return (
-    <>
-      <h1>500 - Unhandled server error</h1>
-      <p>
-        This error has been logged.
-        <Link href="/">
-          <a>Return to the home page.</a>
-        </Link>
-      </p>
-    </>
-  );
+export default function Contacts() {
+  return <BookmarksPage />;
 }

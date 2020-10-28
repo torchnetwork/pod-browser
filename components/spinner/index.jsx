@@ -19,8 +19,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import BookmarksPage from "../../components/pages/bookmarks";
+import React from "react";
+import { LoadingIndicator } from "@inrupt/prism-react-components";
 
-export default function Contacts() {
-  return <BookmarksPage />;
+export default function Spinner() {
+  return <LoadingIndicator center />;
 }

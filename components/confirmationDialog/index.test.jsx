@@ -19,10 +19,14 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React, { ReactElement } from "react";
+import React from "react";
+import { shallow } from "enzyme";
+import { shallowToJson } from "enzyme-to-json";
+import ConfirmationDialog from "./index";
 
-import IndexPage from "../components/pages/index";
-
-export default function Index(): ReactElement {
-  return <IndexPage />;
-}
+describe("ConfirmationDialog", () => {
+  test("Renders a ConfirmationDialog", () => {
+    const tree = shallow(<ConfirmationDialog />);
+    expect(shallowToJson(tree)).toMatchSnapshot();
+  });
+});

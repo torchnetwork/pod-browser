@@ -19,10 +19,10 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React, { ReactElement } from "react";
+import React from "react";
 
-import ResourcePage from "../../components/pages/resource";
+import LoginPage from "../components/pages/login";
 
-export default function Resource(): ReactElement {
-  return <ResourcePage />;
+export default function Login() {
+  return <LoginPage />;
 }
