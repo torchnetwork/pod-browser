@@ -19,9 +19,36 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { PrismTheme, createStyles } from "@solid/lit-prism-patterns";
+import { createStyles } from "@solid/lit-prism-patterns";
 
-const styles = (theme: PrismTheme) =>
-  createStyles(theme, ["icons", "headerBanner"]);
+const styles = (theme) =>
+  createStyles(theme, ["icons", "headerBanner", "buttons"], {
+    icon: theme.icons.iconColor(theme.palette.primary.main),
+    "icon-close": {
+      ...theme.icons.iconColor(theme.palette.primary.text),
+      fontSize: theme.typography.h1.fontSize,
+    },
+    "menu-drawer-item__text": {
+      fontSize: theme.typography.body.fontSize,
+      fontWeight: theme.typography.fontWeightLight,
+    },
+    "menu-drawer-item__link": {
+      "text-decoration": "underline",
+    },
+    drawerContainer: {
+      borderRadius: `0 0 
+      ${theme.shape.borderRadius * 2.5}px 
+      ${theme.shape.borderRadius * 2.5}px`,
+    },
+    hamburgerMenu: {
+      fontSize: theme.typography.body.fontSize,
+      display: "flex",
+      width: "100%",
+      justifyContent: "flex-end",
+      [theme.breakpoints.up("sm")]: {
+        display: "none",
+      },
+    },
+  });
 
 export default styles;
