@@ -19,22 +19,10 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { createStyles, table } from "@solid/lit-prism-patterns";
+import React from "react";
 
-const styles = (theme) => {
-  const tableStyles = table.styles(theme);
-  return createStyles(theme, ["table", "icons"], {
-    table: {
-      "& tbody td": {
-        "&:first-child": tableStyles["table__body-cell--width-preview"],
-      },
-      "& tbody a": tableStyles.table__link,
-    },
-    avatar: {
-      width: "30px",
-      height: "30px",
-    },
-  });
-};
+import ProfilePage from "../components/pages/profile";
 
-export default styles;
+export default function Profile() {
+  return <ProfilePage />;
+}

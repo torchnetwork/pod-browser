@@ -19,22 +19,15 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { createStyles, table } from "@solid/lit-prism-patterns";
+import React from "react";
+import { useRouter } from "next/router";
+import { useRedirectIfLoggedOut } from "../../../../src/effects/auth";
+import Profile from "../../../profile";
 
-const styles = (theme) => {
-  const tableStyles = table.styles(theme);
-  return createStyles(theme, ["table", "icons"], {
-    table: {
-      "& tbody td": {
-        "&:first-child": tableStyles["table__body-cell--width-preview"],
-      },
-      "& tbody a": tableStyles.table__link,
-    },
-    avatar: {
-      width: "30px",
-      height: "30px",
-    },
-  });
-};
+export default function ContactShow() {
+  useRedirectIfLoggedOut();
+  const router = useRouter();
+  const decodedIri = decodeURIComponent(router.query.iri);
 
-export default styles;
+  return <Profile profileIri={decodedIri} />;
+}

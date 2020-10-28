@@ -19,22 +19,35 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { createStyles, table } from "@solid/lit-prism-patterns";
+import React from "react";
+import * as RouterFns from "next/router";
+import { mountToJson } from "../../../../__testUtils/mountWithTheme";
+import mockSessionContextProvider from "../../../../__testUtils/mockSessionContextProvider";
+import mockSession from "../../../../__testUtils/mockSession";
 
-const styles = (theme) => {
-  const tableStyles = table.styles(theme);
-  return createStyles(theme, ["table", "icons"], {
-    table: {
-      "& tbody td": {
-        "&:first-child": tableStyles["table__body-cell--width-preview"],
+import ContactPage from "./index";
+
+jest.mock("../../../../src/effects/auth");
+
+describe("Contact show page", () => {
+  test("Renders the Contact show page", () => {
+    jest.spyOn(RouterFns, "useRouter").mockReturnValue({
+      asPath: "/pathname/",
+      replace: jest.fn(),
+      query: {
+        iri: "https://example.com/profile/card#me",
       },
-      "& tbody a": tableStyles.table__link,
-    },
-    avatar: {
-      width: "30px",
-      height: "30px",
-    },
-  });
-};
+    });
 
-export default styles;
+    const session = mockSession();
+    const SessionProvider = mockSessionContextProvider(session);
+
+    const tree = mountToJson(
+      <SessionProvider>
+        <ContactPage />
+      </SessionProvider>
+    );
+
+    expect(tree).toMatchSnapshot();
+  });
+});

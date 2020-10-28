@@ -19,22 +19,20 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { createStyles, table } from "@solid/lit-prism-patterns";
+import React from "react";
+import { mountToJson } from "../../__testUtils/mountWithTheme";
+import Profile from "./index";
 
-const styles = (theme) => {
-  const tableStyles = table.styles(theme);
-  return createStyles(theme, ["table", "icons"], {
-    table: {
-      "& tbody td": {
-        "&:first-child": tableStyles["table__body-cell--width-preview"],
-      },
-      "& tbody a": tableStyles.table__link,
-    },
-    avatar: {
-      width: "30px",
-      height: "30px",
-    },
+const profileIri = "https://example.com/profile/card#me";
+
+describe("Profile", () => {
+  test("renders a profile", () => {
+    const tree = mountToJson(<Profile profileIri={profileIri} />);
+    expect(tree).toMatchSnapshot();
   });
-};
 
-export default styles;
+  test("renders an editable profile", () => {
+    const tree = mountToJson(<Profile profileIri={profileIri} editing />);
+    expect(tree).toMatchSnapshot();
+  });
+});

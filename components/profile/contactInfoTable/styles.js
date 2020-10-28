@@ -23,16 +23,20 @@ import { createStyles, table } from "@solid/lit-prism-patterns";
 
 const styles = (theme) => {
   const tableStyles = table.styles(theme);
-  return createStyles(theme, ["table", "icons"], {
+  return createStyles(theme, ["table", "button", "input"], {
     table: {
       "& tbody td": {
-        "&:first-child": tableStyles["table__body-cell--width-preview"],
+        "&:nth-child(1)": {
+          ...tableStyles["table__body-cell--width-preview"],
+          "padding-right": "1.85em",
+        },
+        "&:nth-child(2)": {
+          width: "100%",
+        },
+        "&:nth-child(3)": {
+          width: "10em",
+        },
       },
-      "& tbody a": tableStyles.table__link,
-    },
-    avatar: {
-      width: "30px",
-      height: "30px",
     },
   });
 };

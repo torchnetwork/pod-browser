@@ -19,22 +19,39 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { createStyles, table } from "@solid/lit-prism-patterns";
+import React from "react";
+import T from "prop-types";
+import Link from "next/link";
+import { useThing } from "@inrupt/solid-ui-react";
+import { getStringNoLocale, asUrl } from "@inrupt/solid-client";
+import { vcard, foaf } from "rdf-namespaces";
 
-const styles = (theme) => {
-  const tableStyles = table.styles(theme);
-  return createStyles(theme, ["table", "icons"], {
-    table: {
-      "& tbody td": {
-        "&:first-child": tableStyles["table__body-cell--width-preview"],
-      },
-      "& tbody a": tableStyles.table__link,
-    },
-    avatar: {
-      width: "30px",
-      height: "30px",
-    },
-  });
+export function buildProfileLink(iri) {
+  return `/contacts/${encodeURIComponent(iri)}`;
+}
+
+export default function ProfileLink(props) {
+  const { iri } = props;
+  const { thing } = useThing();
+
+  // Pass in an iri, or use the thing from context (such as for the contacts list)
+  const profileIri = iri || asUrl(thing);
+
+  // TODO remove this once react-sdk allows property fallbacks
+  const name =
+    getStringNoLocale(thing, vcard.fn) || getStringNoLocale(thing, foaf.name);
+
+  return (
+    <Link href="/contacts/[show]" as={buildProfileLink(profileIri)}>
+      {name}
+    </Link>
+  );
+}
+
+ProfileLink.propTypes = {
+  iri: T.string,
 };
 
-export default styles;
+ProfileLink.defaultProps = {
+  iri: null,
+};

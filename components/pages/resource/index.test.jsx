@@ -32,7 +32,7 @@ jest.mock("../../../src/effects/auth");
 jest.mock("next/router");
 jest.mock("../../../src/hooks/useRedirectIfNoControlAccessToOwnPod");
 
-describe("Index page", () => {
+describe("Resource page", () => {
   beforeEach(() => {
     useRouter.mockImplementation(() => ({
       query: {
@@ -41,7 +41,7 @@ describe("Index page", () => {
     }));
   });
 
-  test("Renders a logout button", () => {
+  test("Renders the resource page", () => {
     const tree = shallow(<IndexPage />);
     expect(shallowToJson(tree)).toMatchSnapshot();
   });

@@ -27,7 +27,7 @@ import LoginPage from "./index";
 jest.mock("../../../src/effects/auth");
 
 describe("Login page", () => {
-  test("Renders a logout button", () => {
+  test("Renders a login button", () => {
     const tree = mountToJson(<LoginPage />);
     expect(tree).toMatchSnapshot();
   });

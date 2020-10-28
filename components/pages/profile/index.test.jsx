@@ -19,22 +19,26 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { createStyles, table } from "@solid/lit-prism-patterns";
+import React from "react";
+import { mountToJson } from "../../../__testUtils/mountWithTheme";
+import mockSessionContextProvider from "../../../__testUtils/mockSessionContextProvider";
+import mockSession from "../../../__testUtils/mockSession";
 
-const styles = (theme) => {
-  const tableStyles = table.styles(theme);
-  return createStyles(theme, ["table", "icons"], {
-    table: {
-      "& tbody td": {
-        "&:first-child": tableStyles["table__body-cell--width-preview"],
-      },
-      "& tbody a": tableStyles.table__link,
-    },
-    avatar: {
-      width: "30px",
-      height: "30px",
-    },
+import ProfilePage from "./index";
+
+jest.mock("../../../src/effects/auth");
+
+describe("Profile page", () => {
+  test("Renders the profile page", () => {
+    const session = mockSession();
+    const SessionProvider = mockSessionContextProvider(session);
+
+    const tree = mountToJson(
+      <SessionProvider>
+        <ProfilePage />
+      </SessionProvider>
+    );
+
+    expect(tree).toMatchSnapshot();
   });
-};
-
-export default styles;
+});
