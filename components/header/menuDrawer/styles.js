@@ -28,12 +28,18 @@ const styles = (theme) =>
       ...theme.icons.iconColor(theme.palette.primary.text),
       fontSize: theme.typography.h1.fontSize,
     },
+    "menu-drawer-item": {
+      padding: theme.spacing(1),
+    },
     "menu-drawer-item__text": {
       fontSize: theme.typography.body.fontSize,
       fontWeight: theme.typography.fontWeightLight,
     },
     "menu-drawer-item__link": {
       "text-decoration": "underline",
+      "&:visited": {
+        color: "inherit",
+      },
     },
     drawerContainer: {
       borderRadius: `0 0 
