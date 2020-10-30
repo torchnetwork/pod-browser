@@ -1243,20 +1243,6 @@ font-display: block;",
                                               <li
                                                 className="PodBrowser-action-menu__item"
                                               >
-                                                <button
-                                                  className="PodBrowser-action-menu__trigger"
-                                                  data-testid="share-permissions-button"
-                                                  onClick={[Function]}
-                                                  type="button"
-                                                >
-                                                  Sharing & App Permissions
-                                                </button>
-                                              </li>
-                                            </ActionMenuItem>
-                                            <ActionMenuItem>
-                                              <li
-                                                className="PodBrowser-action-menu__item"
-                                              >
                                                 <DeleteResourceLink
                                                   className="PodBrowser-action-menu__trigger PodBrowser-action-menu__trigger--danger"
                                                   data-testid="download-resource-button"
@@ -1794,10 +1780,7 @@ font-display: block;",
               </WithStyles(ForwardRef(Paper))>
             </ForwardRef(Accordion)>
           </WithStyles(ForwardRef(Accordion))>
-          <WithStyles(ForwardRef(Accordion))
-            expanded={false}
-            onChange={[Function]}
-          >
+          <WithStyles(ForwardRef(Accordion))>
             <ForwardRef(Accordion)
               classes={
                 Object {
@@ -1807,8 +1790,6 @@ font-display: block;",
                   "rounded": "PodBrowser-rounded",
                 }
               }
-              expanded={false}
-              onChange={[Function]}
             >
               <WithStyles(ForwardRef(Paper))
                 className="PodBrowser-root PodBrowser-rounded"
@@ -3888,20 +3869,6 @@ font-display: block;",
                                               <li
                                                 className="PodBrowser-action-menu__item"
                                               >
-                                                <button
-                                                  className="PodBrowser-action-menu__trigger"
-                                                  data-testid="share-permissions-button"
-                                                  onClick={[Function]}
-                                                  type="button"
-                                                >
-                                                  Sharing & App Permissions
-                                                </button>
-                                              </li>
-                                            </ActionMenuItem>
-                                            <ActionMenuItem>
-                                              <li
-                                                className="PodBrowser-action-menu__item"
-                                              >
                                                 <DeleteResourceLink
                                                   className="PodBrowser-action-menu__trigger PodBrowser-action-menu__trigger--danger"
                                                   data-testid="download-resource-button"
@@ -4439,10 +4406,7 @@ font-display: block;",
               </WithStyles(ForwardRef(Paper))>
             </ForwardRef(Accordion)>
           </WithStyles(ForwardRef(Accordion))>
-          <WithStyles(ForwardRef(Accordion))
-            expanded={false}
-            onChange={[Function]}
-          >
+          <WithStyles(ForwardRef(Accordion))>
             <ForwardRef(Accordion)
               classes={
                 Object {
@@ -4452,8 +4416,6 @@ font-display: block;",
                   "rounded": "PodBrowser-rounded",
                 }
               }
-              expanded={false}
-              onChange={[Function]}
             >
               <WithStyles(ForwardRef(Paper))
                 className="PodBrowser-root PodBrowser-rounded"
