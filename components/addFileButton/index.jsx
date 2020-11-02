@@ -19,9 +19,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import T from "prop-types";
-import { getSourceUrl, overwriteFile } from "@inrupt/solid-client";
+import { overwriteFile } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
 import PodLocationContext from "../../src/contexts/podLocationContext";
 import AlertContext from "../../src/contexts/alertContext";
@@ -31,6 +31,10 @@ import { joinPath } from "../../src/stringHelpers";
 const TESTCAFE_ID_UPLOAD_BUTTON = "upload-file-button";
 const TESTCAFE_ID_UPLOAD_INPUT = "upload-file-input";
 export const DUPLICATE_DIALOG_ID = "upload-duplicate-file";
+
+function normalizeSafeFileName(fileName) {
+  return fileName.replace(/^-/, "");
+}
 
 export function handleSaveResource({
   fetch,
@@ -43,8 +47,9 @@ export function handleSaveResource({
 }) {
   return async (uploadedFile) => {
     try {
-      const response = await overwriteFile(
-        joinPath(currentUri, encodeURIComponent(uploadedFile.name)),
+      const fileName = normalizeSafeFileName(uploadedFile.name);
+      await overwriteFile(
+        joinPath(currentUri, encodeURIComponent(fileName)),
         uploadedFile,
         {
           type: uploadedFile.type,
@@ -55,11 +60,7 @@ export function handleSaveResource({
       onSave();
 
       setSeverity("success");
-      setMessage(
-        `Your file has been saved to ${decodeURIComponent(
-          getSourceUrl(response)
-        )}`
-      );
+      setMessage(`Your file has been uploaded as ${fileName}`);
       setAlertOpen(true);
     } catch (error) {
       setSeverity("error");
@@ -82,7 +83,9 @@ export function handleUploadedFile({
   return (uploadedFile, existingFile) => {
     if (existingFile) {
       setOpen(DUPLICATE_DIALOG_ID);
-      setTitle(`File ${uploadedFile.name} already exists`);
+      setTitle(
+        `File ${normalizeSafeFileName(uploadedFile.name)} already exists`
+      );
       setContent(<p>Do you want to replace it?</p>);
       setConfirmationSetup(true);
       setIsUploading(false);
@@ -109,9 +112,9 @@ export function handleFileSelect({
         const [uploadedFile] = e.target.files;
         setFile(uploadedFile);
         try {
-          const existingFile = resourceList.filter(
-            (resource) => resource.name === uploadedFile.name
-          ).length;
+          const existingFile = !!resourceList.find(
+            (file) => file.name === normalizeSafeFileName(uploadedFile.name)
+          );
           saveUploadedFile(uploadedFile, existingFile);
         } catch (error) {
           setSeverity("error");
