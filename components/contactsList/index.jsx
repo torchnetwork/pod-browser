@@ -30,9 +30,14 @@ import {
   PageHeader,
   Table as PrismTable,
 } from "@inrupt/prism-react-components";
-import { getSourceUrl, getUrl, getStringNoLocale } from "@inrupt/solid-client";
+import {
+  getSourceUrl,
+  getStringNoLocale,
+  getThingAll,
+  asUrl,
+} from "@inrupt/solid-client";
 import { Table, TableColumn, useSession } from "@inrupt/solid-ui-react";
-import { vcard, foaf } from "rdf-namespaces";
+import { vcard } from "rdf-namespaces";
 import SortedTableCarat from "../sortedTableCarat";
 import Spinner from "../spinner";
 import styles from "./styles";
@@ -63,8 +68,12 @@ export function handleDeleteContact({
 }) {
   return async () => {
     const selectedContact = people[selectedContactIndex];
-    await deleteContact(getSourceUrl(addressBook), selectedContact, fetch);
-    peopleMutate();
+    const { response: updatedDataset } = await deleteContact(
+      getSourceUrl(addressBook),
+      selectedContact,
+      fetch
+    );
+    peopleMutate(updatedDataset);
     closeDrawer();
   };
 }
@@ -72,23 +81,32 @@ export function handleDeleteContact({
 function ContactsList() {
   useRedirectIfLoggedOut();
 
+  const {
+    session: { fetch },
+  } = useSession();
+
   const tableClass = PrismTable.useTableClass("table", "inherits");
   const classes = useStyles();
   const bem = useBem(classes);
   const actionClass = PageHeader.usePageHeaderActionClassName();
   const [search, setSearch] = useState("");
-
+  const [people, setPeople] = useState(null);
   const [addressBook, addressBookError] = useAddressBook();
-  const { data: people, error: peopleError, mutate: peopleMutate } = usePeople(
-    addressBook
-  );
+  const {
+    data: peopleDataset,
+    error: peopleError,
+    mutate: peopleMutate,
+  } = usePeople(addressBook);
+
+  useEffect(() => {
+    if (!peopleDataset) return;
+    const peopleThings = getThingAll(peopleDataset, { fetch });
+    setPeople(peopleThings);
+  }, [peopleDataset, fetch]);
+
   const profiles = useProfiles(people);
   const formattedNamePredicate = vcard.fn;
   const hasPhotoPredicate = vcard.hasPhoto;
-
-  const {
-    session: { fetch },
-  } = useSession();
 
   const [selectedContactIndex, setSelectedContactIndex] = useState(null);
   const [selectedContactName, setSelectedContactName] = useState("");
@@ -97,14 +115,15 @@ function ContactsList() {
   useEffect(() => {
     if (selectedContactIndex === null) return;
     const name = getStringNoLocale(
-      people[selectedContactIndex].dataset,
+      profiles[selectedContactIndex],
       formattedNamePredicate
     );
     setSelectedContactName(name);
 
-    const webId = getUrl(people[selectedContactIndex].dataset, foaf.openid);
+    const webId = asUrl(profiles[selectedContactIndex]);
+
     setSelectedContactWebId(webId);
-  }, [selectedContactIndex, formattedNamePredicate, people]);
+  }, [selectedContactIndex, formattedNamePredicate, profiles, people]);
 
   if (addressBookError) return addressBookError;
   if (peopleError) return peopleError;

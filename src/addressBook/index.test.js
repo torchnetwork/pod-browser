@@ -25,13 +25,11 @@ import * as solidClientFns from "@inrupt/solid-client";
 import * as resourceFns from "../solidClientHelpers/resource";
 
 import { mockPersonDatasetAlice } from "../../__testUtils/mockPersonResource";
-import { mockPersonContactDataset } from "../../__testUtils/mockContactResource";
 
 import {
   createAddressBook,
   createContact,
   getGroups,
-  getContacts,
   getProfiles,
   getSchemaFunction,
   mapSchema,
@@ -266,69 +264,18 @@ describe("getSchemaOperations", () => {
   });
 });
 
-describe("getContacts", () => {
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-  test("it fetches the people in the address book", async () => {
-    const containerIri = "https://user.example.com/contacts";
-    const fetch = jest.fn();
-    const personContainer1 = "https://user.example.com/contacts/Person/1234/";
-    const personContainer2 = "https://user.example.com/contacts/Person/5678/";
-    const expectedPerson1 = {
-      dataset: "Person 1",
-      iri: `${personContainer1}index.ttl`,
-    };
-    const expectedPerson2 = {
-      dataset: "Person 2",
-      iri: `${personContainer2}index.ttl`,
-    };
-
-    jest
-      .spyOn(resourceFns, "getResource")
-      .mockResolvedValueOnce({ response: { dataset: "people container" } })
-      .mockResolvedValueOnce({ response: expectedPerson1 })
-      .mockResolvedValueOnce({ response: expectedPerson2 });
-
-    jest
-      .spyOn(solidClientFns, "getUrlAll")
-      .mockReturnValueOnce([expectedPerson1.iri, expectedPerson2.iri]);
-
-    const {
-      response: [person1, person2],
-    } = await getContacts(foaf.Person, containerIri, fetch);
-
-    expect(person1).toEqual(expectedPerson1);
-    expect(person2).toEqual(expectedPerson2);
-  });
-  test("it returns an error if it can't fetch the people container", async () => {
-    const containerIri = "https://user.example.com/contacts";
-    const fetch = jest.fn();
-
-    jest
-      .spyOn(resourceFns, "getResource")
-      .mockResolvedValueOnce({ error: "There was an error" });
-
-    const { error } = await getContacts(foaf.Person, containerIri, fetch);
-
-    expect(error).toEqual("There was an error");
-  });
-});
-
 describe("getProfiles", () => {
   afterEach(() => {
     jest.restoreAllMocks();
   });
-  test("it fetches the profiles of the given people contacts", async () => {
+  test("it fetches the profiles of the given people things", async () => {
     const fetch = jest.fn();
-    const person1 = {
-      dataset: "Person 1",
-      iri: "https://user.example.com/contacts/Person/1234/index.ttl",
-    };
-    const person2 = {
-      dataset: "Person 2",
-      iri: "https://user.example.com/contacts/Person/1234/index.ttl",
-    };
+    const person1 = solidClientFns.mockThingFrom(
+      "https://user.example.com/contacts/Person/1234/index.ttl"
+    );
+    const person2 = solidClientFns.mockThingFrom(
+      "https://user.example.com/contacts/Person/1234/index.ttl"
+    );
     const expectedProfile1 = {
       webId: "http://testperson.example.com/profile/card#me",
     };
@@ -342,6 +289,15 @@ describe("getProfiles", () => {
     const mockThingProfile2 = solidClientFns.mockThingFrom(
       expectedProfile2.webId
     );
+
+    jest
+      .spyOn(resourceFns, "getResource")
+      .mockResolvedValueOnce({
+        response: { dataset: "Profile 1", iri: expectedProfile1.webId },
+      })
+      .mockResolvedValueOnce({
+        response: { dataset: "Profile 2", iri: expectedProfile2.webId },
+      });
 
     jest
       .spyOn(resourceFns, "getResource")
@@ -383,6 +339,15 @@ describe("getProfiles", () => {
     const mockThingProfile = solidClientFns.mockThingFrom(
       expectedProfile.webId
     );
+
+    jest
+      .spyOn(resourceFns, "getResource")
+      .mockResolvedValueOnce({
+        response: { dataset: "Profile 1", iri: expectedProfile.webId },
+      })
+      .mockResolvedValueOnce({
+        response: { dataset: "Profile 2", iri: expectedProfile.webId },
+      });
 
     jest
       .spyOn(resourceFns, "getResource")
@@ -482,12 +447,7 @@ describe("deleteContact", () => {
   const owner = "https://example.com/card#me";
   const contactContainerUrl = "http://example.com/contact/id-001/";
   const contactUrl = `${contactContainerUrl}index.ttl`;
-
-  const contactToDelete = {
-    iri: contactUrl,
-    dataset: mockPersonContactDataset(),
-  };
-
+  const contactToDelete = solidClientFns.mockThingFrom(contactUrl);
   const addressBook = createAddressBook({ iri: addressBookUrl, owner });
   const newAddressBook = createAddressBook({ iri: addressBookUrl, owner });
 

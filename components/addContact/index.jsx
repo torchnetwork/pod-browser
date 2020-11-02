@@ -37,6 +37,7 @@ import AlertContext from "../../src/contexts/alertContext";
 import { useRedirectIfLoggedOut } from "../../src/effects/auth";
 import styles from "./styles";
 import { fetchProfile } from "../../src/solidClientHelpers/profile";
+import usePeople from "../../src/hooks/usePeople";
 
 const useStyles = makeStyles((theme) => createStyles(styles(theme)));
 export const EXISTING_WEBID_ERROR_MESSAGE =
@@ -53,6 +54,8 @@ export function handleSubmit({
   alertSuccess,
   fetch,
   setDirtyForm,
+  peopleDataset,
+  peopleMutate,
 }) {
   return async (iri) => {
     setDirtyForm(true);
@@ -66,7 +69,7 @@ export function handleSubmit({
       const { name, webId, types } = await fetchProfile(iri, fetch);
 
       const existingContact = await findContactInAddressBook(
-        addressBookIri,
+        peopleDataset,
         webId,
         fetch
       );
@@ -90,6 +93,7 @@ export function handleSubmit({
         if (response) {
           alertSuccess(`${contact.fn} was added to your contacts`);
           setAgentId("");
+          peopleMutate();
         }
       } else {
         alertError(NO_NAME_ERROR_MESSAGE);
@@ -120,6 +124,7 @@ export default function AddContact() {
   const [isLoading, setIsLoading] = useState(false);
   const [agentId, setAgentId] = useState("");
   const [dirtyForm, setDirtyForm] = useState(false);
+  const { data: peopleDataset, mutate: peopleMutate } = usePeople(addressBook);
 
   if (!webId || isLoading) return <Spinner />;
 
@@ -132,6 +137,8 @@ export default function AddContact() {
     fetch,
     webId,
     setDirtyForm,
+    peopleDataset,
+    peopleMutate,
   });
 
   const handleChange = (newValue) => {

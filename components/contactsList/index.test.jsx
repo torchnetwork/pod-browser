@@ -64,8 +64,12 @@ describe("ContactsList", () => {
 
   it("renders spinner while usePeople is loading", () => {
     useAddressBook.mockReturnValue([42, null]);
+    const peopleDatasetUri = "https://example.org/contacts/people.ttl";
+    const mockPeopleDataset = solidClientFns.mockSolidDatasetFrom(
+      peopleDatasetUri
+    );
     usePeople.mockReturnValue({
-      data: undefined,
+      data: mockPeopleDataset,
       error: undefined,
       mutate: () => {},
     });
@@ -82,14 +86,19 @@ describe("ContactsList", () => {
   });
 
   it("renders spinner while useProfiles is loading", () => {
+    const peopleDatasetUri = "https://example.org/contacts/people.ttl";
+    const mockPeopleDataset = solidClientFns.mockSolidDatasetFrom(
+      peopleDatasetUri
+    );
+    const mockPeopleArray = [mockPersonDatasetAlice(), mockPersonDatasetBob()];
     useAddressBook.mockReturnValue([42, null]);
     usePeople.mockReturnValue({
-      data: "peopleData",
+      data: mockPeopleDataset,
       error: undefined,
       mutate: () => {},
     });
     useProfiles.mockReturnValue(null);
-
+    jest.spyOn(solidClientFns, "getThingAll").mockReturnValue(mockPeopleArray);
     expect(
       mountToJson(
         <SessionProvider>
@@ -97,7 +106,7 @@ describe("ContactsList", () => {
         </SessionProvider>
       )
     ).toMatchSnapshot();
-    expect(useProfiles).toHaveBeenCalledWith("peopleData");
+    expect(useProfiles).toHaveBeenCalledWith(mockPeopleArray);
   });
 
   it("renders error if useAddressBook returns error", () => {
@@ -118,9 +127,13 @@ describe("ContactsList", () => {
   });
 
   it("renders page when people is loaded", () => {
+    const peopleDatasetUri = "https://example.org/contacts/people.ttl";
+    const mockPeopleDataset = solidClientFns.mockSolidDatasetFrom(
+      peopleDatasetUri
+    );
     useAddressBook.mockReturnValue([42, null]);
     usePeople.mockReturnValue({
-      data: "peopleData",
+      data: mockPeopleDataset,
       error: undefined,
       mutate: () => {},
     });
@@ -167,7 +180,13 @@ describe("handleDeleteContact", () => {
     const peopleMutate = jest.fn();
     const selectedContactIndex = 0;
 
+    const peopleDatasetUri = "https://example.org/contacts/people.ttl";
+    const mockPeopleDataset = solidClientFns.mockSolidDatasetFrom(
+      peopleDatasetUri
+    );
+
     jest.spyOn(solidClientFns, "getSourceUrl").mockReturnValue(addressBookUrl);
+    deleteContact.mockResolvedValue(mockPeopleDataset);
 
     const handler = handleDeleteContact({
       addressBook,

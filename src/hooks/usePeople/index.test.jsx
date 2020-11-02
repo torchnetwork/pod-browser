@@ -21,13 +21,11 @@
 
 import React from "react";
 import { renderHook } from "@testing-library/react-hooks";
-import { mockSolidDatasetFrom } from "@inrupt/solid-client";
+import * as solidClientFns from "@inrupt/solid-client";
 import { cache, SWRConfig } from "swr";
-import { foaf } from "rdf-namespaces";
 import usePeople from "./index";
 import mockSession from "../../../__testUtils/mockSession";
 import mockSessionContextProvider from "../../../__testUtils/mockSessionContextProvider";
-import { getContacts } from "../../addressBook";
 
 jest.mock("../../addressBook");
 
@@ -49,9 +47,8 @@ describe("usePeople", () => {
   describe("with address book", () => {
     let session;
     let wrapper;
-    const response = 42;
     const addressBookUrl = "http://example.com/contacts/index.ttl";
-    const addressBook = mockSolidDatasetFrom(addressBookUrl);
+    const addressBook = solidClientFns.mockSolidDatasetFrom(addressBookUrl);
 
     beforeEach(() => {
       session = mockSession();
@@ -67,48 +64,23 @@ describe("usePeople", () => {
     afterEach(() => {
       cache.clear();
     });
+    const peopleDatasetUrl = "http://example.com/contacts/people.ttl";
+    const mockPeopleDataset = solidClientFns.mockSolidDatasetFrom(
+      peopleDatasetUrl
+    );
+    jest
+      .spyOn(solidClientFns, "getSolidDataset")
+      .mockResolvedValue(mockPeopleDataset);
 
-    it("should call getContacts", async () => {
-      getContacts.mockResolvedValue({ response });
-
-      renderHook(() => usePeople(addressBook), {
-        wrapper,
-      });
-
-      expect(getContacts).toHaveBeenCalledWith(
-        foaf.Person,
-        addressBookUrl,
-        session.fetch
-      );
-    });
-
-    it("should return response", async () => {
-      getContacts.mockResolvedValue({ response });
-
+    it("should return people dataset", async () => {
       const { result, waitFor } = renderHook(() => usePeople(addressBook), {
         wrapper,
       });
 
       await waitFor(() =>
         expect(result.current).toMatchObject({
-          data: response,
+          data: mockPeopleDataset,
           error: undefined,
-        })
-      );
-    });
-
-    it("should return error", async () => {
-      const error = "Some error";
-      getContacts.mockResolvedValue({ error });
-
-      const { result, waitFor } = renderHook(() => usePeople(addressBook), {
-        wrapper,
-      });
-
-      await waitFor(() =>
-        expect(result.current).toMatchObject({
-          data: undefined,
-          error,
         })
       );
     });

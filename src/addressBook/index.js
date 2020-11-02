@@ -33,11 +33,10 @@ import {
   getUrl,
   getUrlAll,
   removeThing,
-  getSolidDataset,
   setThing,
 } from "@inrupt/solid-client";
 import { v4 as uuid } from "uuid";
-import { rdf, dc, acl, vcard, ldp, foaf, schema } from "rdf-namespaces";
+import { rdf, dc, acl, vcard, foaf, schema } from "rdf-namespaces";
 import {
   createResponder,
   defineDataset,
@@ -130,47 +129,16 @@ export async function getGroups(containerIri, fetch) {
   return respond(groups);
 }
 
-export async function getContacts(type, containerIri, fetch) {
-  const { respond, error } = createResponder();
-  const { container } = TYPE_MAP[type];
-
-  if (!container) {
-    throw new Error(`Cannot load contacts of type: ${type}`);
-  }
-
-  const contactsIri = `${joinPath(containerIri, container)}/`;
-
-  const {
-    response: contactsResponse,
-    error: contactsError,
-  } = await getResource(contactsIri, fetch);
-
-  if (contactsError && isHTTPError(contactsError, ERROR_CODES.NOT_FOUND)) {
-    // temporary solution to allow loading contacts page when /contacts/Person isn't created yet
-    return respond([]);
-  }
-
-  if (contactsError) {
-    return error(contactsError);
-  }
-
-  const contactsIris = getUrlAll(
-    contactsResponse.dataset,
-    ldp.contains
-  ).map((url) => joinPath(url, INDEX_FILE));
+export async function getProfiles(peopleThings, fetch) {
+  const peopleIris = peopleThings.map((t) => asUrl(t));
 
   const contactsResponses = await Promise.all(
-    contactsIris.map((iri) => getResource(iri, fetch))
+    peopleIris.map((iri) => getResource(iri, fetch))
   );
 
-  const contacts = contactsResponses
+  const people = contactsResponses
     .filter(({ error: e }) => !e)
     .map(({ response }) => response);
-
-  return respond(contacts);
-}
-
-export async function getProfiles(people, fetch) {
   const profileResponses = await Promise.all(
     people.map(({ dataset }) => {
       const url = getUrl(dataset, foaf.openid);
@@ -337,13 +305,8 @@ export function createContact(addressBookIri, contact, types) {
   };
 }
 
-export async function findContactInAddressBook(addressBookIri, webId, fetch) {
-  const { response: people } = await getContacts(
-    foaf.Person,
-    addressBookIri,
-    fetch
-  );
-
+export async function findContactInAddressBook(peopleDataset, webId, fetch) {
+  const people = peopleDataset && getThingAll(peopleDataset, { fetch });
   const profiles = await getProfiles(people, fetch);
   const existingContact = profiles.filter(
     (profile) => asUrl(profile) === webId
@@ -400,42 +363,29 @@ export async function saveContact(addressBookIri, contactSchema, types, fetch) {
 }
 
 export async function deleteContact(addressBookIri, contactToDelete, fetch) {
-  const webId = getUrl(contactToDelete.dataset, foaf.openid);
-  const profileDataset = await getSolidDataset(webId);
-  const types = getUrlAll(profileDataset, rdf.type);
-
-  // TODO: get contact from contacts index once SOLIDOS-503 is resolved
-  const containerMap = TYPE_MAP[types.find((type) => TYPE_MAP[type])];
-
-  if (!containerMap) {
-    throw new Error(`Contact is unsupported type: ${webId}`);
-  }
-
-  const { indexFile } = containerMap;
-
-  const contactIri = contactToDelete.iri;
-  const contactsIri = joinPath(addressBookIri, indexFile);
-  const { response: contactsIndex, error: contactsError } = await getResource(
-    contactsIri,
+  const contactIri = asUrl(contactToDelete);
+  const peopleIri = joinPath(addressBookIri, "people.ttl");
+  const { response: peopleIndex, error: peopleError } = await getResource(
+    peopleIri,
     fetch
   );
 
-  if (contactsError) {
-    throw contactsError;
+  if (peopleError) {
+    throw peopleError;
   }
 
-  const contactsIndexThings = getThingAll(contactsIndex.dataset);
+  const contactsIndexThings = getThingAll(peopleIndex.dataset);
   const contactsIndexEntryToRemove = contactsIndexThings.find((thing) =>
     asUrl(thing).includes(contactIri)
   );
 
   const updatedcontactsIndex = removeThing(
-    contactsIndex.dataset,
+    peopleIndex.dataset,
     contactsIndexEntryToRemove
   );
 
   const updatedcontactsIndexResponse = saveResource(
-    { dataset: updatedcontactsIndex, iri: contactsIri },
+    { dataset: updatedcontactsIndex, iri: peopleIri },
     fetch
   );
 
@@ -452,4 +402,6 @@ export async function deleteContact(addressBookIri, contactToDelete, fetch) {
   if (saveContactsError) {
     throw saveContactsError;
   }
+
+  return updatedcontactsIndexResponse;
 }

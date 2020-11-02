@@ -18,12 +18,10 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
 import useSWR from "swr";
 import { useSession } from "@inrupt/solid-ui-react";
-import { getSourceUrl } from "@inrupt/solid-client";
-import { foaf } from "rdf-namespaces";
-import { getContacts } from "../../addressBook";
+import { getSolidDataset, getSourceUrl } from "@inrupt/solid-client";
+import { joinPath } from "../../stringHelpers";
 
 export default function usePeople(addressBook) {
   const {
@@ -32,16 +30,7 @@ export default function usePeople(addressBook) {
 
   return useSWR(addressBook, async () => {
     const contactsIri = getSourceUrl(addressBook);
-    const { response, error } = await getContacts(
-      foaf.Person,
-      contactsIri,
-      fetch
-    );
-
-    if (error) {
-      throw error;
-    }
-
-    return response;
+    const peopleIri = joinPath(contactsIri, "people.ttl");
+    return getSolidDataset(peopleIri, { fetch });
   });
 }
