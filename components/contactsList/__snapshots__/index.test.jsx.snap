@@ -3795,7 +3795,9 @@ font-display: block;",
                             className="PodBrowser-table__body-row PodBrowser-table__body-row--selectable"
                             key="row_0"
                             onClick={[Function]}
+                            onKeyUp={[Function]}
                             role="row"
+                            tabIndex="0"
                           >
                             <A
                               dataset={42}
@@ -16606,7 +16608,9 @@ font-display: block;",
                             className="PodBrowser-table__body-row PodBrowser-table__body-row--selectable"
                             key="row_1"
                             onClick={[Function]}
+                            onKeyUp={[Function]}
                             role="row"
+                            tabIndex="0"
                           >
                             <A
                               dataset={42}
@@ -29409,7 +29413,7 @@ font-display: block;",
                           <div
                             className="PodBrowser-drawer__article"
                           >
-                            <Button
+                            <ForwardRef
                               onClick={[Function]}
                               variant="text"
                             >
@@ -29426,7 +29430,7 @@ font-display: block;",
                                 </Icon>
                                  Close
                               </button>
-                            </Button>
+                            </ForwardRef>
                           </div>
                           <WithStyles(ForwardRef(Accordion))
                             defaultExpanded={true}
