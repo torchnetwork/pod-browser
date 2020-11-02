@@ -19,11 +19,12 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import * as solidClientHelperFns from "@inrupt/solid-client";
+import * as solidClientFns from "@inrupt/solid-client";
 import AcpAccessControlStrategy from "./acp";
 import WacAccessControlStrategy from "./wac";
 import { getAccessControl, noAccessPolicyError } from "./index";
-import * as mockedAcpFns from "./acp/mockedClientApi";
+
+const acp = solidClientFns.acp_lowlevel_preview;
 
 jest.mock("./acp");
 jest.mock("./wac");
@@ -37,8 +38,8 @@ describe("getAccessControl", () => {
   const wacStrategy = "wacStrategy";
 
   beforeEach(() => {
-    jest.spyOn(solidClientHelperFns, "hasAccessibleAcl").mockReturnValue(false);
-    jest.spyOn(mockedAcpFns, "hasLinkedAcr").mockReturnValue(false);
+    jest.spyOn(solidClientFns, "hasAccessibleAcl").mockReturnValue(false);
+    jest.spyOn(acp, "hasLinkedAcr").mockReturnValue(false);
     jest.spyOn(WacAccessControlStrategy, "init").mockReturnValue(wacStrategy);
     jest.spyOn(AcpAccessControlStrategy, "init").mockReturnValue(acpStrategy);
   });
@@ -51,7 +52,7 @@ describe("getAccessControl", () => {
 
   describe("ACP is supported", () => {
     beforeEach(async () => {
-      mockedAcpFns.hasLinkedAcr.mockReturnValue(true);
+      acp.hasLinkedAcr.mockReturnValue(true);
       result = await getAccessControl(resource, policiesContainer, fetch);
     });
 
@@ -68,7 +69,7 @@ describe("getAccessControl", () => {
 
   describe("WAC is supported", () => {
     beforeEach(async () => {
-      solidClientHelperFns.hasAccessibleAcl.mockReturnValue(true);
+      solidClientFns.hasAccessibleAcl.mockReturnValue(true);
       result = await getAccessControl(resource, policiesContainer, fetch);
     });
 

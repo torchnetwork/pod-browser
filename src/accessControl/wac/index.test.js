@@ -50,9 +50,24 @@ describe("WacAccessControlStrategy", () => {
       }));
 
     it("exposes the methods we expect for a access control strategy", () =>
-      ["getPermissions", "savePermissionsForAgent"].forEach((method) =>
-        expect(wac[method]).toBeDefined()
-      ));
+      [
+        "deleteFile",
+        "getPermissions",
+        "savePermissionsForAgent",
+      ].forEach((method) => expect(wac[method]).toBeDefined()));
+  });
+
+  describe("deleteFile", () => {
+    beforeEach(async () => {
+      wac = await WacAccessControlStrategy.init(resourceInfo, fetch);
+    });
+
+    it("triggers solidClientFns.deleteFile", async () => {
+      const response = "response";
+      jest.spyOn(solidClientFns, "deleteFile").mockResolvedValue(response);
+      await expect(wac.deleteFile()).resolves.toBe(response);
+      expect(solidClientFns.deleteFile).toHaveBeenCalledWith(url, { fetch });
+    });
   });
 
   describe("getPermissions", () => {

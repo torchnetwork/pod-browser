@@ -19,40 +19,16 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/* istanbul ignore file */
-// TODO: Remove once Solid Client ACP API is complete
-
 import {
+  acp_lowlevel_preview as acp,
   asUrl,
+  deleteFile,
   getSolidDataset,
   getSourceUrl,
   saveSolidDatasetAt,
+  setThing,
 } from "@inrupt/solid-client";
 import { joinPath } from "../../stringHelpers";
-import {
-  addControlPolicyUrl,
-  addPolicyUrl,
-  createAccessControl,
-  createPolicy,
-  getAccessControlAll,
-  getAllowModesOnPolicy,
-  getReferencedPolicyUrlAll,
-  getPolicy,
-  getPolicyAll,
-  getPolicyUrlAll,
-  getRequiredRuleOnPolicyAll,
-  getResourceInfoWithAcp,
-  setAccessControl,
-  setAllowModesOnPolicy,
-  setPolicy,
-  setRequiredRuleOnPolicy,
-  saveAccessControlResource,
-  getAgentForRuleAll,
-  createRule,
-  getRule,
-  setAgentInRule,
-  getSolidDatasetWithAcp,
-} from "./mockedClientApi";
 import { fetchProfile } from "../../solidClientHelpers/profile";
 import {
   ACL,
@@ -61,12 +37,14 @@ import {
 } from "../../solidClientHelpers/permissions";
 import {
   chain,
+  chainPromise,
   createResponder,
+  isHTTPError,
   sharedStart,
 } from "../../solidClientHelpers/utils";
 import { getOrCreateDataset } from "../../solidClientHelpers/resource";
 
-const POLICIES_CONTAINER = "policies/";
+const POLICIES_CONTAINER = "pb_policies/";
 
 export function getPoliciesContainerUrl(podRootUri) {
   return joinPath(podRootUri, POLICIES_CONTAINER);
@@ -90,12 +68,12 @@ export function addAcpModes(existingAcpModes, newAcpModes) {
     : newAcpModes;
 }
 
-export function convertAcpToAcl(acp) {
+export function convertAcpToAcl(access) {
   return createAccessMap(
-    acp.apply.read,
-    acp.apply.write,
-    acp.apply.append,
-    acp.access.read && acp.access.write
+    access.apply.read,
+    access.apply.write,
+    access.apply.append,
+    access.access.read && access.access.write
   );
 }
 
@@ -103,7 +81,7 @@ export function getOrCreatePermission(permissions, webId) {
   const permission = permissions[webId] ?? {
     webId,
   };
-  permission.acp = permissions.acp ?? {
+  permission.acp = permission.acp ?? {
     apply: createAcpMap(),
     access: createAcpMap(),
   };
@@ -112,61 +90,88 @@ export function getOrCreatePermission(permissions, webId) {
 
 export function getPolicyUrl(resource, policiesContainer) {
   const resourceUrl = getSourceUrl(resource);
-  const policiesUrl = getSourceUrl(policiesContainer);
-  const matchingStart = sharedStart(resourceUrl, policiesUrl);
+  const policiesContainerUrl = getSourceUrl(policiesContainer);
+  const rootUrl = policiesContainerUrl.substr(
+    0,
+    policiesContainerUrl.length - POLICIES_CONTAINER.length
+  );
+  const matchingStart = sharedStart(resourceUrl, rootUrl);
   const path = resourceUrl.substr(matchingStart.length);
   return `${getPoliciesContainerUrl(matchingStart) + path}.ttl`;
 }
 
 export function getOrCreatePolicy(policyDataset, url) {
-  const existingPolicy = getPolicy(policyDataset, url);
+  const existingPolicy = acp.getPolicy(policyDataset, url);
   if (existingPolicy) {
     return { policy: existingPolicy, dataset: policyDataset };
   }
-  const newPolicy = createPolicy(url);
-  const updatedPolicyDataset = setPolicy(policyDataset, newPolicy);
+  const newPolicy = acp.createPolicy(url);
+  const updatedPolicyDataset = acp.setPolicy(policyDataset, newPolicy);
   return { policy: newPolicy, dataset: updatedPolicyDataset };
 }
 
 export function getRulesOrCreate(ruleUrls, policy, policyDataset) {
   // assumption: Rules resides in the same resource as the policies
   const rules = ruleUrls
-    .map((url) => getRule(policyDataset, url))
+    .map((url) => acp.getRule(policyDataset, url))
     .filter((rule) => !!rule);
   if (rules.length === 0) {
     const ruleUrl = `${asUrl(policy)}Rule`; // e.g. <pod>/policies/.ttl#readPolicyRule
-    return [createRule(ruleUrl)];
+    return { existing: false, rules: [acp.createRule(ruleUrl)] };
   }
-  return rules;
+  return { existing: true, rules };
 }
 
 export function getRuleWithAgent(rules, agentWebId) {
   // assumption 1: the rules for the policies we work with will not have agents across multiple rules
   // assumption 2: there will always be at least one rule (we enforce this with getRulesOrCreate)
   const rule = rules.find((r) =>
-    getAgentForRuleAll(r).find((webId) => webId === agentWebId)
+    acp.getAgentForRuleAll(r).find((webId) => webId === agentWebId)
   );
   // if we don't find the agent in a rule, we'll just pick the first one
   return rule || rules[0];
 }
 
-export async function setAgents(policy, policyDataset, webId, accessToMode) {
-  const ruleUrls = getRequiredRuleOnPolicyAll(policy);
-  const rules = getRulesOrCreate(ruleUrls, policy, policyDataset);
+export function setAgents(policy, policyDataset, webId, accessToMode) {
+  const ruleUrls = acp.getRequiredRuleForPolicyAll(policy);
+  const { existing, rules } = getRulesOrCreate(ruleUrls, policy, policyDataset);
   const rule = getRuleWithAgent(rules, webId);
-  const existingAgents = getAgentForRuleAll(rule);
+  const existingAgents = acp.getAgentForRuleAll(rule);
   const agentIndex = existingAgents.indexOf(webId);
-  let modifiedAgents;
+  let modifiedRule = rule;
   if (accessToMode && agentIndex === -1) {
-    modifiedAgents = existingAgents.concat(webId);
+    modifiedRule = acp.addAgentForRule(rule, webId);
   }
   if (!accessToMode && agentIndex !== -1) {
-    modifiedAgents = existingAgents
-      .slice(0, agentIndex)
-      .concat(existingAgents.slice(agentIndex + 1));
+    modifiedRule = acp.removeAgentForRule(rule, webId);
   }
-  const modifiedRule = setAgentInRule(rule, modifiedAgents);
-  return setRequiredRuleOnPolicy(policy, modifiedRule);
+  const modifiedDataset = setThing(policyDataset, modifiedRule);
+  return {
+    policy: existing
+      ? acp.setRequiredRuleForPolicy(policy, modifiedRule)
+      : acp.addRequiredRuleForPolicy(policy, modifiedRule),
+    dataset: modifiedDataset,
+  };
+}
+
+export function getPolicyModesAndAgents(policyUrls, policyDataset) {
+  return policyUrls
+    .map((url) => acp.getPolicy(policyDataset, url))
+    .filter((policy) => !!policy)
+    .map((policy) => {
+      const modes = acp.getAllowModesOnPolicy(policy);
+      const ruleUrls = acp.getRequiredRuleForPolicyAll(policy);
+      // assumption: rule resides in the same resource as policies
+      const rules = ruleUrls.map((url) => acp.getRule(policyDataset, url));
+      const agents = rules.reduce(
+        (memo, rule) => memo.concat(acp.getAgentForRuleAll(rule)),
+        []
+      );
+      return {
+        modes,
+        agents,
+      };
+    });
 }
 
 export default class AcpAccessControlStrategy {
@@ -182,70 +187,94 @@ export default class AcpAccessControlStrategy {
     this.#fetch = fetch;
   }
 
-  async getPolicyModesAndAgents(policyUrls) {
-    const policyResources = await Promise.all(
-      policyUrls.map((url) => getSolidDataset(url, { fetch: this.#fetch }))
-    );
-    const policies = policyResources
-      .map((policyDataset) => ({
-        policy: getPolicyAll(policyDataset),
-        dataset: policyDataset,
-      }))
-      .flat();
-    return Promise.all(
-      policies.map(({ policy, dataset }) => {
-        const modes = getAllowModesOnPolicy(policy);
-        const ruleUrls = getRequiredRuleOnPolicyAll(policy);
-        // assumption: rule resides in the same resource as policies
-        const rules = ruleUrls.map((url) => getRule(dataset, url));
-        const agents = rules.map((rule) => getAgentForRuleAll(rule)).flat();
-        return {
-          modes,
-          agents,
-        };
-      })
-    );
+  async deleteFile() {
+    await deleteFile(getSourceUrl(this.#datasetWithAcr), {
+      fetch: this.#fetch,
+    });
+    try {
+      await deleteFile(this.#policyUrl, { fetch: this.#fetch });
+    } catch (err) {
+      if (!isHTTPError(err.message, 404)) {
+        throw err;
+      }
+    }
   }
 
   async getPermissions() {
     const permissions = {};
-    // assigning Read, Write, and Append
-    const accessControls = getAccessControlAll(this.#datasetWithAcr);
-    const policyUrls = accessControls
-      .map((ac) => getPolicyUrlAll(ac).filter((url) => url === this.#policyUrl))
-      .flat();
-    (await this.getPolicyModesAndAgents(policyUrls)).forEach(
-      ({ modes, agents }) =>
+    try {
+      const policyDataset = await getSolidDataset(this.#policyUrl, {
+        fetch: this.#fetch,
+      });
+      // assigning Read, Write, and Append
+      // assumption 1: We know the URLs of the policies we want to check
+      getPolicyModesAndAgents(
+        [
+          `${this.#policyUrl}#readApplyPolicy`,
+          `${this.#policyUrl}#writeApplyPolicy`,
+          `${this.#policyUrl}#appendApplyPolicy`,
+        ],
+        policyDataset
+      ).forEach(({ modes, agents }) =>
         agents.forEach((webId) => {
           const permission = getOrCreatePermission(permissions, webId);
           permission.acp.apply = addAcpModes(permission.acp.apply, modes);
           permissions[webId] = permission;
         })
-    );
-    // assigning Control
-    const controlPolicyUrls = getReferencedPolicyUrlAll(
-      this.#datasetWithAcr
-    ).filter((url) => url === this.#policyUrl);
-    (await this.getPolicyModesAndAgents(controlPolicyUrls)).forEach(
-      ({ modes, agents }) =>
+      );
+      // assigning Control
+      // assumption 2: control access involves another policy URL, but since both have the same modes, we only check one
+      getPolicyModesAndAgents(
+        [`${this.#policyUrl}#controlAccessPolicy`],
+        policyDataset
+      ).forEach(({ modes, agents }) =>
         agents.forEach((webId) => {
           const permission = getOrCreatePermission(permissions, webId);
           permission.acp.access = addAcpModes(permission.acp.access, modes);
           permissions[webId] = permission;
         })
+      );
+      // normalize permissions
+      return Promise.all(
+        Object.values(permissions).map(async ({ acp: access, webId }) => {
+          const acl = convertAcpToAcl(access);
+          return {
+            acl,
+            alias: displayPermissions(acl),
+            profile: await fetchProfile(webId, this.#fetch),
+            webId,
+          };
+        })
+      );
+    } catch (error) {
+      if (isHTTPError(error.message, 404)) {
+        return [];
+      }
+      throw error;
+    }
+  }
+
+  async ensureAccessControl(policyUrl, datasetWithAcr) {
+    const accessControls = acp.getAccessControlAll(datasetWithAcr);
+    const existingAccessControl = accessControls.find((ac) =>
+      acp.getPolicyUrlAll(ac).find((url) => policyUrl === url)
     );
-    // normalize permissions
-    return Promise.all(
-      Object.values(permissions).map(async ({ acp, webId }) => {
-        const acl = convertAcpToAcl(acp);
-        return {
-          acl,
-          alias: displayPermissions(acl),
-          profile: await fetchProfile(webId, this.#fetch),
-          webId,
-        };
-      })
-    );
+    let modifiedDatasetWithAcr = datasetWithAcr;
+    if (!existingAccessControl) {
+      const newAccessControl = chain(
+        acp.createAccessControl(),
+        (ac) => acp.addPolicyUrl(ac, policyUrl),
+        (ac) => acp.addMemberPolicyUrl(ac, policyUrl)
+      );
+      modifiedDatasetWithAcr = acp.setAccessControl(
+        datasetWithAcr,
+        newAccessControl
+      );
+      modifiedDatasetWithAcr = await acp.saveAcrFor(modifiedDatasetWithAcr, {
+        fetch: this.#fetch,
+      });
+    }
+    return modifiedDatasetWithAcr;
   }
 
   async saveApplyPolicyWithAgentForOriginalResource(
@@ -255,33 +284,29 @@ export default class AcpAccessControlStrategy {
     mode,
     acpMap
   ) {
-    const policyUrl = `${this.#policyUrl}#${mode}Policy`;
+    const policyUrl = `${this.#policyUrl}#${mode}ApplyPolicy`;
+    const existingPolicy = acp.getPolicy(policyDataset, policyUrl);
+    if (!existingPolicy && !access[mode]) {
+      // no need to add policy if it doesn't exist and we're not adding the agent to it
+      return policyDataset;
+    }
     const { dataset: modifiedPolicyDataset } = chain(
       getOrCreatePolicy(policyDataset, policyUrl),
-      ({ policy: p, dataset: d }) => ({
-        policy: setAllowModesOnPolicy(p, acpMap),
-        dataset: d,
+      ({ policy, dataset }) => ({
+        policy: acp.setAllowModesOnPolicy(policy, acpMap),
+        dataset,
       }),
-      ({ policy: p, dataset: d }) => ({
-        policy: setAgents(p, d, webId, access[mode]),
-        dataset: d,
+      ({ policy, dataset }) => setAgents(policy, dataset, webId, access[mode]),
+      ({ policy, dataset }) => ({
+        policy,
+        dataset: acp.setPolicy(dataset, policy),
       })
     );
     // making sure that policy is connected to access control
-    const accessControls = getAccessControlAll(this.#datasetWithAcr);
-    let accessControlWithPolicy = accessControls.find((ac) =>
-      getPolicyUrlAll(ac).find(policyUrl)
+    this.#datasetWithAcr = await this.ensureAccessControl(
+      policyUrl,
+      this.#datasetWithAcr
     );
-    if (!accessControlWithPolicy) {
-      accessControlWithPolicy = chain(createAccessControl(), (ac) =>
-        addPolicyUrl(ac, policyUrl)
-      );
-    }
-    this.#datasetWithAcr = setAccessControl(
-      this.#datasetWithAcr,
-      accessControlWithPolicy
-    );
-    // return the modified policy dataset
     return modifiedPolicyDataset;
   }
 
@@ -291,23 +316,33 @@ export default class AcpAccessControlStrategy {
     access
   ) {
     const policyUrl = `${this.#policyUrl}#controlAccessPolicy`;
-    const existingAccessPolicyUrl = getReferencedPolicyUrlAll(
-      this.#datasetWithAcr
-    ).find((url) => url === policyUrl);
-    const existingPolicy = getPolicy(policyDataset, existingAccessPolicyUrl);
-    const accessPolicy = chain(
-      existingPolicy || getOrCreatePolicy(policyDataset, policyUrl),
-      (p) => setAllowModesOnPolicy(p, createAcpMap(true, true)),
-      (p) => setAgents(p, policyDataset, webId, access.control)
-    );
-    const modifiedPolicyDataset = setPolicy(policyDataset, accessPolicy);
-    // making sure that policy is connected to access control
-    if (!existingPolicy) {
-      this.#datasetWithAcr = await addControlPolicyUrl(
-        this.#datasetWithAcr,
-        policyUrl
-      );
+    const existingPolicy = acp.getPolicy(policyDataset, policyUrl);
+    if (!existingPolicy && !access.control) {
+      // no need to add policy if it doesn't exist and we're not adding the agent to it
+      return policyDataset;
     }
+    const { dataset: modifiedPolicyDataset } = chain(
+      getOrCreatePolicy(policyDataset, policyUrl),
+      ({ policy, dataset }) => ({
+        policy: acp.setAllowModesOnPolicy(policy, createAcpMap(true, true)),
+        dataset,
+      }),
+      ({ policy, dataset }) =>
+        setAgents(policy, dataset, webId, access.control),
+      ({ policy, dataset }) => ({
+        policy,
+        dataset: acp.setPolicy(dataset, policy),
+      })
+    );
+    // making sure that policy is connected to access control
+    this.#datasetWithAcr = await chainPromise(
+      acp.addAcrPolicyUrl(this.#datasetWithAcr, policyUrl),
+      (datasetWithAcr) => acp.addMemberAcrPolicyUrl(datasetWithAcr, policyUrl),
+      async (datasetWithAcr) =>
+        acp.saveAcrFor(datasetWithAcr, {
+          fetch: this.#fetch,
+        })
+    );
     // return the modified policy dataset
     return modifiedPolicyDataset;
   }
@@ -318,31 +353,30 @@ export default class AcpAccessControlStrategy {
     access
   ) {
     const policyUrl = `${this.#policyUrl}#controlApplyPolicy`;
-    const policyDatasetWithAcr = await getSolidDatasetWithAcp(
-      getSourceUrl(policyDataset)
-    );
-    const accessControls = getAccessControlAll(policyDatasetWithAcr);
-    const existingAccessPolicyUrl = accessControls
-      .map((ac) => getPolicyUrlAll(ac).filter((url) => url === this.#policyUrl))
-      .flat();
-    const existingPolicy = getPolicy(policyDataset, existingAccessPolicyUrl[0]);
-    const applyPolicy = chain(
-      existingPolicy || getOrCreatePolicy(policyDataset, policyUrl),
-      (p) => setAllowModesOnPolicy(p, createAcpMap(true, true)),
-      (p) => setAgents(p, policyDataset, webId, access.control)
-    );
-    const modifiedPolicyDataset = setPolicy(policyDataset, applyPolicy);
-    // making sure that policy is connected to access control
-    let accessControlWithPolicy = accessControls.find((ac) =>
-      getPolicyUrlAll(ac).find(policyUrl)
-    );
-    if (!accessControlWithPolicy) {
-      accessControlWithPolicy = chain(createAccessControl(), (ac) =>
-        addPolicyUrl(ac, policyUrl)
-      );
+    const existingPolicy = acp.getPolicy(policyDataset, policyUrl);
+    if (!existingPolicy && !access.control) {
+      // no need to add policy if it doesn't exist and we're not adding the agent to it
+      return policyDataset;
     }
-    setAccessControl(policyDatasetWithAcr, accessControlWithPolicy);
-    // return the modified policy dataset
+    const policyDatasetWithAcr = await acp.getSolidDatasetWithAcr(
+      getSourceUrl(policyDataset),
+      { fetch: this.#fetch }
+    );
+    const { policy: modifiedPolicyDataset } = chain(
+      getOrCreatePolicy(policyDataset, policyUrl),
+      ({ policy, dataset }) => ({
+        policy: acp.setAllowModesOnPolicy(policy, createAcpMap(true, true)),
+        dataset,
+      }),
+      ({ policy, dataset }) =>
+        setAgents(policy, dataset, webId, access.control),
+      ({ policy, dataset }) => ({
+        policy: acp.setPolicy(dataset, policy),
+        dataset,
+      })
+    );
+    // ensuring that access control is set for policy resource ACR
+    await this.ensureAccessControl(policyUrl, policyDatasetWithAcr);
     return modifiedPolicyDataset;
   }
 
@@ -357,41 +391,49 @@ export default class AcpAccessControlStrategy {
     if (getOrCreateError) return error(getOrCreateError);
 
     try {
-      const updatedDataset = chain(
+      const updatedDataset = await chainPromise(
         policyDataset,
-        async (d) =>
+        async (dataset) =>
           this.saveApplyPolicyWithAgentForOriginalResource(
-            d,
+            dataset,
             webId,
             access,
             "read",
             createAcpMap(true)
           ),
-        async (d) =>
+        async (dataset) =>
           this.saveApplyPolicyWithAgentForOriginalResource(
-            d,
+            dataset,
             webId,
             access,
             "write",
             createAcpMap(false, true)
           ),
-        async (d) =>
+        async (dataset) =>
           this.saveApplyPolicyWithAgentForOriginalResource(
-            d,
+            dataset,
             webId,
             access,
             "append",
             createAcpMap(false, false, true)
           ),
-        async (d) =>
-          this.saveAccessPolicyWithAgentForOriginalResource(d, webId, access),
-        async (d) =>
-          this.saveApplyPolicyWithAgentsForPolicyResource(d, webId, access)
+        async (dataset) =>
+          this.saveAccessPolicyWithAgentForOriginalResource(
+            dataset,
+            webId,
+            access
+          ),
+        async (dataset) =>
+          this.saveApplyPolicyWithAgentsForPolicyResource(
+            dataset,
+            webId,
+            access
+          )
       );
-      await saveSolidDatasetAt(this.#policyUrl, updatedDataset);
-      this.#datasetWithAcr = await saveAccessControlResource(
-        this.#datasetWithAcr
-      );
+      // saving to the policy resource
+      await saveSolidDatasetAt(this.#policyUrl, updatedDataset, {
+        fetch: this.#fetch,
+      });
     } catch (err) {
       return error(err.message);
     }
@@ -400,7 +442,7 @@ export default class AcpAccessControlStrategy {
 
   static async init(resourceInfo, policiesContainer, fetch) {
     const resourceUrl = getSourceUrl(resourceInfo);
-    const datasetWithAcr = await getResourceInfoWithAcp(resourceUrl, {
+    const datasetWithAcr = await acp.getResourceInfoWithAcr(resourceUrl, {
       fetch,
     });
     return new AcpAccessControlStrategy(

@@ -21,6 +21,7 @@
 
 import {
   createAclFromFallbackAcl,
+  deleteFile,
   getAgentAccessAll,
   getAgentDefaultAccessAll,
   getFallbackAcl,
@@ -51,6 +52,12 @@ export default class WacAccessControlStrategy {
   constructor(datasetWithAcl, fetch) {
     this.#datasetWithAcl = datasetWithAcl;
     this.#fetch = fetch;
+  }
+
+  async deleteFile() {
+    return deleteFile(getSourceUrl(this.#datasetWithAcl), {
+      fetch: this.#fetch,
+    });
   }
 
   async getPermissions() {

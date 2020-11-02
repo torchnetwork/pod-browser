@@ -21,9 +21,16 @@
 
 import React from "react";
 import T from "prop-types";
-import { deleteFile } from "@inrupt/solid-client";
-import { useSession } from "@inrupt/solid-ui-react";
 import DeleteLink from "../deleteLink";
+import useAccessControl from "../../src/hooks/useAccessControl";
+import useResourceInfo from "../../src/hooks/useResourceInfo";
+
+export function createDeleteHandler(accessControl, onDelete) {
+  return async () => {
+    await accessControl.deleteFile();
+    onDelete();
+  };
+}
 
 /* eslint react/jsx-props-no-spreading: 0 */
 export default function DeleteResourceLink({
@@ -32,12 +39,18 @@ export default function DeleteResourceLink({
   onDelete,
   ...linkProps
 }) {
-  const { fetch } = useSession();
+  const { data: resourceInfo, error: resourceInfoError } = useResourceInfo(
+    resourceIri
+  );
+  const { accessControl, error: accessControlError } = useAccessControl(
+    resourceInfo
+  );
 
-  const handleDelete = async () => {
-    await deleteFile(resourceIri, { fetch });
-    onDelete();
-  };
+  const handleDelete = createDeleteHandler(accessControl, onDelete);
+
+  if (resourceInfoError || accessControlError) {
+    return null;
+  }
 
   return (
     <DeleteLink

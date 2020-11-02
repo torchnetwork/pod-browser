@@ -23,7 +23,7 @@ import React, { useContext, useEffect } from "react";
 import T from "prop-types";
 import { useRouter } from "next/router";
 import { Drawer } from "@inrupt/prism-react-components";
-import { DatasetProvider, useSession } from "@inrupt/solid-ui-react";
+import { DatasetProvider } from "@inrupt/solid-ui-react";
 import DetailsMenuContext from "../../src/contexts/detailsMenuContext";
 import { stripQueryParams } from "../../src/stringHelpers";
 import ResourceDetails from "../resourceDetails";
@@ -43,7 +43,6 @@ export function handleCloseDrawer({ setMenuOpen, router }) {
 
 export default function ResourceDrawer({ onUpdate }) {
   const { menuOpen, setMenuOpen } = useContext(DetailsMenuContext);
-  const { fetch } = useSession();
   const router = useRouter();
   const {
     query: { action, resourceIri },
@@ -52,8 +51,7 @@ export default function ResourceDrawer({ onUpdate }) {
     resourceIri
   );
   const { accessControl, error: accessControlError } = useAccessControl(
-    resourceInfo,
-    fetch
+    resourceInfo
   );
 
   useEffect(() => {
