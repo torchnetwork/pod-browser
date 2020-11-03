@@ -18,9 +18,10 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+
 import useSWR from "swr";
 import { useSession } from "@inrupt/solid-ui-react";
-import { getSolidDataset, getSourceUrl } from "@inrupt/solid-client";
+import { getSolidDataset, getSourceUrl, getUrl } from "@inrupt/solid-client";
 import { joinPath } from "../../stringHelpers";
 
 export default function usePeople(addressBook) {
@@ -30,7 +31,12 @@ export default function usePeople(addressBook) {
 
   return useSWR(addressBook, async () => {
     const contactsIri = getSourceUrl(addressBook);
-    const peopleIri = joinPath(contactsIri, "people.ttl");
-    return getSolidDataset(peopleIri, { fetch });
+    const addressBookIri = joinPath(contactsIri, "index.ttl");
+    const addressBookDataset = await getSolidDataset(addressBookIri, { fetch });
+    const peopleDatasetIri = getUrl(
+      addressBookDataset,
+      "http://www.w3.org/2006/vcard/ns#nameEmailIndex"
+    );
+    return getSolidDataset(peopleDatasetIri, { fetch });
   });
 }
