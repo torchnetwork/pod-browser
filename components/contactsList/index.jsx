@@ -83,7 +83,6 @@ function ContactsList() {
     addressBook
   );
   const profiles = useProfiles(people);
-  const formattedNamePredicate = vcard.fn;
   const hasPhotoPredicate = vcard.hasPhoto;
 
   const {
@@ -94,12 +93,21 @@ function ContactsList() {
   const [selectedContactName, setSelectedContactName] = useState("");
   const [selectedContactWebId, setSelectedContactWebId] = useState("");
 
+  const formattedNamePredicate =
+    [vcard.fn, foaf.name].find(
+      (prop) =>
+        selectedContactIndex &&
+        getStringNoLocale(people[selectedContactIndex].dataset, prop)
+    ) || vcard.fn;
+
   useEffect(() => {
     if (selectedContactIndex === null) return;
+
     const name = getStringNoLocale(
       people[selectedContactIndex].dataset,
       formattedNamePredicate
     );
+
     setSelectedContactName(name);
 
     const webId = getUrl(people[selectedContactIndex].dataset, foaf.openid);

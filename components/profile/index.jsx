@@ -21,7 +21,7 @@
 
 import React, { useState } from "react";
 import T from "prop-types";
-import { vcard } from "rdf-namespaces";
+import { vcard, foaf } from "rdf-namespaces";
 import Link from "next/link";
 import {
   Avatar,
@@ -32,21 +32,116 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { useBem } from "@solid/lit-prism-patterns";
+import { getStringNoLocale } from "@inrupt/solid-client";
 import { Container, BackToNavLink } from "@inrupt/prism-react-components";
 
-import { CombinedDataProvider, Text, Image } from "@inrupt/solid-ui-react";
+import {
+  CombinedDataProvider,
+  Text,
+  Image,
+  useThing,
+} from "@inrupt/solid-ui-react";
 
 import ContactInfoTable from "./contactInfoTable";
 import styles from "./styles";
 
 const useStyles = makeStyles((theme) => createStyles(styles(theme)));
+const NAME_FALLBACKS = [vcard.fn, foaf.name];
+
+export function ProfileInfo({ editing }) {
+  const classes = useStyles();
+  const bem = useBem(classes);
+
+  const { thing: profile } = useThing();
+
+  // Temporarily check both properties until the React SDK allows fallbacks
+  const nameProp = profile
+    ? NAME_FALLBACKS.find((prop) => getStringNoLocale(profile, prop))
+    : vcard.fn;
+
+  return (
+    <>
+      <Box alignItems="center" display="flex">
+        <Box>
+          <Avatar className={classes.avatar}>
+            <Image
+              property={vcard.hasPhoto}
+              width={120}
+              errorComponent={() => (
+                <Avatar
+                  className={bem("avatar")}
+                  alt="Contact photo placeholder"
+                />
+              )}
+            />
+          </Avatar>
+        </Box>
+
+        <Box p={2}>
+          <h3>
+            <Text property={nameProp} />
+          </h3>
+        </Box>
+      </Box>
+
+      <hr />
+
+      <Box mt={2}>
+        <Box>
+          <InputLabel>Name</InputLabel>
+          <Text
+            property={vcard.fn}
+            edit={editing}
+            autosave
+            inputProps={{ className: bem("input") }}
+          />
+        </Box>
+
+        <Box mt={1}>
+          <InputLabel>Role</InputLabel>
+          <Text
+            property={vcard.role}
+            edit={editing}
+            inputProps={{ className: bem("input") }}
+            autosave
+          />
+        </Box>
+
+        <Box mt={1}>
+          <InputLabel>Company</InputLabel>
+          <Text
+            property={vcard.org}
+            edit={editing}
+            inputProps={{ className: bem("input") }}
+            autosave
+          />
+        </Box>
+      </Box>
+
+      <Box mt={4}>
+        <InputLabel>Email Addresses</InputLabel>
+        <ContactInfoTable property={vcard.hasEmail} editing={editing} />
+      </Box>
+
+      <Box mt={4}>
+        <InputLabel>Phone Numbers</InputLabel>
+        <ContactInfoTable property={vcard.hasTelephone} editing={editing} />
+      </Box>
+    </>
+  );
+}
+
+ProfileInfo.propTypes = {
+  editing: T.bool,
+};
+
+ProfileInfo.defaultProps = {
+  editing: false,
+};
 
 export default function Profile(props) {
   const { profileIri, editing } = props;
   const [error, setError] = useState(null);
-
-  const classes = useStyles();
-  const bem = useBem(classes);
 
   // TODO replace with toast error or something?
   if (error) {
@@ -68,75 +163,7 @@ export default function Profile(props) {
             thingUrl={profileIri}
             onError={setError}
           >
-            <Box alignItems="center" display="flex">
-              <Box>
-                <Avatar className={classes.avatar}>
-                  <Image
-                    property={vcard.hasPhoto}
-                    width={120}
-                    errorComponent={() => (
-                      <Avatar
-                        className={bem("avatar")}
-                        alt="Contact photo placeholder"
-                      />
-                    )}
-                  />
-                </Avatar>
-              </Box>
-
-              <Box p={2}>
-                <h3>
-                  <Text property={vcard.fn} />
-                </h3>
-              </Box>
-            </Box>
-
-            <hr />
-
-            <Box mt={2}>
-              <Box>
-                <InputLabel>Name</InputLabel>
-                <Text
-                  property={vcard.fn}
-                  edit={editing}
-                  autosave
-                  inputProps={{ className: bem("input") }}
-                />
-              </Box>
-
-              <Box mt={1}>
-                <InputLabel>Role</InputLabel>
-                <Text
-                  property={vcard.role}
-                  edit={editing}
-                  inputProps={{ className: bem("input") }}
-                  autosave
-                />
-              </Box>
-
-              <Box mt={1}>
-                <InputLabel>Company</InputLabel>
-                <Text
-                  property={vcard.org}
-                  edit={editing}
-                  inputProps={{ className: bem("input") }}
-                  autosave
-                />
-              </Box>
-            </Box>
-
-            <Box mt={4}>
-              <InputLabel>Email Addresses</InputLabel>
-              <ContactInfoTable property={vcard.hasEmail} editing={editing} />
-            </Box>
-
-            <Box mt={4}>
-              <InputLabel>Phone Numbers</InputLabel>
-              <ContactInfoTable
-                property={vcard.hasTelephone}
-                editing={editing}
-              />
-            </Box>
+            <ProfileInfo editing={editing} />
           </CombinedDataProvider>
         </Box>
       </Paper>
