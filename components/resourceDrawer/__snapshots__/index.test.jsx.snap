@@ -984,23 +984,7 @@ font-display: block;",
                             </ForwardRef(Divider)>
                           </WithStyles(ForwardRef(Divider))>
                           <WithStyles(ForwardRef(Accordion))
-                            defaultExpanded={
-                              Object {
-                                "deleteFile": [MockFunction],
-                                "getPermissions": [MockFunction] {
-                                  "calls": Array [
-                                    Array [],
-                                  ],
-                                  "results": Array [
-                                    Object {
-                                      "type": "return",
-                                      "value": Promise {},
-                                    },
-                                  ],
-                                },
-                                "savePermissionsForAgent": [MockFunction],
-                              }
-                            }
+                            defaultExpanded={true}
                           >
                             <ForwardRef(Accordion)
                               classes={
@@ -1011,23 +995,7 @@ font-display: block;",
                                   "rounded": "PodBrowser-rounded",
                                 }
                               }
-                              defaultExpanded={
-                                Object {
-                                  "deleteFile": [MockFunction],
-                                  "getPermissions": [MockFunction] {
-                                    "calls": Array [
-                                      Array [],
-                                    ],
-                                    "results": Array [
-                                      Object {
-                                        "type": "return",
-                                        "value": Promise {},
-                                      },
-                                    ],
-                                  },
-                                  "savePermissionsForAgent": [MockFunction],
-                                }
-                              }
+                              defaultExpanded={true}
                             >
                               <WithStyles(ForwardRef(Paper))
                                 className="PodBrowser-root PodBrowser-expanded PodBrowser-rounded"
@@ -1092,23 +1060,7 @@ font-display: block;",
                                         expandIcon={<Memo(ExpandMoreIcon) />}
                                       >
                                         <WithStyles(ForwardRef(ButtonBase))
-                                          aria-expanded={
-                                            Object {
-                                              "deleteFile": [MockFunction],
-                                              "getPermissions": [MockFunction] {
-                                                "calls": Array [
-                                                  Array [],
-                                                ],
-                                                "results": Array [
-                                                  Object {
-                                                    "type": "return",
-                                                    "value": Promise {},
-                                                  },
-                                                ],
-                                              },
-                                              "savePermissionsForAgent": [MockFunction],
-                                            }
-                                          }
+                                          aria-expanded={true}
                                           className="PodBrowser-root PodBrowser-expanded"
                                           component="div"
                                           data-testid="accordion-resource-actions-trigger"
@@ -1120,23 +1072,7 @@ font-display: block;",
                                           onFocusVisible={[Function]}
                                         >
                                           <ForwardRef(ButtonBase)
-                                            aria-expanded={
-                                              Object {
-                                                "deleteFile": [MockFunction],
-                                                "getPermissions": [MockFunction] {
-                                                  "calls": Array [
-                                                    Array [],
-                                                  ],
-                                                  "results": Array [
-                                                    Object {
-                                                      "type": "return",
-                                                      "value": Promise {},
-                                                    },
-                                                  ],
-                                                },
-                                                "savePermissionsForAgent": [MockFunction],
-                                              }
-                                            }
+                                            aria-expanded={true}
                                             className="PodBrowser-root PodBrowser-expanded"
                                             classes={
                                               Object {
@@ -1156,23 +1092,7 @@ font-display: block;",
                                           >
                                             <div
                                               aria-disabled={false}
-                                              aria-expanded={
-                                                Object {
-                                                  "deleteFile": [MockFunction],
-                                                  "getPermissions": [MockFunction] {
-                                                    "calls": Array [
-                                                      Array [],
-                                                    ],
-                                                    "results": Array [
-                                                      Object {
-                                                        "type": "return",
-                                                        "value": Promise {},
-                                                      },
-                                                    ],
-                                                  },
-                                                  "savePermissionsForAgent": [MockFunction],
-                                                }
-                                              }
+                                              aria-expanded={true}
                                               className="PodBrowser-root PodBrowser-root PodBrowser-expanded"
                                               data-testid="accordion-resource-actions-trigger"
                                               onBlur={[Function]}
@@ -1342,23 +1262,7 @@ font-display: block;",
                                       </ForwardRef(AccordionSummary)>
                                     </WithStyles(ForwardRef(AccordionSummary))>
                                     <WithStyles(ForwardRef(Collapse))
-                                      in={
-                                        Object {
-                                          "deleteFile": [MockFunction],
-                                          "getPermissions": [MockFunction] {
-                                            "calls": Array [
-                                              Array [],
-                                            ],
-                                            "results": Array [
-                                              Object {
-                                                "type": "return",
-                                                "value": Promise {},
-                                              },
-                                            ],
-                                          },
-                                          "savePermissionsForAgent": [MockFunction],
-                                        }
-                                      }
+                                      in={true}
                                       timeout="auto"
                                     >
                                       <ForwardRef(Collapse)
@@ -1371,23 +1275,7 @@ font-display: block;",
                                             "wrapperInner": "PodBrowser-wrapperInner",
                                           }
                                         }
-                                        in={
-                                          Object {
-                                            "deleteFile": [MockFunction],
-                                            "getPermissions": [MockFunction] {
-                                              "calls": Array [
-                                                Array [],
-                                              ],
-                                              "results": Array [
-                                                Object {
-                                                  "type": "return",
-                                                  "value": Promise {},
-                                                },
-                                              ],
-                                            },
-                                            "savePermissionsForAgent": [MockFunction],
-                                          }
-                                        }
+                                        in={true}
                                         timeout="auto"
                                       >
                                         <Transition
@@ -1395,23 +1283,7 @@ font-display: block;",
                                           appear={false}
                                           enter={true}
                                           exit={true}
-                                          in={
-                                            Object {
-                                              "deleteFile": [MockFunction],
-                                              "getPermissions": [MockFunction] {
-                                                "calls": Array [
-                                                  Array [],
-                                                ],
-                                                "results": Array [
-                                                  Object {
-                                                    "type": "return",
-                                                    "value": Promise {},
-                                                  },
-                                                ],
-                                              },
-                                              "savePermissionsForAgent": [MockFunction],
-                                            }
-                                          }
+                                          in={true}
                                           mountOnEnter={false}
                                           onEnter={[Function]}
                                           onEntered={[Function]}
@@ -2375,6 +2247,7 @@ font-display: block;",
                                                                   >
                                                                     <button
                                                                       className="PodBrowser-action-menu__trigger PodBrowser-action-menu__trigger--prompt"
+                                                                      data-testid="permissions-add-user-with-webid-button"
                                                                       onClick={[Function]}
                                                                       type="button"
                                                                     >
@@ -3819,23 +3692,7 @@ font-display: block;",
                         </ForwardRef(Divider)>
                       </WithStyles(ForwardRef(Divider))>
                       <WithStyles(ForwardRef(Accordion))
-                        defaultExpanded={
-                          Object {
-                            "deleteFile": [MockFunction],
-                            "getPermissions": [MockFunction] {
-                              "calls": Array [
-                                Array [],
-                              ],
-                              "results": Array [
-                                Object {
-                                  "type": "return",
-                                  "value": Promise {},
-                                },
-                              ],
-                            },
-                            "savePermissionsForAgent": [MockFunction],
-                          }
-                        }
+                        defaultExpanded={true}
                       >
                         <ForwardRef(Accordion)
                           classes={
@@ -3846,23 +3703,7 @@ font-display: block;",
                               "rounded": "PodBrowser-rounded",
                             }
                           }
-                          defaultExpanded={
-                            Object {
-                              "deleteFile": [MockFunction],
-                              "getPermissions": [MockFunction] {
-                                "calls": Array [
-                                  Array [],
-                                ],
-                                "results": Array [
-                                  Object {
-                                    "type": "return",
-                                    "value": Promise {},
-                                  },
-                                ],
-                              },
-                              "savePermissionsForAgent": [MockFunction],
-                            }
-                          }
+                          defaultExpanded={true}
                         >
                           <WithStyles(ForwardRef(Paper))
                             className="PodBrowser-root PodBrowser-expanded PodBrowser-rounded"
@@ -3927,23 +3768,7 @@ font-display: block;",
                                     expandIcon={<Memo(ExpandMoreIcon) />}
                                   >
                                     <WithStyles(ForwardRef(ButtonBase))
-                                      aria-expanded={
-                                        Object {
-                                          "deleteFile": [MockFunction],
-                                          "getPermissions": [MockFunction] {
-                                            "calls": Array [
-                                              Array [],
-                                            ],
-                                            "results": Array [
-                                              Object {
-                                                "type": "return",
-                                                "value": Promise {},
-                                              },
-                                            ],
-                                          },
-                                          "savePermissionsForAgent": [MockFunction],
-                                        }
-                                      }
+                                      aria-expanded={true}
                                       className="PodBrowser-root PodBrowser-expanded"
                                       component="div"
                                       data-testid="accordion-resource-actions-trigger"
@@ -3955,23 +3780,7 @@ font-display: block;",
                                       onFocusVisible={[Function]}
                                     >
                                       <ForwardRef(ButtonBase)
-                                        aria-expanded={
-                                          Object {
-                                            "deleteFile": [MockFunction],
-                                            "getPermissions": [MockFunction] {
-                                              "calls": Array [
-                                                Array [],
-                                              ],
-                                              "results": Array [
-                                                Object {
-                                                  "type": "return",
-                                                  "value": Promise {},
-                                                },
-                                              ],
-                                            },
-                                            "savePermissionsForAgent": [MockFunction],
-                                          }
-                                        }
+                                        aria-expanded={true}
                                         className="PodBrowser-root PodBrowser-expanded"
                                         classes={
                                           Object {
@@ -3991,23 +3800,7 @@ font-display: block;",
                                       >
                                         <div
                                           aria-disabled={false}
-                                          aria-expanded={
-                                            Object {
-                                              "deleteFile": [MockFunction],
-                                              "getPermissions": [MockFunction] {
-                                                "calls": Array [
-                                                  Array [],
-                                                ],
-                                                "results": Array [
-                                                  Object {
-                                                    "type": "return",
-                                                    "value": Promise {},
-                                                  },
-                                                ],
-                                              },
-                                              "savePermissionsForAgent": [MockFunction],
-                                            }
-                                          }
+                                          aria-expanded={true}
                                           className="PodBrowser-root PodBrowser-root PodBrowser-expanded"
                                           data-testid="accordion-resource-actions-trigger"
                                           onBlur={[Function]}
@@ -4177,23 +3970,7 @@ font-display: block;",
                                   </ForwardRef(AccordionSummary)>
                                 </WithStyles(ForwardRef(AccordionSummary))>
                                 <WithStyles(ForwardRef(Collapse))
-                                  in={
-                                    Object {
-                                      "deleteFile": [MockFunction],
-                                      "getPermissions": [MockFunction] {
-                                        "calls": Array [
-                                          Array [],
-                                        ],
-                                        "results": Array [
-                                          Object {
-                                            "type": "return",
-                                            "value": Promise {},
-                                          },
-                                        ],
-                                      },
-                                      "savePermissionsForAgent": [MockFunction],
-                                    }
-                                  }
+                                  in={true}
                                   timeout="auto"
                                 >
                                   <ForwardRef(Collapse)
@@ -4206,23 +3983,7 @@ font-display: block;",
                                         "wrapperInner": "PodBrowser-wrapperInner",
                                       }
                                     }
-                                    in={
-                                      Object {
-                                        "deleteFile": [MockFunction],
-                                        "getPermissions": [MockFunction] {
-                                          "calls": Array [
-                                            Array [],
-                                          ],
-                                          "results": Array [
-                                            Object {
-                                              "type": "return",
-                                              "value": Promise {},
-                                            },
-                                          ],
-                                        },
-                                        "savePermissionsForAgent": [MockFunction],
-                                      }
-                                    }
+                                    in={true}
                                     timeout="auto"
                                   >
                                     <Transition
@@ -4230,23 +3991,7 @@ font-display: block;",
                                       appear={false}
                                       enter={true}
                                       exit={true}
-                                      in={
-                                        Object {
-                                          "deleteFile": [MockFunction],
-                                          "getPermissions": [MockFunction] {
-                                            "calls": Array [
-                                              Array [],
-                                            ],
-                                            "results": Array [
-                                              Object {
-                                                "type": "return",
-                                                "value": Promise {},
-                                              },
-                                            ],
-                                          },
-                                          "savePermissionsForAgent": [MockFunction],
-                                        }
-                                      }
+                                      in={true}
                                       mountOnEnter={false}
                                       onEnter={[Function]}
                                       onEntered={[Function]}
@@ -5210,6 +4955,7 @@ font-display: block;",
                                                               >
                                                                 <button
                                                                   className="PodBrowser-action-menu__trigger PodBrowser-action-menu__trigger--prompt"
+                                                                  data-testid="permissions-add-user-with-webid-button"
                                                                   onClick={[Function]}
                                                                   type="button"
                                                                 >
@@ -6694,23 +6440,7 @@ font-display: block;",
                             </ForwardRef(Divider)>
                           </WithStyles(ForwardRef(Divider))>
                           <WithStyles(ForwardRef(Accordion))
-                            defaultExpanded={
-                              Object {
-                                "deleteFile": [MockFunction],
-                                "getPermissions": [MockFunction] {
-                                  "calls": Array [
-                                    Array [],
-                                  ],
-                                  "results": Array [
-                                    Object {
-                                      "type": "return",
-                                      "value": Promise {},
-                                    },
-                                  ],
-                                },
-                                "savePermissionsForAgent": [MockFunction],
-                              }
-                            }
+                            defaultExpanded={true}
                           >
                             <ForwardRef(Accordion)
                               classes={
@@ -6721,23 +6451,7 @@ font-display: block;",
                                   "rounded": "PodBrowser-rounded",
                                 }
                               }
-                              defaultExpanded={
-                                Object {
-                                  "deleteFile": [MockFunction],
-                                  "getPermissions": [MockFunction] {
-                                    "calls": Array [
-                                      Array [],
-                                    ],
-                                    "results": Array [
-                                      Object {
-                                        "type": "return",
-                                        "value": Promise {},
-                                      },
-                                    ],
-                                  },
-                                  "savePermissionsForAgent": [MockFunction],
-                                }
-                              }
+                              defaultExpanded={true}
                             >
                               <WithStyles(ForwardRef(Paper))
                                 className="PodBrowser-root PodBrowser-expanded PodBrowser-rounded"
@@ -6802,23 +6516,7 @@ font-display: block;",
                                         expandIcon={<Memo(ExpandMoreIcon) />}
                                       >
                                         <WithStyles(ForwardRef(ButtonBase))
-                                          aria-expanded={
-                                            Object {
-                                              "deleteFile": [MockFunction],
-                                              "getPermissions": [MockFunction] {
-                                                "calls": Array [
-                                                  Array [],
-                                                ],
-                                                "results": Array [
-                                                  Object {
-                                                    "type": "return",
-                                                    "value": Promise {},
-                                                  },
-                                                ],
-                                              },
-                                              "savePermissionsForAgent": [MockFunction],
-                                            }
-                                          }
+                                          aria-expanded={true}
                                           className="PodBrowser-root PodBrowser-expanded"
                                           component="div"
                                           data-testid="accordion-resource-actions-trigger"
@@ -6830,23 +6528,7 @@ font-display: block;",
                                           onFocusVisible={[Function]}
                                         >
                                           <ForwardRef(ButtonBase)
-                                            aria-expanded={
-                                              Object {
-                                                "deleteFile": [MockFunction],
-                                                "getPermissions": [MockFunction] {
-                                                  "calls": Array [
-                                                    Array [],
-                                                  ],
-                                                  "results": Array [
-                                                    Object {
-                                                      "type": "return",
-                                                      "value": Promise {},
-                                                    },
-                                                  ],
-                                                },
-                                                "savePermissionsForAgent": [MockFunction],
-                                              }
-                                            }
+                                            aria-expanded={true}
                                             className="PodBrowser-root PodBrowser-expanded"
                                             classes={
                                               Object {
@@ -6866,23 +6548,7 @@ font-display: block;",
                                           >
                                             <div
                                               aria-disabled={false}
-                                              aria-expanded={
-                                                Object {
-                                                  "deleteFile": [MockFunction],
-                                                  "getPermissions": [MockFunction] {
-                                                    "calls": Array [
-                                                      Array [],
-                                                    ],
-                                                    "results": Array [
-                                                      Object {
-                                                        "type": "return",
-                                                        "value": Promise {},
-                                                      },
-                                                    ],
-                                                  },
-                                                  "savePermissionsForAgent": [MockFunction],
-                                                }
-                                              }
+                                              aria-expanded={true}
                                               className="PodBrowser-root PodBrowser-root PodBrowser-expanded"
                                               data-testid="accordion-resource-actions-trigger"
                                               onBlur={[Function]}
@@ -7052,23 +6718,7 @@ font-display: block;",
                                       </ForwardRef(AccordionSummary)>
                                     </WithStyles(ForwardRef(AccordionSummary))>
                                     <WithStyles(ForwardRef(Collapse))
-                                      in={
-                                        Object {
-                                          "deleteFile": [MockFunction],
-                                          "getPermissions": [MockFunction] {
-                                            "calls": Array [
-                                              Array [],
-                                            ],
-                                            "results": Array [
-                                              Object {
-                                                "type": "return",
-                                                "value": Promise {},
-                                              },
-                                            ],
-                                          },
-                                          "savePermissionsForAgent": [MockFunction],
-                                        }
-                                      }
+                                      in={true}
                                       timeout="auto"
                                     >
                                       <ForwardRef(Collapse)
@@ -7081,23 +6731,7 @@ font-display: block;",
                                             "wrapperInner": "PodBrowser-wrapperInner",
                                           }
                                         }
-                                        in={
-                                          Object {
-                                            "deleteFile": [MockFunction],
-                                            "getPermissions": [MockFunction] {
-                                              "calls": Array [
-                                                Array [],
-                                              ],
-                                              "results": Array [
-                                                Object {
-                                                  "type": "return",
-                                                  "value": Promise {},
-                                                },
-                                              ],
-                                            },
-                                            "savePermissionsForAgent": [MockFunction],
-                                          }
-                                        }
+                                        in={true}
                                         timeout="auto"
                                       >
                                         <Transition
@@ -7105,23 +6739,7 @@ font-display: block;",
                                           appear={false}
                                           enter={true}
                                           exit={true}
-                                          in={
-                                            Object {
-                                              "deleteFile": [MockFunction],
-                                              "getPermissions": [MockFunction] {
-                                                "calls": Array [
-                                                  Array [],
-                                                ],
-                                                "results": Array [
-                                                  Object {
-                                                    "type": "return",
-                                                    "value": Promise {},
-                                                  },
-                                                ],
-                                              },
-                                              "savePermissionsForAgent": [MockFunction],
-                                            }
-                                          }
+                                          in={true}
                                           mountOnEnter={false}
                                           onEnter={[Function]}
                                           onEntered={[Function]}
@@ -8085,6 +7703,7 @@ font-display: block;",
                                                                   >
                                                                     <button
                                                                       className="PodBrowser-action-menu__trigger PodBrowser-action-menu__trigger--prompt"
+                                                                      data-testid="permissions-add-user-with-webid-button"
                                                                       onClick={[Function]}
                                                                       type="button"
                                                                     >
