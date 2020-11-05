@@ -87,16 +87,6 @@ export function ProfileInfo({ editing }) {
       <hr />
 
       <Box mt={2}>
-        <Box>
-          <InputLabel>Name</InputLabel>
-          <Text
-            property={vcard.fn}
-            edit={editing}
-            autosave
-            inputProps={{ className: bem("input") }}
-          />
-        </Box>
-
         <Box mt={1}>
           <InputLabel>Role</InputLabel>
           <Text
