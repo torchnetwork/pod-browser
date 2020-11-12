@@ -19,15 +19,22 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React from "react";
+import React, { useContext } from "react";
 import T from "prop-types";
+import { useDataset, useSession } from "@inrupt/solid-ui-react";
 import DeleteLink from "../deleteLink";
-import useAccessControl from "../../src/hooks/useAccessControl";
-import useResourceInfo from "../../src/hooks/useResourceInfo";
+import usePoliciesContainer from "../../src/hooks/usePoliciesContainer";
+import AlertContext from "../../src/contexts/alertContext";
+import { deleteResource } from "../../src/solidClientHelpers/resource";
 
-export function createDeleteHandler(accessControl, onDelete) {
+export function createDeleteHandler(
+  resource,
+  policiesContainer,
+  onDelete,
+  fetch
+) {
   return async () => {
-    await accessControl.deleteFile();
+    await deleteResource(resource, policiesContainer, fetch);
     onDelete();
   };
 }
@@ -39,18 +46,27 @@ export default function DeleteResourceLink({
   onDelete,
   ...linkProps
 }) {
-  const { data: resourceInfo, error: resourceInfoError } = useResourceInfo(
+  const { fetch } = useSession();
+
+  const { alertError } = useContext(AlertContext);
+  const { policiesContainer } = usePoliciesContainer();
+  const { dataset: resourceDataset, error: datasetError } = useDataset(
     resourceIri
   );
-  const { accessControl, error: accessControlError } = useAccessControl(
-    resourceInfo
-  );
-
-  const handleDelete = createDeleteHandler(accessControl, onDelete);
-
-  if (resourceInfoError || accessControlError) {
-    return null;
+  if (datasetError) {
+    alertError(datasetError);
   }
+  const resource = {
+    dataset: resourceDataset,
+    iri: resourceIri,
+  };
+
+  const handleDelete = createDeleteHandler(
+    resource,
+    policiesContainer,
+    onDelete,
+    fetch
+  );
 
   return (
     <DeleteLink

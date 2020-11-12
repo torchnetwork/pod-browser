@@ -35,7 +35,11 @@ import {
   getResource,
   getResourceName,
   saveResource,
+  deleteResource,
 } from "./resource";
+import { getPolicyUrl } from "./policies";
+
+jest.mock("./policies");
 
 describe("getResource", () => {
   test("it returns a dataset and an iri", async () => {
@@ -235,5 +239,47 @@ describe("saveResource", () => {
     );
 
     expect(error).toEqual("boom");
+  });
+});
+
+describe("deleteResource", () => {
+  const mockDeleteFile = jest
+    .spyOn(SolidClientFns, "deleteFile")
+    .mockImplementation(jest.fn());
+
+  const fetch = jest.fn();
+  const resourceIri = "https://example.org/example.txt";
+  const policiesContainer = "https://example.og/pb_policies/";
+  const resourceDataset = mockSolidDatasetFrom(resourceIri);
+  const resource = {
+    dataset: resourceDataset,
+    iri: resourceIri,
+  };
+
+  test("it deletes the given resource only when no policy is found", async () => {
+    getPolicyUrl.mockReturnValue(null);
+
+    await deleteResource(resource, policiesContainer, fetch);
+
+    expect(mockDeleteFile).toHaveBeenCalledWith(resourceIri, {
+      fetch,
+    });
+    expect(mockDeleteFile).not.toHaveBeenCalledWith(null);
+  });
+
+  test("it deletes the given resource and corresponding access policy if available", async () => {
+    getPolicyUrl.mockReturnValue("https://example.org/examplePolicyUrl");
+
+    await deleteResource(resource, policiesContainer, fetch);
+
+    expect(mockDeleteFile).toHaveBeenCalledWith(resourceIri, {
+      fetch,
+    });
+    expect(mockDeleteFile).toHaveBeenCalledWith(
+      "https://example.org/examplePolicyUrl",
+      {
+        fetch,
+      }
+    );
   });
 });

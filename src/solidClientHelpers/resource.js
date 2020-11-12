@@ -23,12 +23,14 @@ import {
   createContainerAt,
   createSolidDataset,
   createThing,
+  deleteFile,
   getSolidDataset,
   getThing,
   saveSolidDatasetAt,
   setThing,
 } from "@inrupt/solid-client";
 import { parseUrl } from "../stringHelpers";
+import { getPolicyUrl } from "./policies";
 import { createResponder, isContainerIri, isHTTPError } from "./utils";
 
 export function getResourceName(iri) {
@@ -101,5 +103,22 @@ export async function saveResource({ dataset, iri }, fetch) {
     return respond(response);
   } catch (e) {
     return error(e.message);
+  }
+}
+
+export async function deleteResource(resource, policiesContainer, fetch) {
+  const { dataset, iri } = resource;
+  await deleteFile(iri, {
+    fetch,
+  });
+  if (!policiesContainer) return;
+  const policyUrl = getPolicyUrl(dataset, policiesContainer);
+  try {
+    if (!policyUrl) return;
+    await deleteFile(policyUrl, { fetch });
+  } catch (err) {
+    if (!isHTTPError(err.message, 404) && !isHTTPError(err.message, 403)) {
+      throw err;
+    }
   }
 }

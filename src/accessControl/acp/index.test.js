@@ -27,13 +27,15 @@ import AcpAccessControlStrategy, {
   createAcpMap,
   getOrCreatePermission,
   getOrCreatePolicy,
-  getPoliciesContainerUrl,
   getPolicyModesAndAgents,
-  getPolicyUrl,
   getRulesOrCreate,
   getRuleWithAgent,
   setAgents,
 } from "./index";
+import {
+  getPolicyUrl,
+  getPoliciesContainerUrl,
+} from "../../solidClientHelpers/policies";
 import { createAccessMap } from "../../solidClientHelpers/permissions";
 import { chain } from "../../solidClientHelpers/utils";
 import { mockProfileAlice } from "../../../__testUtils/mockPersonResource";
@@ -89,47 +91,9 @@ describe("AcpAccessControlStrategy", () => {
       ).toHaveBeenCalledWith(resourceInfoUrl, { fetch }));
 
     it("exposes the methods we expect for a access control strategy", () =>
-      [
-        "deleteFile",
-        "getPermissions",
-        "savePermissionsForAgent",
-      ].forEach((method) => expect(acp[method]).toBeDefined()));
-  });
-
-  describe("deleteFile", () => {
-    beforeEach(() => {
-      acp = new AcpAccessControlStrategy(
-        datasetWithAcr,
-        policiesContainer,
-        fetch
-      );
-      jest.spyOn(scFns, "deleteFile").mockResolvedValue();
-    });
-    it("deletes original resource", async () => {
-      await acp.deleteFile();
-      expect(scFns.deleteFile).toHaveBeenCalledWith(datasetWithAcrUrl, {
-        fetch,
-      });
-    });
-    it("deletes the corresponding policy resource", async () => {
-      await acp.deleteFile();
-      expect(scFns.deleteFile).toHaveBeenCalledWith(
-        getPolicyUrl(datasetWithAcr, policiesContainer),
-        { fetch }
-      );
-    });
-    it("ignores if the policy resource does not exist", async () => {
-      scFns.deleteFile.mockResolvedValueOnce().mockImplementationOnce(() => {
-        throw new Error("404");
-      });
-      await expect(acp.deleteFile()).resolves.toBeUndefined();
-    });
-    it("throws the error if it's anything besides 404", async () => {
-      scFns.deleteFile.mockResolvedValueOnce().mockImplementationOnce(() => {
-        throw new Error("500");
-      });
-      await expect(acp.deleteFile()).rejects.toEqual(new Error("500"));
-    });
+      ["getPermissions", "savePermissionsForAgent"].forEach((method) =>
+        expect(acp[method]).toBeDefined()
+      ));
   });
 
   describe("getPermissions", () => {
@@ -493,35 +457,6 @@ describe("getOrCreatePolicy", () => {
     );
     expect(policy).toEqual(policyThing);
     expect(dataset).toEqual(setThing(policyDataset, policyThing));
-  });
-});
-
-describe("getPolicyUrl", () => {
-  const policiesUrl = getPoliciesContainerUrl(podUrl);
-  const policies = mockSolidDatasetFrom(policiesUrl);
-
-  it("returns corresponding policy URLs", () => {
-    expect(getPolicyUrl(mockSolidDatasetFrom(podUrl), policies)).toEqual(
-      "http://example.com/pb_policies/.ttl"
-    );
-    expect(
-      getPolicyUrl(mockSolidDatasetFrom(`${podUrl}test`), policies)
-    ).toEqual("http://example.com/pb_policies/test.ttl");
-    expect(
-      getPolicyUrl(mockSolidDatasetFrom(`${podUrl}test.ttl`), policies)
-    ).toEqual("http://example.com/pb_policies/test.ttl.ttl");
-    expect(
-      getPolicyUrl(mockSolidDatasetFrom(`${podUrl}foo/bar`), policies)
-    ).toEqual("http://example.com/pb_policies/foo/bar.ttl");
-    expect(getPolicyUrl(mockSolidDatasetFrom(policiesUrl), policies)).toEqual(
-      "http://example.com/pb_policies/pb_policies/.ttl"
-    );
-    expect(
-      getPolicyUrl(mockSolidDatasetFrom(`${policiesUrl}test`), policies)
-    ).toEqual("http://example.com/pb_policies/pb_policies/test.ttl");
-    expect(
-      getPolicyUrl(mockSolidDatasetFrom(`${podUrl}public`), policies)
-    ).toEqual("http://example.com/pb_policies/public.ttl");
   });
 });
 

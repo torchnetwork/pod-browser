@@ -22,13 +22,11 @@
 import {
   acp_v1 as acp,
   asUrl,
-  deleteFile,
   getSolidDataset,
   getSourceUrl,
   saveSolidDatasetAt,
   setThing,
 } from "@inrupt/solid-client";
-import { joinPath } from "../../stringHelpers";
 import { fetchProfile } from "../../solidClientHelpers/profile";
 import {
   ACL,
@@ -40,15 +38,9 @@ import {
   chainPromise,
   createResponder,
   isHTTPError,
-  sharedStart,
 } from "../../solidClientHelpers/utils";
 import { getOrCreateDataset } from "../../solidClientHelpers/resource";
-
-const POLICIES_CONTAINER = "pb_policies/";
-
-export function getPoliciesContainerUrl(podRootUri) {
-  return joinPath(podRootUri, POLICIES_CONTAINER);
-}
+import { getPolicyUrl } from "../../solidClientHelpers/policies";
 
 export function createAcpMap(read = false, write = false, append = false) {
   return {
@@ -86,18 +78,6 @@ export function getOrCreatePermission(permissions, webId) {
     access: createAcpMap(),
   };
   return permission;
-}
-
-export function getPolicyUrl(resource, policiesContainer) {
-  const resourceUrl = getSourceUrl(resource);
-  const policiesContainerUrl = getSourceUrl(policiesContainer);
-  const rootUrl = policiesContainerUrl.substr(
-    0,
-    policiesContainerUrl.length - POLICIES_CONTAINER.length
-  );
-  const matchingStart = sharedStart(resourceUrl, rootUrl);
-  const path = resourceUrl.substr(matchingStart.length);
-  return `${getPoliciesContainerUrl(matchingStart) + path}.ttl`;
 }
 
 export function getOrCreatePolicy(policyDataset, url) {
@@ -185,19 +165,6 @@ export default class AcpAccessControlStrategy {
     this.#datasetWithAcr = datasetWithAcr;
     this.#policyUrl = getPolicyUrl(datasetWithAcr, policiesContainer);
     this.#fetch = fetch;
-  }
-
-  async deleteFile() {
-    await deleteFile(getSourceUrl(this.#datasetWithAcr), {
-      fetch: this.#fetch,
-    });
-    try {
-      await deleteFile(this.#policyUrl, { fetch: this.#fetch });
-    } catch (err) {
-      if (!isHTTPError(err.message, 404)) {
-        throw err;
-      }
-    }
   }
 
   async getPermissions() {
