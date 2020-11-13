@@ -250,16 +250,12 @@ describe("deleteResource", () => {
   const fetch = jest.fn();
   const resourceIri = "https://example.org/example.txt";
   const policiesContainer = "https://example.og/pb_policies/";
-  const resourceDataset = mockSolidDatasetFrom(resourceIri);
-  const resource = {
-    dataset: resourceDataset,
-    iri: resourceIri,
-  };
+  const resourceInfo = mockSolidDatasetFrom(resourceIri);
 
   test("it deletes the given resource only when no policy is found", async () => {
     getPolicyUrl.mockReturnValue(null);
 
-    await deleteResource(resource, policiesContainer, fetch);
+    await deleteResource(resourceInfo, policiesContainer, fetch);
 
     expect(mockDeleteFile).toHaveBeenCalledWith(resourceIri, {
       fetch,
@@ -270,7 +266,7 @@ describe("deleteResource", () => {
   test("it deletes the given resource and corresponding access policy if available", async () => {
     getPolicyUrl.mockReturnValue("https://example.org/examplePolicyUrl");
 
-    await deleteResource(resource, policiesContainer, fetch);
+    await deleteResource(resourceInfo, policiesContainer, fetch);
 
     expect(mockDeleteFile).toHaveBeenCalledWith(resourceIri, {
       fetch,
