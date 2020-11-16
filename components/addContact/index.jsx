@@ -25,8 +25,8 @@ import { useBem } from "@solid/lit-prism-patterns";
 import { BackToNav, BackToNavLink } from "@inrupt/prism-react-components";
 import clsx from "clsx";
 import Link from "next/link";
-import { getSourceUrl } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
+import { foaf } from "rdf-namespaces";
 import Spinner from "../spinner";
 import { findContactInAddressBook, saveContact } from "../../src/addressBook";
 import useAddressBook from "../../src/hooks/useAddressBook";
@@ -36,6 +36,7 @@ import AlertContext from "../../src/contexts/alertContext";
 import { useRedirectIfLoggedOut } from "../../src/effects/auth";
 import styles from "./styles";
 import { fetchProfile } from "../../src/solidClientHelpers/profile";
+import useContacts from "../../src/hooks/useContacts";
 
 const useStyles = makeStyles((theme) => createStyles(styles(theme)));
 export const EXISTING_WEBID_ERROR_MESSAGE =
@@ -52,6 +53,8 @@ export function handleSubmit({
   alertSuccess,
   fetch,
   setDirtyForm,
+  peopleMutate,
+  people,
 }) {
   return async (iri) => {
     setDirtyForm(true);
@@ -59,17 +62,14 @@ export function handleSubmit({
       return;
     }
     setIsLoading(true);
-    const addressBookIri = getSourceUrl(addressBook);
 
     try {
       const { name, webId, types } = await fetchProfile(iri, fetch);
-
       const existingContact = await findContactInAddressBook(
-        addressBookIri,
+        people,
         webId,
         fetch
       );
-
       if (existingContact.length) {
         alertError(EXISTING_WEBID_ERROR_MESSAGE);
         setIsLoading(false);
@@ -79,7 +79,7 @@ export function handleSubmit({
       if (name) {
         const contact = { webId, fn: name };
         const { response, error } = await saveContact(
-          addressBookIri,
+          addressBook,
           contact,
           types,
           fetch
@@ -89,6 +89,7 @@ export function handleSubmit({
         if (response) {
           alertSuccess(`${contact.fn} was added to your contacts`);
           setAgentId("");
+          peopleMutate();
         }
       } else {
         alertError(NO_NAME_ERROR_MESSAGE);
@@ -119,6 +120,13 @@ export default function AddContact() {
   const [isLoading, setIsLoading] = useState(false);
   const [agentId, setAgentId] = useState("");
   const [dirtyForm, setDirtyForm] = useState(false);
+  const {
+    data: people,
+    error: peopleError,
+    mutate: peopleMutate,
+  } = useContacts(addressBook, foaf.Person);
+
+  if (peopleError) alertError(peopleError);
 
   if (!webId || isLoading) return <Spinner />;
 
@@ -131,6 +139,8 @@ export default function AddContact() {
     fetch,
     webId,
     setDirtyForm,
+    peopleMutate,
+    people,
   });
 
   const handleChange = (newValue) => {
