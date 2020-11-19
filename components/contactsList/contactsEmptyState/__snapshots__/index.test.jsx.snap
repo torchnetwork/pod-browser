@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ContactsEmptyState it renders an empty state component 1`] = `
+<DocumentFragment>
+  <div
+    class="PodBrowser-content"
+  >
+    <div
+      class="PodBrowser-container PodBrowser-empty-state-container"
+    >
+      <i
+        class="PodBrowser-icon-user-astronaut PodBrowser-icon-large"
+      />
+      <h1>
+        You don’t have any contacts yet!
+      </h1>
+      <p>
+        Add a new contact to share files with.
+      </p>
+      <a
+        class="PodBrowser-button PodBrowser-add-contact-button"
+        data-testid="add-new-contact-button"
+        href="/contacts/add"
+      >
+        Add new contact
+      </a>
+    </div>
+  </div>
+</DocumentFragment>
+`;
