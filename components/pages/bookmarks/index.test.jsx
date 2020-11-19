@@ -19,12 +19,18 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { StyleRules } from "@material-ui/styles";
+import React from "react";
+import { render } from "@testing-library/react";
+import BookmarksPage from "./index";
+import TestApp from "../../../__testUtils/testApp";
 
-const styles: StyleRules = {
-  container: {
-    textAlign: "center",
-  },
-};
-
-export default styles;
+describe("BookmarksPage", () => {
+  it("renders", () => {
+    const { asFragment } = render(
+      <TestApp>
+        <BookmarksPage />
+      </TestApp>
+    );
+    expect(asFragment()).toMatchSnapshot();
+  });
+});

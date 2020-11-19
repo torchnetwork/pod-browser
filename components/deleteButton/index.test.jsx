@@ -20,15 +20,14 @@
  */
 
 import React from "react";
-import { mount } from "enzyme";
-import { mountToJson, WithTheme } from "../../__testUtils/mountWithTheme";
-import defaultTheme from "../../src/theme";
+import userEvent from "@testing-library/user-event";
 
 import DeleteButton, {
   handleDeleteResource,
   handleConfirmation,
 } from "./index";
 import mockConfirmationDialogContextProvider from "../../__testUtils/mockConfirmationDialogContextProvider";
+import { renderWithTheme } from "../../__testUtils/withTheme";
 
 jest.mock("@inrupt/solid-client");
 
@@ -39,7 +38,7 @@ const successMessage = "successMessage";
 
 describe("Delete button", () => {
   test("it renders a delete button", () => {
-    const tree = mountToJson(
+    const { asFragment } = renderWithTheme(
       <DeleteButton
         onDelete={jest.fn()}
         confirmationTitle={confirmationTitle}
@@ -48,7 +47,7 @@ describe("Delete button", () => {
         successMessage={successMessage}
       />
     );
-    expect(tree).toMatchSnapshot();
+    expect(asFragment()).toMatchSnapshot();
   });
   test("clicking on delete button calls setOpen with the correct id", () => {
     const setOpen = jest.fn();
@@ -59,21 +58,19 @@ describe("Delete button", () => {
       setContent: jest.fn(),
       confirmed: null,
     });
-    const tree = mount(
-      <WithTheme theme={defaultTheme}>
-        <ConfirmationDialogProvider>
-          <DeleteButton
-            onDelete={jest.fn()}
-            confirmationTitle={confirmationTitle}
-            confirmationContent={confirmationContent}
-            dialogId={dialogId}
-            successMessage={successMessage}
-          />
-        </ConfirmationDialogProvider>
-      </WithTheme>
+    const { container } = renderWithTheme(
+      <ConfirmationDialogProvider>
+        <DeleteButton
+          onDelete={jest.fn()}
+          confirmationTitle={confirmationTitle}
+          confirmationContent={confirmationContent}
+          dialogId={dialogId}
+          successMessage={successMessage}
+        />
+      </ConfirmationDialogProvider>
     );
-    const deletebutton = tree.find("button");
-    deletebutton.simulate("click");
+    const deletebutton = container.querySelector("button");
+    userEvent.click(deletebutton);
     expect(setOpen).toHaveBeenCalledWith(dialogId);
   });
 });

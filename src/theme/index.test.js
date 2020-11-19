@@ -19,8 +19,10 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { PrismTheme, button } from "@solid/lit-prism-patterns";
+import theme from "./index";
 
-const styles = (theme: PrismTheme) => button.styles(theme);
-
-export default styles;
+describe("theme", () => {
+  it("renders a theme object", () => {
+    expect(theme).toMatchSnapshot();
+  });
+});

@@ -20,8 +20,6 @@
  */
 
 import React from "react";
-import { mount } from "enzyme";
-import { mountToJson } from "enzyme-to-json";
 import { vcard } from "rdf-namespaces";
 import {
   addStringNoLocale,
@@ -41,8 +39,7 @@ import AddContact, {
 } from "./index";
 import * as addressBookFns from "../../src/addressBook";
 import { contactsContainerIri } from "../../src/addressBook";
-import { WithTheme } from "../../__testUtils/mountWithTheme";
-import { defaultTheme } from "../../src/theme";
+import { renderWithTheme } from "../../__testUtils/withTheme";
 import {
   aliceWebIdUrl,
   mockPersonDatasetAlice,
@@ -54,29 +51,25 @@ describe("AddContact", () => {
   test("it renders the Add Contact form", () => {
     const session = mockSession();
     const SessionProvider = mockSessionContextProvider(session);
-    const tree = mount(
+    const { asFragment } = renderWithTheme(
       <SessionProvider>
-        <WithTheme theme={defaultTheme}>
-          <AddContact />
-        </WithTheme>
+        <AddContact />
       </SessionProvider>
     );
 
-    expect(mountToJson(tree)).toMatchSnapshot();
+    expect(asFragment()).toMatchSnapshot();
   });
 
   test("it renders a spinner when user is not logged in", () => {
     const session = mockUnauthenticatedSession();
     const SessionProvider = mockSessionContextProvider(session);
-    const tree = mount(
+    const { asFragment } = renderWithTheme(
       <SessionProvider>
-        <WithTheme theme={defaultTheme}>
-          <AddContact />
-        </WithTheme>
+        <AddContact />
       </SessionProvider>
     );
 
-    expect(mountToJson(tree)).toMatchSnapshot();
+    expect(asFragment()).toMatchSnapshot();
   });
 });
 describe("handleSubmit", () => {

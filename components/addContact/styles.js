@@ -23,11 +23,6 @@ import { createStyles } from "@solid/lit-prism-patterns";
 
 const styles = (theme) => {
   return createStyles(theme, ["container", "table"], {
-    "container-breadcrumbs": {
-      borderBottom: `solid 1px ${theme.palette.divider}`,
-      marginTop: theme.spacing(1),
-      paddingBottom: theme.spacing(1),
-    },
     "container-view--menu-open": {
       [theme.breakpoints.up("sm")]: {
         paddingRight: "50%",

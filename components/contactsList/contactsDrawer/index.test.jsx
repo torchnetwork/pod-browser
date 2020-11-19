@@ -19,50 +19,26 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { StyleRules } from "@material-ui/core";
-import { PrismTheme, content } from "@solid/lit-prism-patterns";
+import React from "react";
+import ContactsDrawer from "./index";
+import { renderWithTheme } from "../../../__testUtils/withTheme";
 
-const rules = {
-  accordionDetails: {
-    display: "block",
-  },
-  centeredSection: {
-    paddingLeft: "1rem",
-    paddingRight: "1rem",
-  },
-  headerSection: {
-    paddingLeft: "1rem",
-    paddingRight: "1rem",
-    display: "flex",
-    alignItems: "flex-start",
-    "& button": {
-      marginLeft: "auto",
-    },
-  },
-  raw: {
-    height: "100%",
-    width: "100%",
-    maxHeight: "200px",
-    overflow: "auto",
-  },
-  formListItem: {
-    display: "block",
-  },
-  detailText: {
-    fontSize: "0.75rem",
-  },
-  typeValue: {
-    marginLeft: "auto",
-  },
-  agentInput: {
-    width: "100%",
-    marginBottom: "1rem",
-  },
-};
+describe("ContactsDrawer", () => {
+  const onClose = () => {};
+  const onDelete = () => {};
+  const selectedContactName = "Alice";
+  const profileIri = "https://example.com/profile#alice";
 
-export default function styles(theme: PrismTheme): StyleRules {
-  return {
-    ...rules,
-    ...content.styles(theme),
-  };
-}
+  it("renders", () => {
+    const { asFragment } = renderWithTheme(
+      <ContactsDrawer
+        open
+        onClose={onClose}
+        onDelete={onDelete}
+        selectedContactName={selectedContactName}
+        profileIri={profileIri}
+      />
+    );
+    expect(asFragment()).toMatchSnapshot();
+  });
+});

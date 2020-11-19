@@ -19,27 +19,18 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { useEffect } from "react";
+import React from "react";
+import { render } from "@testing-library/react";
+import AddContactPage from "./index";
+import TestApp from "../../../../__testUtils/testApp";
 
-export const ESC_KEYCODE = 27;
-
-export function handleEscKeydown(
-  callback: (evnt: KeyboardEvent) => unknown
-): (evnt: KeyboardEvent) => unknown {
-  return (e: KeyboardEvent) => {
-    if (!e?.keyCode) return;
-    if (e.keyCode === ESC_KEYCODE) callback(e);
-  };
-}
-
-export default function useEscKey(
-  callback: (evnt: KeyboardEvent) => unknown
-): void {
-  return useEffect(() => {
-    document.body.addEventListener("keydown", handleEscKeydown(callback));
-
-    return () => {
-      document.body.removeEventListener("keydown", handleEscKeydown(callback));
-    };
+describe("AddContactPage", () => {
+  it("renders", () => {
+    const { asFragment } = render(
+      <TestApp>
+        <AddContactPage />
+      </TestApp>
+    );
+    expect(asFragment()).toMatchSnapshot();
   });
-}
+});

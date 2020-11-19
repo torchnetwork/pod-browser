@@ -19,5 +19,18 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-const Adapter = require("@wojtekmaj/enzyme-adapter-react-17")
-require("enzyme").configure({adapter: new Adapter()})
+import React from "react";
+import { render } from "@testing-library/react";
+import TestApp from "../../../__testUtils/testApp";
+import ContactsPage from "./index";
+
+describe("ContactsPage", () => {
+  it("renders", () => {
+    const { asFragment } = render(
+      <TestApp>
+        <ContactsPage />
+      </TestApp>
+    );
+    expect(asFragment()).toMatchSnapshot();
+  });
+});

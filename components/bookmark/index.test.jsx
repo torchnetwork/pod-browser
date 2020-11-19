@@ -20,12 +20,10 @@
  */
 
 import React from "react";
-import { mount } from "enzyme";
 import { mockSolidDatasetFrom } from "@inrupt/solid-client";
-import { mountToJson, WithTheme } from "../../__testUtils/mountWithTheme";
+import { renderWithTheme } from "../../__testUtils/withTheme";
 import Bookmark, { toggleBookmarkHandler } from "./index";
 import BookmarkContext from "../../src/contexts/bookmarksContext";
-import defaultTheme from "../../src/theme";
 import * as bookmarkHelpers from "../../src/solidClientHelpers/bookmarks";
 
 const iri = "https://mypod.myhost.com/catvideos";
@@ -36,25 +34,23 @@ const setBookmarks = jest.fn();
 
 describe("Bookmark", () => {
   test("it renders a bookmark icon", async () => {
-    const tree = mountToJson(
+    const { asFragment } = renderWithTheme(
       <BookmarkContext.Provider value={(bookmarks, setBookmarks)}>
         <Bookmark iri={iri} />
       </BookmarkContext.Provider>
     );
-    expect(tree).toMatchSnapshot();
+    expect(asFragment()).toMatchSnapshot();
   });
 });
 describe("toggleHandler", () => {
   test("it updates icon when the toggle handler is triggered", async () => {
-    const tree = mount(
-      <WithTheme theme={defaultTheme}>
-        <BookmarkContext.Provider value={(bookmarks, setBookmarks)}>
-          <Bookmark iri={iri} />
-        </BookmarkContext.Provider>
-      </WithTheme>
+    const { container } = renderWithTheme(
+      <BookmarkContext.Provider value={(bookmarks, setBookmarks)}>
+        <Bookmark iri={iri} />
+      </BookmarkContext.Provider>
     );
 
-    expect(tree.html()).toContain("bookmark-icon-unselected");
+    expect(container.querySelector("#bookmark-icon-unselected")).toBeDefined();
   });
 
   test("it updates the icon when adding bookmarks", async () => {
@@ -108,15 +104,13 @@ describe("toggleHandler", () => {
     expect(setBookmarks).toHaveBeenCalled();
   });
   test("it renders an error when it is unsuccessful in adding bookmark", async () => {
-    const tree = mount(
-      <WithTheme theme={defaultTheme}>
-        <BookmarkContext.Provider value={(bookmarks, setBookmarks)}>
-          <Bookmark iri={iri} />
-        </BookmarkContext.Provider>
-      </WithTheme>
+    const { container } = renderWithTheme(
+      <BookmarkContext.Provider value={(bookmarks, setBookmarks)}>
+        <Bookmark iri={iri} />
+      </BookmarkContext.Provider>
     );
 
-    expect(tree.html()).toContain("bookmark-icon-unselected");
+    expect(container.querySelector("#bookmark-icon-unselected")).toBeDefined();
 
     const setBookmarked = jest.fn();
     const setAlertOpen = jest.fn();

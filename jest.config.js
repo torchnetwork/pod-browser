@@ -19,28 +19,18 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-const tsConfig = require("./tsconfig.json");
-
 module.exports = {
   // Automatically clear mock calls and instances between every test
   clearMocks: true,
 
   // The test environment that will be used for testing
   testEnvironment: "jsdom",
-  setupFilesAfterEnv: ["<rootDir>jest/setupTests.js"],
 
   testPathIgnorePatterns: ["/node_modules/", "/__testUtils/"],
 
   transform: {
-    "^.+\\.(js|jsx|ts|tsx)$": "ts-jest",
+    "^.+\\.jsx?$": "babel-jest",
     "^.+\\.ttl$": "jest-raw-loader",
-  },
-
-  // ts config
-  globals: {
-    "ts-jest": {
-      tsConfig: { ...tsConfig.compilerOptions, jsx: "react" },
-    },
   },
 
   // Coverage configs
@@ -49,14 +39,13 @@ module.exports = {
   coveragePathIgnorePatterns: [
     "/node_modules/",
     "/__testUtils/",
-    "styles.ts",
     "/src/windowHelpers",
   ],
 
   coverageThreshold: {
     global: {
-      branches: 86,
-      functions: 86,
+      branches: 90,
+      functions: 90,
       lines: 95,
       statements: 95,
     },

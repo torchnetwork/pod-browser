@@ -20,10 +20,8 @@
  */
 
 import React from "react";
-import { mount } from "enzyme";
 import { useRouter } from "next/router";
-import { mountToJson as enzymeMountToJson } from "enzyme-to-json";
-import { WithTheme } from "../../../__testUtils/mountWithTheme";
+import { renderWithTheme } from "../../../__testUtils/withTheme";
 import PodIndicator, {
   clickHandler,
   closeHandler,
@@ -36,7 +34,6 @@ import {
   bobWebIdUrl,
 } from "../../../__testUtils/mockPersonResource";
 import usePodOwnerProfile from "../../../src/hooks/usePodOwnerProfile";
-import defaultTheme from "../../../src/theme";
 
 import { packageProfile } from "../../../src/solidClientHelpers/profile";
 import { resourceHref } from "../../../src/navigator";
@@ -60,13 +57,9 @@ describe("PodIndicator", () => {
       profile: packageProfile(aliceWebIdUrl, userProfile),
       error: null,
     });
-    const tree = mount(
-      <WithTheme theme={defaultTheme}>
-        <PodIndicator />
-      </WithTheme>
-    );
-    expect(tree.html()).toContain("Alice");
-    expect(enzymeMountToJson(tree)).toMatchSnapshot();
+    const { asFragment, queryByText } = renderWithTheme(<PodIndicator />);
+    expect(queryByText("Alice")).toBeDefined();
+    expect(asFragment()).toMatchSnapshot();
   });
 
   test("it renders the pod indicator with the correct name with a name", async () => {
@@ -75,13 +68,9 @@ describe("PodIndicator", () => {
       profile: packageProfile(bobWebIdUrl, userProfile),
       error: null,
     });
-    const tree = mount(
-      <WithTheme theme={defaultTheme}>
-        <PodIndicator />
-      </WithTheme>
-    );
-    expect(tree.html()).toContain("Bob");
-    expect(enzymeMountToJson(tree)).toMatchSnapshot();
+    const { asFragment, queryByText } = renderWithTheme(<PodIndicator />);
+    expect(queryByText("Bob")).toBeDefined();
+    expect(asFragment()).toMatchSnapshot();
   });
 
   test("it returns null if there is no profile", async () => {
@@ -89,12 +78,8 @@ describe("PodIndicator", () => {
       profile: null,
       error: null,
     });
-    const tree = mount(
-      <WithTheme theme={defaultTheme}>
-        <PodIndicator />
-      </WithTheme>
-    );
-    expect(enzymeMountToJson(tree)).toMatchSnapshot();
+    const { asFragment } = renderWithTheme(<PodIndicator />);
+    expect(asFragment).toMatchSnapshot();
   });
 });
 

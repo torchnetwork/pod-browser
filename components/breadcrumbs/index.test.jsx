@@ -20,55 +20,53 @@
  */
 
 import React from "react";
-import { mount } from "enzyme";
-import { mountToJson, WithTheme } from "../../__testUtils/mountWithTheme";
-import defaultTheme from "../../src/theme";
+import { renderWithTheme } from "../../__testUtils/withTheme";
 import { PodLocationProvider } from "../../src/contexts/podLocationContext";
 import Breadcrumbs from "./index";
 
 describe("Breadcrumbs view", () => {
   test("Renders a breadcrumbs view", () => {
-    const tree = mountToJson(
+    const { asFragment } = renderWithTheme(
       <PodLocationProvider currentUri="https://www.mypodbrowser.com">
         <Breadcrumbs />
       </PodLocationProvider>
     );
-    expect(tree).toMatchSnapshot();
+    expect(asFragment()).toMatchSnapshot();
   });
 
   test("Renders a breadcrumbs view with breadcrumbs based on url slashes", () => {
-    const tree = mountToJson(
+    const { asFragment } = renderWithTheme(
       <PodLocationProvider currentUri="https://www.mypodbrowser.com/some/location">
         <Breadcrumbs />
       </PodLocationProvider>
     );
-    expect(tree).toMatchSnapshot();
+    expect(asFragment()).toMatchSnapshot();
   });
 
   test("Renders last breadcrumb as plain text", () => {
-    const tree = mount(
-      <WithTheme theme={defaultTheme}>
-        <PodLocationProvider currentUri="https://www.mypodbrowser.com/some/location">
-          <Breadcrumbs />
-        </PodLocationProvider>
-      </WithTheme>
+    const { container } = renderWithTheme(
+      <PodLocationProvider currentUri="https://www.mypodbrowser.com/some/location">
+        <Breadcrumbs />
+      </PodLocationProvider>
     );
-    expect(tree.html()).toContain(
-      'href="/resource/https%3A%2F%2Fwww.mypodbrowser.com%2Fsome'
-    );
-    expect(tree.html()).not.toContain(
-      'href="/resource/https%3A%2F%2Fwww.mypodbrowser.com%2Fsome%2Flocation'
-    );
+    expect(
+      container.querySelector(
+        "[href='/resource/https%3A%2F%2Fwww.mypodbrowser.com%2Fsome']"
+      )
+    ).toBeDefined();
+    expect(
+      container.querySelector(
+        "[href='/resource/https%3A%2F%2Fwww.mypodbrowser.com%2Fsome%2Flocation']"
+      )
+    ).toBeNull();
   });
 
   test("Displays current folder as crumb in breadcrumbs", () => {
-    const tree = mount(
-      <WithTheme theme={defaultTheme}>
-        <PodLocationProvider currentUri="https://www.mypodbrowser.com/some/location">
-          <Breadcrumbs />
-        </PodLocationProvider>
-      </WithTheme>
+    const { queryByText } = renderWithTheme(
+      <PodLocationProvider currentUri="https://www.mypodbrowser.com/some/location">
+        <Breadcrumbs />
+      </PodLocationProvider>
     );
-    expect(tree.html()).toContain("location");
+    expect(queryByText(/location/i)).toBeDefined();
   });
 });

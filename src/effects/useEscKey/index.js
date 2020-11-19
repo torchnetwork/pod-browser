@@ -19,21 +19,23 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { PrismTheme, createStyles } from "@solid/lit-prism-patterns";
+import { useEffect } from "react";
 
-const styles = (theme: PrismTheme) =>
-  createStyles(theme, ["button", "content"], {
-    "login-form": {
-      background: theme.palette.background.default,
-      borderRadius: theme.shape.borderRadius,
-      boxShadow: "0px 2px 4px 0px rgba(0,0,0,0.3)",
-      padding: theme.spacing(5),
-      minWidth: 420,
-      maxWidth: 600,
-    },
-    "login-form__what-is-solid": {
-      margin: 0,
-    },
+export const ESC_KEYCODE = 27;
+
+export function handleEscKeydown(callback) {
+  return (e) => {
+    if (!e?.keyCode) return;
+    if (e.keyCode === ESC_KEYCODE) callback(e);
+  };
+}
+
+export default function useEscKey(callback) {
+  return useEffect(() => {
+    document.body.addEventListener("keydown", handleEscKeydown(callback));
+
+    return () => {
+      document.body.removeEventListener("keydown", handleEscKeydown(callback));
+    };
   });
-
-export default styles;
+}

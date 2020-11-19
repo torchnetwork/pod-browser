@@ -20,8 +20,6 @@
  */
 
 import React from "react";
-import { mount } from "enzyme";
-import { mountToJson } from "enzyme-to-json";
 import { mockSolidDatasetFrom } from "@inrupt/solid-client";
 import DeleteResourceButton, { createDeleteHandler } from "./index";
 import usePoliciesContainer from "../../src/hooks/usePoliciesContainer";
@@ -29,9 +27,8 @@ import {
   getResource,
   deleteResource,
 } from "../../src/solidClientHelpers/resource";
-import { WithTheme } from "../../__testUtils/mountWithTheme";
-import defaultTheme from "../../src/theme";
 import useResourceInfo from "../../src/hooks/useResourceInfo";
+import { renderWithTheme } from "../../__testUtils/withTheme";
 
 jest.mock("@inrupt/solid-client");
 jest.mock("../../src/hooks/useResourceInfo");
@@ -49,21 +46,19 @@ describe("Delete resource button", () => {
   }));
   useResourceInfo.mockReturnValue("resource info");
   describe("it hooks works successfully", () => {
-    let tree;
+    let renderResult;
     beforeEach(() => {
-      tree = mount(
-        <WithTheme theme={defaultTheme}>
-          <DeleteResourceButton
-            onDelete={jest.fn()}
-            resourceIri={resourceIri}
-            name={name}
-          />
-        </WithTheme>
+      renderResult = renderWithTheme(
+        <DeleteResourceButton
+          onDelete={jest.fn()}
+          resourceIri={resourceIri}
+          name={name}
+        />
       );
     });
 
     it("renders a delete resource button", () => {
-      expect(mountToJson(tree)).toMatchSnapshot();
+      expect(renderResult.asFragment()).toMatchSnapshot();
     });
   });
 

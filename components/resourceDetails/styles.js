@@ -19,19 +19,49 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { content } from "@solid/lit-prism-patterns";
 
-import { createStyles, PrismTheme } from "@solid/lit-prism-patterns";
-
-const styles = (theme: PrismTheme) =>
-  createStyles(theme, ["icons", "table"], {
-    spinnerContainer: {
-      display: "flex",
-      flexDirection: "row",
-      flexWrap: "nowrap",
-      justifyContent: "center",
+const rules = {
+  accordionDetails: {
+    display: "block",
+  },
+  centeredSection: {
+    paddingLeft: "1rem",
+    paddingRight: "1rem",
+  },
+  headerSection: {
+    paddingLeft: "1rem",
+    paddingRight: "1rem",
+    display: "flex",
+    alignItems: "flex-start",
+    "& button": {
+      marginLeft: "auto",
     },
-    "resource-icon": theme.icons.iconColor(theme.palette.text.secondary),
-  });
+  },
+  raw: {
+    height: "100%",
+    width: "100%",
+    maxHeight: "200px",
+    overflow: "auto",
+  },
+  formListItem: {
+    display: "block",
+  },
+  detailText: {
+    fontSize: "0.75rem",
+  },
+  typeValue: {
+    marginLeft: "auto",
+  },
+  agentInput: {
+    width: "100%",
+    marginBottom: "1rem",
+  },
+};
 
-export default styles;
+export default function styles(theme) {
+  return {
+    ...rules,
+    ...content.styles(theme),
+  };
+}

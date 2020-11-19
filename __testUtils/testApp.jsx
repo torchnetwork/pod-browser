@@ -19,41 +19,36 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { StyleRules } from "@material-ui/styles";
-import { PrismTheme, content } from "@solid/lit-prism-patterns";
+import React from "react";
+import T from "prop-types";
+import WithTheme from "./withTheme";
+import { FeatureProvider } from "../src/contexts/featureFlagsContext";
+import { AlertProvider } from "../src/contexts/alertContext";
+import { ConfirmationDialogProvider } from "../src/contexts/confirmationDialogContext";
+import mockSessionContextProvider from "./mockSessionContextProvider";
+import mockSession from "./mockSession";
 
-const rules = {
-  spinnerContainer: {
-    justifyContent: "center",
-  },
-  centeredSection: {
-    paddingLeft: "1rem",
-    paddingRight: "1rem",
-  },
-  raw: {
-    height: "100%",
-    width: "100%",
-    maxHeight: 200,
-    overflow: "auto",
-  },
-  listItem: {
-    display: "flex",
-    justifyContent: "space-between",
-  },
-  detailText: {
-    fontSize: "0.75rem",
-  },
-  typeValue: {
-    marginLeft: "auto",
-  },
-  avatar: {
-    marginRight: "1rem",
-  },
+export default function TestApp({ children, session }) {
+  const SessionProvider = mockSessionContextProvider(session);
+  return (
+    <WithTheme>
+      <SessionProvider>
+        <FeatureProvider>
+          <AlertProvider>
+            <ConfirmationDialogProvider>{children}</ConfirmationDialogProvider>
+          </AlertProvider>
+        </FeatureProvider>
+      </SessionProvider>
+    </WithTheme>
+  );
+}
+
+TestApp.defaultProps = {
+  session: mockSession(),
 };
 
-export default function styles(theme: PrismTheme): StyleRules {
-  return {
-    ...rules,
-    ...content.styles(theme),
-  };
-}
+TestApp.propTypes = {
+  children: T.node.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  session: T.object,
+};

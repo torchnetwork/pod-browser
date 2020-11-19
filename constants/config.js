@@ -19,25 +19,16 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React from "react";
-import T from "prop-types";
-import { render } from "@testing-library/react";
-import { StylesProvider, ThemeProvider } from "@inrupt/prism-react-components";
-import defaultTheme from "../src/theme";
+// type ConfigEntity = {
+//   idpClientId: string;
+//   loginRedirect: string;
+//   host: string;
+// };
 
-export const WithDefaultTheme = (props) => {
-  const { children } = props;
-  return (
-    <StylesProvider generateClassName={(rule) => `PodBrowser-${rule.key}`}>
-      <ThemeProvider theme={defaultTheme}>{children}</ThemeProvider>
-    </StylesProvider>
-  );
-};
-
-export const renderWithTheme = (ui, options) =>
-  render(ui, { wrapper: WithDefaultTheme, ...options });
-
-WithDefaultTheme.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
-  children: T.node.isRequired,
-};
+export default function getConfig() {
+  return {
+    idpClientId: process.env.NEXT_PUBLIC_IDP_CLIENT_ID || "",
+    host: process.env.NEXT_PUBLIC_APP_HOST || "",
+    loginRedirect: "/",
+  };
+}

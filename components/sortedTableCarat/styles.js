@@ -19,7 +19,12 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { createStyles, PrismTheme } from "@solid/lit-prism-patterns";
+import { createStyles } from "@solid/lit-prism-patterns";
 
-export default (theme: PrismTheme) =>
-  createStyles(theme, ["breadcrumb", "icons"]);
+export default function styles(theme) {
+  return createStyles(theme, ["icons", "table"], {
+    table__icon: {
+      marginLeft: "0.5em",
+    },
+  });
+}

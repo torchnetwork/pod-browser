@@ -19,7 +19,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { createTheme } from "@solid/lit-prism-patterns";
-import defaultTheme from "@solid/lit-prism-theme-sdk-default";
+import { button } from "@solid/lit-prism-patterns";
 
-export default createTheme(defaultTheme);
+export default function styles(theme) {
+  return button.styles(theme);
+}

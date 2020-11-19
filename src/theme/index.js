@@ -19,16 +19,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-type ConfigEntity = {
-  idpClientId: string;
-  loginRedirect: string;
-  host: string;
-};
+/* istanbul ignore file */
+import { createTheme } from "@solid/lit-prism-patterns";
+import defaultTheme from "@solid/lit-prism-theme-sdk-default";
 
-export default function getConfig(): ConfigEntity {
-  return {
-    idpClientId: process.env.NEXT_PUBLIC_IDP_CLIENT_ID || "",
-    host: process.env.NEXT_PUBLIC_APP_HOST || "",
-    loginRedirect: "/",
-  };
-}
+export default createTheme(defaultTheme);
