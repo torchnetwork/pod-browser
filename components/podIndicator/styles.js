@@ -19,25 +19,38 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React from "react";
-import { PageHeader as PrismPageHeader } from "@inrupt/prism-react-components";
-import { useSession } from "@inrupt/solid-ui-react";
-import { createStyles, makeStyles } from "@material-ui/styles";
-import { useBem } from "@solid/lit-prism-patterns";
-import styles from "./styles";
-import PodIndicator from "../podIndicator";
+import { createStyles } from "@solid/lit-prism-patterns";
 
-const useStyles = makeStyles((theme) => createStyles(styles(theme)));
+const styles = (theme) =>
+  createStyles(theme, ["button"], {
+    indicator: {
+      display: "flex",
+    },
+    indicatorLabel: {
+      fontSize: "0.825rem",
+      fontWeight: theme.typography.fontWeightMedium,
+    },
+    indicatorPrompt: {
+      backgroundColor: "transparent",
+      display: "inline-flex",
+      color: theme.palette.text.secondary,
+      textTransform: "none",
+      fontSize: "0.825rem",
+      fontWeight: theme.typography.fontWeightRegular,
+    },
+    indicatorName: {
+      textOverflow: "ellipsis",
+      overflow: "hidden",
+      maxWidth: "12rem",
+      whiteSpace: "nowrap",
+    },
+    popover: {
+      padding: theme.spacing(2, 2, 0),
+      maxWidth: "100vw",
+      [theme.breakpoints.up("sm")]: {
+        width: 450,
+      },
+    },
+  });
 
-export default function ContainerPageHeader() {
-  const { session } = useSession();
-  const bem = useBem(useStyles());
-  const podIndicator = session.info.isLoggedIn ? <PodIndicator /> : null;
-  return (
-    <PrismPageHeader
-      title="Files"
-      className={bem("files-container-header")}
-      actions={podIndicator ? [podIndicator] : null}
-    />
-  );
-}
+export default styles;

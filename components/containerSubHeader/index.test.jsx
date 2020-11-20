@@ -19,37 +19,13 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { createStyles } from "@solid/lit-prism-patterns";
+import React from "react";
+import { renderWithTheme } from "../../__testUtils/withTheme";
+import ContainerSubHeader from "./index";
 
-const styles = (theme) =>
-  createStyles(theme, ["button"], {
-    indicator: {
-      display: "flex",
-    },
-    indicatorLabel: {
-      fontSize: "0.825rem",
-      fontWeight: theme.typography.fontWeightMedium,
-    },
-    indicatorPrompt: {
-      display: "inline-flex",
-      color: theme.palette.text.secondary,
-      textTransform: "none",
-      fontSize: "0.825rem",
-      fontWeight: theme.typography.fontWeightRegular,
-    },
-    indicatorName: {
-      textOverflow: "ellipsis",
-      overflow: "hidden",
-      maxWidth: "12rem",
-      whiteSpace: "nowrap",
-    },
-    popover: {
-      padding: theme.spacing(2, 2, 0),
-      maxWidth: "100vw",
-      [theme.breakpoints.up("sm")]: {
-        width: 450,
-      },
-    },
+describe("ContainerSubHeader", () => {
+  test("Renders subheader", () => {
+    const { asFragment } = renderWithTheme(<ContainerSubHeader />);
+    expect(asFragment()).toMatchSnapshot();
   });
-
-export default styles;
+});
