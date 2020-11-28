@@ -76,6 +76,11 @@ if (process.env.NEXT_PUBLIC_MATOMO_URL_BASE) {
   });
 }
 
+const atlassianFeedbackId = process.env.NEXT_PUBLIC_ATLASSIAN_FEEDBACK_ID;
+const atlassianFeedbackWidth = atlassianFeedbackId
+  ? parseInt(process.env.NEXT_PUBLIC_ATLASSIAN_FEEDBACK_WIDTH, 10) || 50
+  : null;
+
 const jss = create(preset());
 
 const useStyles = makeStyles(() => createStyles(appLayout.styles(theme)));
@@ -124,6 +129,14 @@ export default function App(props) {
         />
       </Head>
 
+      {atlassianFeedbackId ? (
+        <script
+          data-jsd-embedded
+          data-key={atlassianFeedbackId}
+          data-base-url="https://jsd-widget.atlassian.com"
+          src="https://jsd-widget.atlassian.com/assets/embed.js"
+        />
+      ) : null}
       <MatomoProvider value={matomoInstance}>
         <StylesProvider jss={jss}>
           <ThemeProvider theme={theme}>
@@ -140,7 +153,9 @@ export default function App(props) {
                       </main>
 
                       <div className={bem("app-layout__footer")}>
-                        <PodBrowserFooter />
+                        <PodBrowserFooter
+                          atlassianFeedbackWidth={atlassianFeedbackWidth}
+                        />
                       </div>
                     </div>
                     <Notification />
