@@ -103,9 +103,14 @@ const styles = (theme, indicatorWidth, indicatorLabelWidth) => {
     },
     itemIcon: {
       padding: theme.spacing(0, 0.8),
+      textAlign: "center",
       minWidth: "max-content !important",
+      width: "34px",
     },
     itemText: {
+      padding: 0,
+    },
+    "bookmark-menu-item": {
       padding: 0,
     },
   });
