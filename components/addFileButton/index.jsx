@@ -48,11 +48,14 @@ export function handleSaveResource({
   return async (uploadedFile) => {
     try {
       const fileName = normalizeSafeFileName(uploadedFile.name);
+      const { type } = uploadedFile;
+      Object.defineProperty(uploadedFile, "type", {
+        get: () => type || "application/octet-stream",
+      });
       await overwriteFile(
         joinPath(currentUri, encodeURIComponent(fileName)),
         uploadedFile,
         {
-          type: uploadedFile.type,
           fetch,
         }
       );
@@ -139,8 +142,13 @@ export function handleConfirmation({
   setConfirmationSetup,
 }) {
   return (confirmationSetup, confirmed, file, open) => {
-    if (confirmationSetup && confirmed === null && open === DUPLICATE_DIALOG_ID)
+    if (
+      confirmationSetup &&
+      confirmed === null &&
+      open === DUPLICATE_DIALOG_ID
+    ) {
       return;
+    }
 
     if (confirmationSetup && confirmed && open === DUPLICATE_DIALOG_ID) {
       saveResource(file);

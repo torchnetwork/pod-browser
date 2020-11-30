@@ -90,7 +90,6 @@ describe("AddFileButton", () => {
       newFilePath,
       file,
       {
-        type: file.type,
         fetch: session.fetch,
       }
     );
@@ -128,16 +127,19 @@ describe("handleSaveResource", () => {
     });
   });
 
+  function mockOverWriteFile(newFilePath) {
+    jest
+      .spyOn(SolidClientFns, "overwriteFile")
+      .mockResolvedValue(SolidClientFns.mockSolidDatasetFrom(newFilePath));
+  }
+
   test("it returns a handler that saves the resource and gives feedback to user", async () => {
     const fileName = "myfile with space.txt";
     const fileWithSpace = new File(["test"], fileName, {
       type: "text/plain",
     });
     const newFilePath = currentUri + encodeURIComponent(fileName);
-
-    jest
-      .spyOn(SolidClientFns, "overwriteFile")
-      .mockResolvedValue(SolidClientFns.mockSolidDatasetFrom(newFilePath));
+    mockOverWriteFile(newFilePath);
 
     await handler(fileWithSpace);
 
@@ -145,7 +147,6 @@ describe("handleSaveResource", () => {
       newFilePath,
       fileWithSpace,
       {
-        type: fileWithSpace.type,
         fetch,
       }
     );
@@ -162,25 +163,58 @@ describe("handleSaveResource", () => {
     const fileWithDash = new File(["test"], fileName, {
       type: "text/plain",
     });
-    const newFilePathWithoutStartingDash =
-      currentUri + encodeURIComponent(fileName.substr(1));
-
-    jest
-      .spyOn(SolidClientFns, "overwriteFile")
-      .mockResolvedValue(
-        SolidClientFns.mockSolidDatasetFrom(newFilePathWithoutStartingDash)
-      );
+    const newFilePath = currentUri + encodeURIComponent(fileName.substr(1));
+    mockOverWriteFile(newFilePath);
 
     await handler(fileWithDash);
 
     expect(SolidClientFns.overwriteFile).toHaveBeenCalledWith(
-      newFilePathWithoutStartingDash,
+      newFilePath,
       fileWithDash,
       {
-        type: fileWithDash.type,
         fetch,
       }
     );
+  });
+
+  it("handles resources without content-type", async () => {
+    const fileName = "test";
+    const fileWithoutType = new File(["test"], fileName, {
+      type: "",
+    });
+    const newFilePath = currentUri + encodeURIComponent(fileName);
+    mockOverWriteFile(newFilePath);
+
+    jest.spyOn(Object, "defineProperty");
+
+    await handler(fileWithoutType);
+
+    expect(SolidClientFns.overwriteFile).toHaveBeenCalledWith(
+      newFilePath,
+      fileWithoutType,
+      {
+        fetch,
+      }
+    );
+    expect(Object.defineProperty).toHaveBeenCalledWith(
+      fileWithoutType,
+      "type",
+      expect.any(Object)
+    );
+    expect(Object.defineProperty.mock.calls[0][2].get()).toEqual(
+      "application/octet-stream"
+    );
+  });
+
+  it("handles errors", async () => {
+    jest.spyOn(SolidClientFns, "overwriteFile").mockImplementation(() => {
+      throw new Error();
+    });
+
+    await expect(handler(file)).resolves.toBeUndefined();
+    expect(setSeverity).toHaveBeenCalledWith("error");
+    expect(setMessage).toHaveBeenCalled();
+    expect(setAlertOpen).toHaveBeenCalledWith(true);
   });
 });
 
@@ -206,20 +240,32 @@ describe("handleFileSelect", () => {
     resourceList,
   });
 
-  test("it returns a handler that uploads a file", async () => {
-    await handler({ target: { files: [file] } });
+  test("it returns a handler that uploads a file", () => {
+    handler({ target: { files: [file] } });
 
     expect(setIsUploading).toHaveBeenCalled();
     expect(setFile).toHaveBeenCalled();
     expect(saveUploadedFile).toHaveBeenCalled();
   });
 
-  test("it returns a handler that returns an error if not successful", async () => {
-    await handler();
+  test("it returns a handler that returns an error if not successful", () => {
+    handler({});
 
     expect(setSeverity).toHaveBeenCalledWith("error");
     expect(setMessage).toHaveBeenCalled();
     expect(setAlertOpen).toHaveBeenCalled();
+  });
+
+  it("handles errors", () => {
+    const error = new Error("test");
+    saveUploadedFile.mockImplementation(() => {
+      throw error;
+    });
+
+    expect(handler({ target: { files: [file] } })).toBeUndefined();
+    expect(setSeverity).toHaveBeenCalledWith("error");
+    expect(setMessage).toHaveBeenCalledWith(error.toString());
+    expect(setAlertOpen).toHaveBeenCalledWith(true);
   });
 });
 
@@ -266,7 +312,7 @@ describe("handleConfirmation", () => {
     setConfirmationSetup,
   });
 
-  test("it returns a handler that saves the file when user confirms dialog", () => {
+  it("returns a handler that saves the file when user confirms dialog", () => {
     handler(true, true, file, DUPLICATE_DIALOG_ID);
 
     expect(setOpen).toHaveBeenCalled();
@@ -274,10 +320,18 @@ describe("handleConfirmation", () => {
     expect(setConfirmed).toHaveBeenCalled();
     expect(setConfirmationSetup).toHaveBeenCalled();
   });
-  test("it returns a handler that exits when user cancels the operation", () => {
+
+  it("returns a handler that exits when user cancels the operation", () => {
     handler(true, false, file, DUPLICATE_DIALOG_ID);
 
     expect(saveResource).not.toHaveBeenCalled();
     expect(setConfirmed).toHaveBeenCalledWith(null);
+  });
+
+  it("does not do anything if dialog is already opened", () => {
+    handler(true, null, file, DUPLICATE_DIALOG_ID);
+
+    expect(saveResource).not.toHaveBeenCalled();
+    expect(setConfirmed).not.toHaveBeenCalled();
   });
 });
