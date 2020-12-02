@@ -29,6 +29,7 @@ import {
   Message,
   SimpleInput,
 } from "@inrupt/prism-react-components";
+import { useSession } from "@inrupt/solid-ui-react";
 
 function AgentSearchForm({
   children,
@@ -37,26 +38,50 @@ function AgentSearchForm({
   value,
   onChange,
   dirtyForm,
+  permissions,
 }) {
   const inputId = useId();
+  const { session } = useSession();
   const [dirtyWebIdField, setDirtyWebIdField] = useState(dirtyForm);
   const invalidWebIdField = !value && (dirtyForm || dirtyWebIdField);
+  const [existingWebId, setExistingWebId] = useState(null);
+  const [isPodOwner, setIsPodOwner] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (value === session.info.webId) {
+      setIsPodOwner(true);
+      return;
+    }
+    if (permissions.filter((p) => p.webId === value).length) {
+      setExistingWebId(value);
+      return;
+    }
     await onSubmit(value);
   };
 
   const handleChange = (event) => {
     onChange(event.target.value);
+    setIsPodOwner(false);
+    setExistingWebId(null);
   };
 
   return (
     <Form onSubmit={handleSubmit}>
       <Label>WebID</Label>
-      {invalidWebIdField ? (
+      {invalidWebIdField && (
         <Message variant="invalid">Please provide a valid WebID</Message>
-      ) : null}
+      )}
+      {isPodOwner && (
+        <Message variant="invalid">
+          You cannot overwrite your own permissions.
+        </Message>
+      )}
+      {existingWebId && (
+        <Message variant="invalid">
+          {`The WebID ${existingWebId} is already in your permissions.`}
+        </Message>
+      )}
       <SimpleInput
         id={inputId}
         onChange={handleChange}
@@ -66,6 +91,7 @@ function AgentSearchForm({
         title="Must start with https://"
         onBlur={() => setDirtyWebIdField(true)}
         required={invalidWebIdField}
+        variant={existingWebId || isPodOwner ? "invalid" : null}
       />
 
       {children}
@@ -82,6 +108,7 @@ AgentSearchForm.propTypes = {
   onChange: T.func,
   onSubmit: T.func,
   value: T.string,
+  permissions: T.arrayOf(T.shape),
 };
 
 AgentSearchForm.defaultProps = {
@@ -91,6 +118,7 @@ AgentSearchForm.defaultProps = {
   onChange: () => {},
   onSubmit: () => {},
   value: "",
+  permissions: null,
 };
 
 export default AgentSearchForm;
