@@ -40,6 +40,16 @@ import styles from "./styles";
 
 const useStyles = makeStyles((theme) => createStyles(styles(theme)));
 
+const TESTCAFE_ID_NAME_FIELD = "profile-name-field";
+const TESTCAFE_ID_ROLE_FIELD = "profile-role-field";
+const TESTCAFE_ID_ORG_FIELD = "profile-org-field";
+
+export function setupErrorComponent(bem) {
+  return () => (
+    <Avatar className={bem("avatar")} alt="Contact photo placeholder" />
+  );
+}
+
 export default function Profile(props) {
   const { profileIri, editing } = props;
   const [error, setError] = useState(null);
@@ -51,6 +61,8 @@ export default function Profile(props) {
   if (error) {
     return error.toString();
   }
+
+  const errorComponent = setupErrorComponent(bem);
 
   return (
     <Container>
@@ -67,12 +79,7 @@ export default function Profile(props) {
                   <Image
                     property={vcard.hasPhoto}
                     width={120}
-                    errorComponent={() => (
-                      <Avatar
-                        className={bem("avatar")}
-                        alt="Contact photo placeholder"
-                      />
-                    )}
+                    errorComponent={errorComponent}
                   />
                 </Avatar>
               </Box>
@@ -93,7 +100,10 @@ export default function Profile(props) {
                   property={vcard.fn}
                   edit={editing}
                   autosave
-                  inputProps={{ className: bem("input") }}
+                  inputProps={{
+                    className: bem("input"),
+                    "data-testid": TESTCAFE_ID_NAME_FIELD,
+                  }}
                 />
               </Box>
 
@@ -102,7 +112,10 @@ export default function Profile(props) {
                 <Text
                   property={vcard.role}
                   edit={editing}
-                  inputProps={{ className: bem("input") }}
+                  inputProps={{
+                    className: bem("input"),
+                    "data-testid": TESTCAFE_ID_ROLE_FIELD,
+                  }}
                   autosave
                 />
               </Box>
@@ -112,7 +125,10 @@ export default function Profile(props) {
                 <Text
                   property={vcard.org}
                   edit={editing}
-                  inputProps={{ className: bem("input") }}
+                  inputProps={{
+                    className: bem("input"),
+                    "data-testid": TESTCAFE_ID_ORG_FIELD,
+                  }}
                   autosave
                 />
               </Box>
