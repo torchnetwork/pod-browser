@@ -19,20 +19,32 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React from "react";
-import Login from "./index";
-import { renderWithTheme } from "../../__testUtils/withTheme";
-import useIdpFromQuery from "../../src/hooks/useIdpFromQuery";
+import { renderHook } from "@testing-library/react-hooks";
+import useIdpFromQuery from "./index";
+import useQuery from "../useQuery";
 
-jest.mock("../../src/hooks/useIdpFromQuery");
+jest.mock("../useQuery");
 
-describe("Login form", () => {
-  beforeEach(() => {
-    useIdpFromQuery.mockReturnValue(null);
+describe("useIdpFromQuery", () => {
+  it("returns null when there is no idp query param", () => {
+    useQuery.mockReturnValue(undefined);
+    const { result } = renderHook(() => useIdpFromQuery());
+    expect(result.current).toBeNull();
   });
 
-  test("Renders a login form, with button bound to swapLoginType", () => {
-    const { asFragment } = renderWithTheme(<Login />);
-    expect(asFragment()).toMatchSnapshot();
+  it("returns an object with a valid idp query param", () => {
+    const idp = "https://example.com";
+    useQuery.mockReturnValue(idp);
+    const { result } = renderHook(() => useIdpFromQuery());
+    expect(result.current).toEqual({
+      iri: idp,
+      label: "example.com",
+    });
+  });
+
+  it("returns null on invalid idp query param", () => {
+    useQuery.mockReturnValue("test");
+    const { result } = renderHook(() => useIdpFromQuery());
+    expect(result.current).toBeNull();
   });
 });

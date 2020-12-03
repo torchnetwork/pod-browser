@@ -23,10 +23,16 @@ import React from "react";
 import { renderWithTheme } from "../../../__testUtils/withTheme";
 import { useRedirectIfLoggedIn } from "../../../src/effects/auth";
 import LoginPage from "./index";
+import useIdpFromQuery from "../../../src/hooks/useIdpFromQuery";
 
 jest.mock("../../../src/effects/auth");
+jest.mock("../../../src/hooks/useIdpFromQuery");
 
 describe("Login page", () => {
+  beforeEach(() => {
+    useIdpFromQuery.mockReturnValue(null);
+  });
+
   test("Renders a login button", () => {
     const { asFragment } = renderWithTheme(<LoginPage />);
     expect(asFragment()).toMatchSnapshot();

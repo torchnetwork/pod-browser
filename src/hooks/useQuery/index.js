@@ -19,20 +19,19 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React from "react";
-import Login from "./index";
-import { renderWithTheme } from "../../__testUtils/withTheme";
-import useIdpFromQuery from "../../src/hooks/useIdpFromQuery";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
-jest.mock("../../src/hooks/useIdpFromQuery");
+export default function useQuery(key) {
+  const [query, setQuery] = useState();
+  const router = useRouter();
 
-describe("Login form", () => {
-  beforeEach(() => {
-    useIdpFromQuery.mockReturnValue(null);
-  });
-
-  test("Renders a login form, with button bound to swapLoginType", () => {
-    const { asFragment } = renderWithTheme(<Login />);
-    expect(asFragment()).toMatchSnapshot();
-  });
-});
+  useEffect(() => {
+    setQuery(
+      Array.isArray(router.query[key])
+        ? router.query[key][0]
+        : router.query[key]
+    );
+  }, [key, router]);
+  return query;
+}

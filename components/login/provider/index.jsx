@@ -21,7 +21,7 @@
 
 /* eslint react/jsx-props-no-spreading: 0 */
 
-import React, { useState } from "react";
+import React, { createRef, useEffect, useState } from "react";
 import T from "prop-types";
 import {
   Box,
@@ -38,6 +38,7 @@ import { Button } from "@inrupt/prism-react-components";
 import { generateRedirectUrl } from "../../../src/windowHelpers";
 import getIdentityProviders from "../../../constants/provider";
 import { ERROR_REGEXES, hasError } from "../../../src/error";
+import useIdpFromQuery from "../../../src/hooks/useIdpFromQuery";
 
 const providers = getIdentityProviders();
 const TESTCAFE_ID_LOGIN_TITLE = "login-title";
@@ -79,10 +80,21 @@ export function getErrorMessage(error) {
 
 export default function Provider({ defaultError }) {
   const buttonBem = Button.useBem();
-  const [providerIri, setProviderIri] = useState("https://inrupt.net");
   const { login } = useSession();
   const [loginError, setLoginError] = useState(defaultError);
   const theme = useTheme();
+  const idp = useIdpFromQuery();
+  const [providerIri, setProviderIri] = useState(
+    Object.values(providers)[0]?.iri
+  );
+  const loginFieldRef = createRef();
+
+  useEffect(() => {
+    if (idp) {
+      setProviderIri(idp.iri);
+      loginFieldRef.current?.querySelector("input")?.focus();
+    }
+  }, [idp, loginFieldRef]);
 
   const authOptions = {
     clientName: "Inrupt PodBrowser",
@@ -91,6 +103,8 @@ export default function Provider({ defaultError }) {
   const onProviderChange = setupOnProviderChange(setProviderIri);
   const handleLogin = setupLoginHandler(login);
   const onError = setupErrorHandler(setLoginError);
+
+  const providersWithIdp = idp ? { [idp.label]: idp, ...providers } : providers;
 
   return (
     <form onSubmit={handleLogin}>
@@ -107,7 +121,10 @@ export default function Provider({ defaultError }) {
               onInputChange={onProviderChange}
               id="provider-select"
               freeSolo
-              options={Object.values(providers).map((provider) => provider.iri)}
+              options={Object.values(providersWithIdp).map(
+                (provider) => provider.iri
+              )}
+              value={idp ? providerIri : null}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -118,6 +135,7 @@ export default function Provider({ defaultError }) {
                   type="url"
                   aria-describedby={loginError ? "login-error-text" : null}
                   data-testid={TESTCAFE_ID_LOGIN_FIELD}
+                  ref={loginFieldRef}
                 />
               )}
             />

@@ -32,10 +32,16 @@ import ProviderLogin, {
   TESTCAFE_ID_LOGIN_FIELD,
 } from "./index";
 import { renderWithTheme } from "../../../__testUtils/withTheme";
+import useIdpFromQuery from "../../../src/hooks/useIdpFromQuery";
 
 jest.mock("../../../src/windowHelpers");
+jest.mock("../../../src/hooks/useIdpFromQuery");
 
 describe("ProviderLogin form", () => {
+  beforeEach(() => {
+    useIdpFromQuery.mockReturnValue(null);
+  });
+
   it("renders a webid login form", () => {
     const { asFragment } = renderWithTheme(<ProviderLogin />);
     expect(asFragment()).toMatchSnapshot();
@@ -60,6 +66,18 @@ describe("ProviderLogin form", () => {
       <ProviderLogin defaultError={new Error()} />
     );
     expect(asFragment()).toMatchSnapshot();
+  });
+
+  it("allows setting idp with query param", () => {
+    const iri = "http://example.com";
+    useIdpFromQuery.mockReturnValue({
+      iri,
+      label: "example.com",
+    });
+    const { getByTestId } = renderWithTheme(<ProviderLogin />);
+    const input = getByTestId(TESTCAFE_ID_LOGIN_FIELD).querySelector("input");
+    expect(input.value).toEqual(iri);
+    expect(document.activeElement).toEqual(input);
   });
 });
 
