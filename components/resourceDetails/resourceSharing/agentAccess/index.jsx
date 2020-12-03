@@ -35,7 +35,7 @@ import { makeStyles } from "@material-ui/styles";
 import { useBem } from "@solid/lit-prism-patterns";
 import { DatasetContext, useSession } from "@inrupt/solid-ui-react";
 import { getSourceUrl } from "@inrupt/solid-client";
-import { Form } from "@inrupt/prism-react-components";
+import { Form, Button as PrismButton } from "@inrupt/prism-react-components";
 import { Alert, Skeleton } from "@material-ui/lab";
 import PermissionsForm from "../../../permissionsForm";
 import styles from "./styles";
@@ -260,9 +260,9 @@ export default function AgentAccess({
           acl={access}
           onChange={setTempAccess}
         >
-          <Button onClick={onSubmit} type="submit">
+          <PrismButton onClick={onSubmit} type="submit">
             Save
-          </Button>
+          </PrismButton>
         </PermissionsForm>
       </Form>
     </>

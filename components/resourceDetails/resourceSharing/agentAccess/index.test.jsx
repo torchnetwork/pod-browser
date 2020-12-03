@@ -169,97 +169,97 @@ describe("AgentAccess", () => {
       expect(asFragment()).toMatchSnapshot();
     });
   });
+});
 
-  describe("getDialogId", () => {
-    it("generates dialogId", () =>
-      expect(getDialogId("foo")).toEqual("change-agent-access-foo"));
+describe("getDialogId", () => {
+  it("generates dialogId", () =>
+    expect(getDialogId("foo")).toEqual("change-agent-access-foo"));
+});
+
+describe("submitHandler", () => {
+  let event;
+
+  beforeEach(() => {
+    event = { preventDefault: jest.fn() };
   });
 
-  describe("submitHandler", () => {
-    let event;
+  test("user changes their own permissions", () => {
+    const setOpen = jest.fn();
+    const dialogId = "dialogId";
+    submitHandler(42, 42, setOpen, dialogId)(event);
 
-    beforeEach(() => {
-      event = { preventDefault: jest.fn() };
-    });
+    expect(event.preventDefault).toHaveBeenCalledWith();
+    expect(setOpen).toHaveBeenCalledWith(dialogId);
+  });
+  test("user changes someone else's permissions", () => {
+    const savePermissions = jest.fn();
+    const tempAccess = "tempAccess";
+    submitHandler(42, 1337, null, null, savePermissions, tempAccess)(event);
 
-    test("user changes their own permissions", () => {
-      const setOpen = jest.fn();
-      const dialogId = "dialogId";
-      submitHandler(42, 42, setOpen, dialogId)(event);
+    expect(event.preventDefault).toHaveBeenCalledWith();
+    expect(savePermissions).toHaveBeenCalledWith(tempAccess);
+  });
+});
 
-      expect(event.preventDefault).toHaveBeenCalledWith();
-      expect(setOpen).toHaveBeenCalledWith(dialogId);
-    });
-    test("user changes someone else's permissions", () => {
-      const savePermissions = jest.fn();
-      const tempAccess = "tempAccess";
-      submitHandler(42, 1337, null, null, savePermissions, tempAccess)(event);
+describe("saveHandler", () => {
+  const accessControl = {
+    savePermissionsForAgent: jest.fn().mockResolvedValue({}),
+  };
+  let onLoading;
+  let setAccess;
+  let setTempAccess;
+  let setSeverity;
+  let setMessage;
+  let setAlertOpen;
+  const newAccess = "newAccess";
+  let savePermissions;
 
-      expect(event.preventDefault).toHaveBeenCalledWith();
-      expect(savePermissions).toHaveBeenCalledWith(tempAccess);
-    });
+  beforeEach(() => {
+    onLoading = jest.fn();
+    setAccess = jest.fn();
+    setTempAccess = jest.fn();
+    setSeverity = jest.fn();
+    setMessage = jest.fn();
+    setAlertOpen = jest.fn();
+    savePermissions = saveHandler(
+      accessControl,
+      onLoading,
+      setAccess,
+      webId,
+      setTempAccess,
+      setSeverity,
+      setMessage,
+      setAlertOpen
+    );
   });
 
-  describe("saveHandler", () => {
-    const accessControl = {
-      savePermissionsForAgent: jest.fn().mockResolvedValue({}),
-    };
-    let onLoading;
-    let setAccess;
-    let setTempAccess;
-    let setSeverity;
-    let setMessage;
-    let setAlertOpen;
-    const newAccess = "newAccess";
-    let savePermissions;
+  test("save is successful", async () => {
+    await expect(savePermissions(newAccess)).resolves.toBeUndefined();
 
-    beforeEach(() => {
-      onLoading = jest.fn();
-      setAccess = jest.fn();
-      setTempAccess = jest.fn();
-      setSeverity = jest.fn();
-      setMessage = jest.fn();
-      setAlertOpen = jest.fn();
-      savePermissions = saveHandler(
-        accessControl,
-        onLoading,
-        setAccess,
-        webId,
-        setTempAccess,
-        setSeverity,
-        setMessage,
-        setAlertOpen
-      );
-    });
+    expect(onLoading).toHaveBeenCalledWith(true);
+    expect(setAccess).toHaveBeenCalledWith(newAccess);
+    expect(accessControl.savePermissionsForAgent).toHaveBeenCalledWith(
+      webId,
+      newAccess
+    );
+    expect(setTempAccess).toHaveBeenCalledWith(null);
+    expect(setSeverity).toHaveBeenCalledWith("success");
+    expect(setMessage).toHaveBeenCalledWith("Permissions have been updated!");
+    expect(setAlertOpen).toHaveBeenCalledWith(true);
+    expect(onLoading).toHaveBeenCalledWith(false);
+  });
 
-    test("save is successful", async () => {
-      await expect(savePermissions(newAccess)).resolves.toBeUndefined();
+  test("save request fails", async () => {
+    const error = "error";
+    accessControl.savePermissionsForAgent.mockResolvedValue({ error });
 
-      expect(onLoading).toHaveBeenCalledWith(true);
-      expect(setAccess).toHaveBeenCalledWith(newAccess);
-      expect(accessControl.savePermissionsForAgent).toHaveBeenCalledWith(
-        webId,
-        newAccess
-      );
-      expect(setTempAccess).toHaveBeenCalledWith(null);
-      expect(setSeverity).toHaveBeenCalledWith("success");
-      expect(setMessage).toHaveBeenCalledWith("Permissions have been updated!");
-      expect(setAlertOpen).toHaveBeenCalledWith(true);
-      expect(onLoading).toHaveBeenCalledWith(false);
-    });
+    await expect(savePermissions(newAccess)).rejects.toEqual(error);
 
-    test("save request fails", async () => {
-      const error = "error";
-      accessControl.savePermissionsForAgent.mockResolvedValue({ error });
-
-      await expect(savePermissions(newAccess)).rejects.toEqual(error);
-
-      expect(onLoading).toHaveBeenCalledWith(true);
-      expect(setAccess).toHaveBeenCalledWith(newAccess);
-      expect(accessControl.savePermissionsForAgent).toHaveBeenCalledWith(
-        webId,
-        newAccess
-      );
-    });
+    expect(onLoading).toHaveBeenCalledWith(true);
+    expect(setAccess).toHaveBeenCalledWith(newAccess);
+    expect(accessControl.savePermissionsForAgent).toHaveBeenCalledWith(
+      webId,
+      newAccess
+    );
   });
 });

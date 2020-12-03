@@ -42,6 +42,7 @@ function AgentAccessList({ onLoading, ...buttonProps }) {
 
   useEffect(() => {
     if (!accessControl) {
+      setPermissions(null);
       return;
     }
     accessControl.getPermissions().then((normalizedPermissions) => {
