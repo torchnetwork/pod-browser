@@ -22,6 +22,8 @@
 import React from "react";
 import { mockSolidDatasetFrom } from "@inrupt/solid-client";
 import { DatasetProvider } from "@inrupt/solid-ui-react";
+import { waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import AgentAccess, { getDialogId, saveHandler, submitHandler } from "./index";
 
 import mockSessionContextProvider from "../../../../__testUtils/mockSessionContextProvider";
@@ -30,6 +32,7 @@ import mockSession from "../../../../__testUtils/mockSession";
 import { renderWithTheme } from "../../../../__testUtils/withTheme";
 import { createAccessMap } from "../../../../src/solidClientHelpers/permissions";
 import useFetchProfile from "../../../../src/hooks/useFetchProfile";
+import * as profileFns from "../../../../src/solidClientHelpers/profile";
 import { mockProfileAlice } from "../../../../__testUtils/mockPersonResource";
 
 jest.mock("../../../../src/solidClientHelpers/permissions");
@@ -67,13 +70,87 @@ describe("AgentAccess", () => {
     expect(useFetchProfile).toHaveBeenCalledWith(webId);
   });
 
-  it("renders an error message if it's unable to load profile", () => {
+  it("renders an error message with a 'try again' button if it's unable to load profile", () => {
     useFetchProfile.mockReturnValue({ error: "error" });
-    const { asFragment } = renderWithTheme(
+    const { asFragment, getByTestId } = renderWithTheme(
       <DatasetProvider dataset={dataset}>
         <AgentAccess permission={permission} />
       </DatasetProvider>
     );
+    expect(getByTestId("try-again-button")).toBeTruthy();
+    expect(asFragment()).toMatchSnapshot();
+  });
+
+  it("renders a spinner after clicking 'try again' button", async () => {
+    useFetchProfile.mockReturnValue({ error: "error" });
+    const { getByTestId } = renderWithTheme(
+      <DatasetProvider dataset={dataset}>
+        <AgentAccess permission={permission} />
+      </DatasetProvider>
+    );
+    const button = getByTestId("try-again-button");
+    userEvent.click(button);
+
+    expect(getByTestId("try-again-spinner")).toBeTruthy();
+  });
+
+  it("tries to fetch the profile again when clicking 'try again' button", async () => {
+    useFetchProfile.mockReturnValue({ error: "error" });
+    const fetchProfile = jest.spyOn(profileFns, "fetchProfile");
+    const { getByTestId } = renderWithTheme(
+      <DatasetProvider dataset={dataset}>
+        <AgentAccess permission={permission} />
+      </DatasetProvider>
+    );
+    const button = getByTestId("try-again-button");
+    userEvent.click(button);
+
+    await waitFor(() =>
+      expect(fetchProfile).toHaveBeenCalledWith(webId, expect.anything())
+    );
+  });
+
+  it("removes the spinner when fetching succeeds", async () => {
+    useFetchProfile.mockReturnValue({ error: "error" });
+    const fetchProfile = jest.spyOn(profileFns, "fetchProfile");
+    fetchProfile.mockReturnValue("profile");
+    const { getByTestId, queryByTestId } = renderWithTheme(
+      <DatasetProvider dataset={dataset}>
+        <AgentAccess permission={permission} />
+      </DatasetProvider>
+    );
+    const button = getByTestId("try-again-button");
+    userEvent.click(button);
+
+    await waitFor(() => expect(queryByTestId("try-again-spinner")).toBeFalsy());
+  });
+
+  it("removes the spinner when fetching errors", async () => {
+    useFetchProfile.mockReturnValue({ error: "error" });
+    const fetchProfile = jest.spyOn(profileFns, "fetchProfile");
+    fetchProfile.mockReturnValue("profile");
+    const { getByTestId, queryByTestId } = renderWithTheme(
+      <DatasetProvider dataset={dataset}>
+        <AgentAccess permission={permission} />
+      </DatasetProvider>
+    );
+    const button = getByTestId("try-again-button");
+    userEvent.click(button);
+
+    await waitFor(() =>
+      expect(fetchProfile).toHaveBeenCalledWith(webId, expect.anything())
+    );
+    await waitFor(() => expect(queryByTestId("try-again-spinner")).toBeFalsy());
+  });
+
+  it("renders a 'remove' button if it's unable to load profile", () => {
+    useFetchProfile.mockReturnValue({ error: "error" });
+    const { asFragment, getByTestId } = renderWithTheme(
+      <DatasetProvider dataset={dataset}>
+        <AgentAccess permission={permission} />
+      </DatasetProvider>
+    );
+    expect(getByTestId("remove-button")).toBeTruthy();
     expect(asFragment()).toMatchSnapshot();
   });
 
@@ -92,97 +169,97 @@ describe("AgentAccess", () => {
       expect(asFragment()).toMatchSnapshot();
     });
   });
-});
 
-describe("getDialogId", () => {
-  it("generates dialogId", () =>
-    expect(getDialogId("foo")).toEqual("change-agent-access-foo"));
-});
-
-describe("submitHandler", () => {
-  let event;
-
-  beforeEach(() => {
-    event = { preventDefault: jest.fn() };
+  describe("getDialogId", () => {
+    it("generates dialogId", () =>
+      expect(getDialogId("foo")).toEqual("change-agent-access-foo"));
   });
 
-  test("user changes their own permissions", () => {
-    const setOpen = jest.fn();
-    const dialogId = "dialogId";
-    submitHandler(42, 42, setOpen, dialogId)(event);
+  describe("submitHandler", () => {
+    let event;
 
-    expect(event.preventDefault).toHaveBeenCalledWith();
-    expect(setOpen).toHaveBeenCalledWith(dialogId);
-  });
-  test("user changes someone else's permissions", () => {
-    const savePermissions = jest.fn();
-    const tempAccess = "tempAccess";
-    submitHandler(42, 1337, null, null, savePermissions, tempAccess)(event);
+    beforeEach(() => {
+      event = { preventDefault: jest.fn() };
+    });
 
-    expect(event.preventDefault).toHaveBeenCalledWith();
-    expect(savePermissions).toHaveBeenCalledWith(tempAccess);
-  });
-});
+    test("user changes their own permissions", () => {
+      const setOpen = jest.fn();
+      const dialogId = "dialogId";
+      submitHandler(42, 42, setOpen, dialogId)(event);
 
-describe("saveHandler", () => {
-  const accessControl = {
-    savePermissionsForAgent: jest.fn().mockResolvedValue({}),
-  };
-  let onLoading;
-  let setAccess;
-  let setTempAccess;
-  let setSeverity;
-  let setMessage;
-  let setAlertOpen;
-  const newAccess = "newAccess";
-  let savePermissions;
+      expect(event.preventDefault).toHaveBeenCalledWith();
+      expect(setOpen).toHaveBeenCalledWith(dialogId);
+    });
+    test("user changes someone else's permissions", () => {
+      const savePermissions = jest.fn();
+      const tempAccess = "tempAccess";
+      submitHandler(42, 1337, null, null, savePermissions, tempAccess)(event);
 
-  beforeEach(() => {
-    onLoading = jest.fn();
-    setAccess = jest.fn();
-    setTempAccess = jest.fn();
-    setSeverity = jest.fn();
-    setMessage = jest.fn();
-    setAlertOpen = jest.fn();
-    savePermissions = saveHandler(
-      accessControl,
-      onLoading,
-      setAccess,
-      webId,
-      setTempAccess,
-      setSeverity,
-      setMessage,
-      setAlertOpen
-    );
+      expect(event.preventDefault).toHaveBeenCalledWith();
+      expect(savePermissions).toHaveBeenCalledWith(tempAccess);
+    });
   });
 
-  test("save is successful", async () => {
-    await expect(savePermissions(newAccess)).resolves.toBeUndefined();
+  describe("saveHandler", () => {
+    const accessControl = {
+      savePermissionsForAgent: jest.fn().mockResolvedValue({}),
+    };
+    let onLoading;
+    let setAccess;
+    let setTempAccess;
+    let setSeverity;
+    let setMessage;
+    let setAlertOpen;
+    const newAccess = "newAccess";
+    let savePermissions;
 
-    expect(onLoading).toHaveBeenCalledWith(true);
-    expect(setAccess).toHaveBeenCalledWith(newAccess);
-    expect(accessControl.savePermissionsForAgent).toHaveBeenCalledWith(
-      webId,
-      newAccess
-    );
-    expect(setTempAccess).toHaveBeenCalledWith(null);
-    expect(setSeverity).toHaveBeenCalledWith("success");
-    expect(setMessage).toHaveBeenCalledWith("Permissions have been updated!");
-    expect(setAlertOpen).toHaveBeenCalledWith(true);
-    expect(onLoading).toHaveBeenCalledWith(false);
-  });
+    beforeEach(() => {
+      onLoading = jest.fn();
+      setAccess = jest.fn();
+      setTempAccess = jest.fn();
+      setSeverity = jest.fn();
+      setMessage = jest.fn();
+      setAlertOpen = jest.fn();
+      savePermissions = saveHandler(
+        accessControl,
+        onLoading,
+        setAccess,
+        webId,
+        setTempAccess,
+        setSeverity,
+        setMessage,
+        setAlertOpen
+      );
+    });
 
-  test("save request fails", async () => {
-    const error = "error";
-    accessControl.savePermissionsForAgent.mockResolvedValue({ error });
+    test("save is successful", async () => {
+      await expect(savePermissions(newAccess)).resolves.toBeUndefined();
 
-    await expect(savePermissions(newAccess)).rejects.toEqual(error);
+      expect(onLoading).toHaveBeenCalledWith(true);
+      expect(setAccess).toHaveBeenCalledWith(newAccess);
+      expect(accessControl.savePermissionsForAgent).toHaveBeenCalledWith(
+        webId,
+        newAccess
+      );
+      expect(setTempAccess).toHaveBeenCalledWith(null);
+      expect(setSeverity).toHaveBeenCalledWith("success");
+      expect(setMessage).toHaveBeenCalledWith("Permissions have been updated!");
+      expect(setAlertOpen).toHaveBeenCalledWith(true);
+      expect(onLoading).toHaveBeenCalledWith(false);
+    });
 
-    expect(onLoading).toHaveBeenCalledWith(true);
-    expect(setAccess).toHaveBeenCalledWith(newAccess);
-    expect(accessControl.savePermissionsForAgent).toHaveBeenCalledWith(
-      webId,
-      newAccess
-    );
+    test("save request fails", async () => {
+      const error = "error";
+      accessControl.savePermissionsForAgent.mockResolvedValue({ error });
+
+      await expect(savePermissions(newAccess)).rejects.toEqual(error);
+
+      expect(onLoading).toHaveBeenCalledWith(true);
+      expect(setAccess).toHaveBeenCalledWith(newAccess);
+      expect(accessControl.savePermissionsForAgent).toHaveBeenCalledWith(
+        webId,
+        newAccess
+      );
+    });
   });
 });

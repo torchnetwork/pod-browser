@@ -20,19 +20,30 @@
  */
 
 /* eslint-disable react/forbid-prop-types */
+/* eslint-disable react/jsx-props-no-spreading */
 
 import React, { useContext, useState } from "react";
 import T from "prop-types";
-import { Avatar, createStyles, Typography } from "@material-ui/core";
+import {
+  Avatar,
+  Button,
+  CircularProgress,
+  createStyles,
+  Typography,
+} from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
+import { useBem } from "@solid/lit-prism-patterns";
 import { DatasetContext, useSession } from "@inrupt/solid-ui-react";
 import { getSourceUrl } from "@inrupt/solid-client";
-import { Button, Form, Message } from "@inrupt/prism-react-components";
-import { Skeleton } from "@material-ui/lab";
+import { Form } from "@inrupt/prism-react-components";
+import { Alert, Skeleton } from "@material-ui/lab";
 import PermissionsForm from "../../../permissionsForm";
 import styles from "./styles";
 import ConfirmationDialogContext from "../../../../src/contexts/confirmationDialogContext";
-import { displayProfileName } from "../../../../src/solidClientHelpers/profile";
+import {
+  displayProfileName,
+  fetchProfile,
+} from "../../../../src/solidClientHelpers/profile";
 import AlertContext from "../../../../src/contexts/alertContext";
 import AccessControlContext from "../../../../src/contexts/accessControlContext";
 import useFetchProfile from "../../../../src/hooks/useFetchProfile";
@@ -40,6 +51,9 @@ import useFetchProfile from "../../../../src/hooks/useFetchProfile";
 const useStyles = makeStyles((theme) => createStyles(styles(theme)));
 
 const TESTCAFE_ID_AGENT_WEB_ID = "agent-web-id";
+const TESTCAFE_ID_TRY_AGAIN_BUTTON = "try-again-button";
+const TESTCAFE_ID_REMOVE_BUTTON = "remove-button";
+const TESTCAFE_ID_TRY_AGAIN_SPINNER = "try-again-spinner";
 
 export function submitHandler(
   authenticatedWebId,
@@ -92,47 +106,30 @@ export function getDialogId(datasetIri) {
   return `change-agent-access-${datasetIri}`;
 }
 
-export default function AgentAccess({ onLoading, permission: { acl, webId } }) {
-  const { data: profile, error: profileError } = useFetchProfile(webId);
+export default function AgentAccess({
+  onLoading,
+  permission: { acl, webId },
+  ...buttonProps
+}) {
+  let { data: profile, error: profileError } = useFetchProfile(webId);
   const classes = useStyles();
   const {
     session: {
       info: { webId: authenticatedWebId },
+      fetch,
     },
   } = useSession();
+  const bem = useBem(useStyles());
   const [access, setAccess] = useState(acl);
   const [tempAccess, setTempAccess] = useState(acl);
   const { dataset } = useContext(DatasetContext);
   const { accessControl } = useContext(AccessControlContext);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { setOpen } = useContext(ConfirmationDialogContext);
 
   const { setMessage, setSeverity, setAlertOpen } = useContext(AlertContext);
   const dialogId = getDialogId(getSourceUrl(dataset));
-
-  if (profileError) {
-    const message = `Failed to load ${webId}`;
-    return <Message variant="error">{message}</Message>;
-  }
-
-  if (!profile) {
-    return (
-      <>
-        <Skeleton
-          className={classes.avatar}
-          variant="circle"
-          width={40}
-          height={40}
-        />
-        <div className={classes.detailText}>
-          <Skeleton variant="text" width={100} />
-        </div>
-      </>
-    );
-  }
-
-  const { avatar } = profile;
-  const name = displayProfileName(profile);
 
   const savePermissions = saveHandler(
     accessControl,
@@ -153,6 +150,99 @@ export default function AgentAccess({ onLoading, permission: { acl, webId } }) {
     savePermissions,
     tempAccess
   );
+
+  const onDelete = submitHandler(
+    authenticatedWebId,
+    webId,
+    setOpen,
+    dialogId,
+    savePermissions,
+    { read: false, write: false, append: false, control: false }
+  );
+
+  const handleRetryClick = async () => {
+    try {
+      profile = await fetchProfile(webId, fetch);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      profileError = error;
+    }
+  };
+
+  if (profileError) {
+    const message = `Unable to load ${webId}`;
+    return (
+      <div className={bem("alert-container")}>
+        <Alert
+          classes={{ root: classes.alertBox, message: classes.alertMessage }}
+          severity="error"
+          action={
+            // eslint-disable-next-line react/jsx-wrap-multilines
+            isLoading ? (
+              <CircularProgress
+                data-testid={TESTCAFE_ID_TRY_AGAIN_SPINNER}
+                size={20}
+                className={bem("spinner")}
+                color="inherit"
+              />
+            ) : (
+              <Button
+                data-testid={TESTCAFE_ID_TRY_AGAIN_BUTTON}
+                className={bem("bold-button")}
+                color="inherit"
+                size="small"
+                onClick={() => {
+                  setIsLoading(true);
+                  setTimeout(handleRetryClick, 750);
+                }}
+              >
+                Try again
+              </Button>
+            )
+          }
+        >
+          {message}
+        </Alert>
+        <div className={bem("avatar-container")}>
+          <Avatar className={classes.avatar} alt={webId} src={null} />
+          <Typography
+            data-testid={TESTCAFE_ID_AGENT_WEB_ID}
+            className={classes.detailText}
+          >
+            {webId}
+          </Typography>
+          <button
+            type="button"
+            {...buttonProps}
+            onClick={onDelete}
+            data-testid={TESTCAFE_ID_REMOVE_BUTTON}
+          >
+            Remove
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <>
+        <Skeleton
+          className={classes.avatar}
+          variant="circle"
+          width={40}
+          height={40}
+        />
+        <div className={classes.detailText}>
+          <Skeleton variant="text" width={100} />
+        </div>
+      </>
+    );
+  }
+
+  const { avatar } = profile;
+  const name = displayProfileName(profile);
 
   return (
     <>

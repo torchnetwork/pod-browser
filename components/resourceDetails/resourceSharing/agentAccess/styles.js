@@ -29,5 +29,33 @@ export default function styles() {
       textAlign: "left",
       flexGrow: 1,
     },
+    "alert-container": {
+      maxWidth: "100%",
+    },
+    alertBox: {
+      fontSize: "14px",
+      width: "100%",
+      overflowWrap: "break-word",
+      margin: "16px 0",
+    },
+    alertMessage: {
+      maxWidth: "50%",
+      overflowWrap: "break-word",
+    },
+    "avatar-container": {
+      display: "flex",
+      maxWidth: "100%",
+      paddingRight: "16px",
+      "& p": {
+        overflowWrap: "anywhere",
+        marginRight: "16px",
+      },
+    },
+    "bold-button": {
+      fontWeight: "bold",
+    },
+    spinner: {
+      margin: "20px",
+    },
   };
 }

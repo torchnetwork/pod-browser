@@ -19,6 +19,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/* eslint-disable react/jsx-props-no-spreading */
+
 import React, { useContext, useEffect, useState } from "react";
 import T from "prop-types";
 import { CircularProgress, List, ListItem } from "@material-ui/core";
@@ -32,7 +34,7 @@ const useStyles = makeStyles((theme) => createStyles(styles(theme)));
 export const TESTCAFE_ID_AGENT_ACCESS_LIST_SHOW_ALL =
   "agent-access-list-show-all";
 
-function AgentAccessList({ onLoading }) {
+function AgentAccessList({ onLoading, ...buttonProps }) {
   const classes = useStyles();
   const [permissions, setPermissions] = useState(null);
   const [showAll, setShowAll] = useState(false);
@@ -40,7 +42,6 @@ function AgentAccessList({ onLoading }) {
 
   useEffect(() => {
     if (!accessControl) {
-      setPermissions(null);
       return;
     }
     accessControl.getPermissions().then((normalizedPermissions) => {
@@ -63,7 +64,11 @@ function AgentAccessList({ onLoading }) {
       <List>
         {permissionsShown.map((permission) => (
           <ListItem key={permission.webId} className={classes.listItem}>
-            <AgentAccess permission={permission} onLoading={onLoading} />
+            <AgentAccess
+              permission={permission}
+              onLoading={onLoading}
+              {...buttonProps}
+            />
           </ListItem>
         ))}
       </List>
