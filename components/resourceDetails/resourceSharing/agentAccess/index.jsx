@@ -86,6 +86,8 @@ export function saveHandler(
     onLoading(true);
     setAccess(newAccess);
 
+    if (!accessControl) return;
+
     const { error } = await accessControl.savePermissionsForAgent(
       webId,
       newAccess
@@ -164,8 +166,8 @@ export default function AgentAccess({
       profile = await fetchProfile(webId, fetch);
       setIsLoading(false);
     } catch (error) {
-      setIsLoading(false);
       profileError = error;
+      setIsLoading(false);
     }
   };
 
@@ -252,7 +254,7 @@ export default function AgentAccess({
       >
         {name}
       </Typography>
-      <Form onSubmit={(event) => onSubmit(event)}>
+      <Form onSubmit={onSubmit}>
         <PermissionsForm
           key={webId}
           webId={webId}

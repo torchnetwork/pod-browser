@@ -70,6 +70,17 @@ describe("AgentAccess", () => {
     expect(useFetchProfile).toHaveBeenCalledWith(webId);
   });
 
+  it("renders skeleton placeholders when profile is not available", () => {
+    useFetchProfile.mockReturnValue({ profile: null });
+    const { asFragment } = renderWithTheme(
+      <DatasetProvider dataset={dataset}>
+        <AgentAccess permission={permission} />
+      </DatasetProvider>
+    );
+
+    expect(asFragment()).toMatchSnapshot();
+  });
+
   it("renders an error message with a 'try again' button if it's unable to load profile", () => {
     useFetchProfile.mockReturnValue({ error: "error" });
     const { asFragment, getByTestId } = renderWithTheme(
@@ -168,6 +179,20 @@ describe("AgentAccess", () => {
       );
       expect(asFragment()).toMatchSnapshot();
     });
+  });
+
+  test("default value for onLoading", async () => {
+    useFetchProfile.mockReturnValue({ error: "error" });
+    const { getByTestId } = renderWithTheme(
+      <DatasetProvider dataset={dataset}>
+        <AgentAccess permission={permission} onLoading={undefined} />
+      </DatasetProvider>
+    );
+    const button = getByTestId("remove-button");
+    const { onLoading } = AgentAccess.defaultProps;
+    userEvent.click(button);
+
+    expect(onLoading).toBeInstanceOf(Function);
   });
 });
 
