@@ -62,7 +62,7 @@ export default function ResourceSharing({ startLoading }) {
         <AccordionDetails className={classes.details}>
           <AgentAccessList
             onLoading={setLoading}
-            className={actionMenuBem("action-menu__trigger")}
+            buttonClasses={actionMenuBem("action-menu__trigger")}
           />
         </AccordionDetails>
       </Accordion>

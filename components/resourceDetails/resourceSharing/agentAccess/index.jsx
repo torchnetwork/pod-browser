@@ -20,7 +20,6 @@
  */
 
 /* eslint-disable react/forbid-prop-types */
-/* eslint-disable react/jsx-props-no-spreading */
 
 import React, { useContext, useState } from "react";
 import T from "prop-types";
@@ -109,7 +108,7 @@ export function getDialogId(datasetIri) {
 export default function AgentAccess({
   onLoading,
   permission: { acl, webId },
-  ...buttonProps
+  buttonClasses,
 }) {
   let { data: profile, error: profileError } = useFetchProfile(webId);
   const classes = useStyles();
@@ -214,7 +213,7 @@ export default function AgentAccess({
           </Typography>
           <button
             type="button"
-            {...buttonProps}
+            className={buttonClasses}
             onClick={onDelete}
             data-testid={TESTCAFE_ID_REMOVE_BUTTON}
           >
@@ -272,8 +271,10 @@ export default function AgentAccess({
 AgentAccess.propTypes = {
   permission: T.object.isRequired,
   onLoading: T.func,
+  buttonClasses: T.string,
 };
 
 AgentAccess.defaultProps = {
   onLoading: () => {},
+  buttonClasses: null,
 };

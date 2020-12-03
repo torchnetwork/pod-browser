@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => createStyles(styles(theme)));
 export const TESTCAFE_ID_AGENT_ACCESS_LIST_SHOW_ALL =
   "agent-access-list-show-all";
 
-function AgentAccessList({ onLoading, ...buttonProps }) {
+function AgentAccessList({ onLoading, buttonClasses }) {
   const classes = useStyles();
   const [permissions, setPermissions] = useState(null);
   const [showAll, setShowAll] = useState(false);
@@ -68,7 +68,7 @@ function AgentAccessList({ onLoading, ...buttonProps }) {
             <AgentAccess
               permission={permission}
               onLoading={onLoading}
-              {...buttonProps}
+              buttonClasses={buttonClasses}
             />
           </ListItem>
         ))}
@@ -88,10 +88,12 @@ function AgentAccessList({ onLoading, ...buttonProps }) {
 
 AgentAccessList.propTypes = {
   onLoading: T.func,
+  buttonClasses: T.string,
 };
 
 AgentAccessList.defaultProps = {
   onLoading: () => {},
+  buttonClasses: null,
 };
 
 export default AgentAccessList;
