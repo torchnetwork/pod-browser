@@ -110,7 +110,7 @@ export function getDialogId(datasetIri) {
 export default function AgentAccess({
   onLoading,
   permission: { acl, webId },
-  buttonClasses,
+  buttonClassName,
 }) {
   let { data: profile, error: profileError } = useFetchProfile(webId);
   const classes = useStyles();
@@ -215,7 +215,7 @@ export default function AgentAccess({
           </Typography>
           <button
             type="button"
-            className={buttonClasses}
+            className={buttonClassName}
             onClick={onDelete}
             data-testid={TESTCAFE_ID_REMOVE_BUTTON}
           >
@@ -273,10 +273,10 @@ export default function AgentAccess({
 AgentAccess.propTypes = {
   permission: T.object.isRequired,
   onLoading: T.func,
-  buttonClasses: T.string,
+  buttonClassName: T.string,
 };
 
 AgentAccess.defaultProps = {
   onLoading: () => {},
-  buttonClasses: null,
+  buttonClassName: null,
 };
