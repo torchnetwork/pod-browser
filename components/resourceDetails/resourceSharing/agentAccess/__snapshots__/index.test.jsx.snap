@@ -248,7 +248,11 @@ exports[`AgentAccess renders an error message if it's unable to load profile 1`]
   <div
     class="PodBrowser-message PodBrowser-message--error"
   >
-    Failed to load http://example.com/webId#me
+    <div
+      class="PodBrowser-message__main"
+    >
+      Failed to load http://example.com/webId#me
+    </div>
   </div>
 </DocumentFragment>
 `;
