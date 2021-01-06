@@ -83,10 +83,13 @@ exports[`Container view Renders a table view without data 1`] = `
           <label
             class="PodBrowser-page-header__action"
             data-testid="upload-file-button"
+            for="upload-file-input"
+            tabindex="0"
           >
             Upload File
             <input
               data-testid="upload-file-input"
+              id="upload-file-input"
               style="display: none;"
               type="file"
             />
@@ -274,10 +277,13 @@ exports[`Container view Renders a table with data 1`] = `
           <label
             class="PodBrowser-page-header__action"
             data-testid="upload-file-button"
+            for="upload-file-input"
+            tabindex="0"
           >
             Upload File
             <input
               data-testid="upload-file-input"
+              id="upload-file-input"
               style="display: none;"
               type="file"
             />

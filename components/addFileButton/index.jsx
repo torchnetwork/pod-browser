@@ -19,7 +19,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import T from "prop-types";
 import { overwriteFile } from "@inrupt/solid-client";
 import { useSession } from "@inrupt/solid-ui-react";
@@ -28,8 +28,9 @@ import AlertContext from "../../src/contexts/alertContext";
 import ConfirmationDialogContext from "../../src/contexts/confirmationDialogContext";
 import { joinPath } from "../../src/stringHelpers";
 
-const TESTCAFE_ID_UPLOAD_BUTTON = "upload-file-button";
-const TESTCAFE_ID_UPLOAD_INPUT = "upload-file-input";
+export const TESTCAFE_ID_UPLOAD_BUTTON = "upload-file-button";
+export const TESTCAFE_ID_UPLOAD_INPUT = "upload-file-input";
+
 export const DUPLICATE_DIALOG_ID = "upload-duplicate-file";
 
 function normalizeSafeFileName(fileName) {
@@ -170,6 +171,7 @@ export default function AddFileButton({ className, onSave, resourceList }) {
   } = useContext(ConfirmationDialogContext);
   const [confirmationSetup, setConfirmationSetup] = useState(false);
   const [file, setFile] = useState(null);
+  const ref = useRef();
 
   const saveResource = handleSaveResource({
     fetch,
@@ -216,20 +218,33 @@ export default function AddFileButton({ className, onSave, resourceList }) {
   }, [confirmationSetup, confirmed, onConfirmation, file, open]);
 
   return (
-    // eslint-disable-next-line jsx-a11y/label-has-associated-control
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <label
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      tabIndex="0"
+      htmlFor="upload-file-input"
+      className={className}
       data-testid={TESTCAFE_ID_UPLOAD_BUTTON}
       disabled={isUploading}
-      className={className}
+      onClick={(e) => {
+        e.target.value = null;
+      }}
+      onKeyUp={(e) => {
+        if (e.key === "Enter") {
+          if (ref.current) {
+            ref.current.click();
+          }
+          e.target.value = null;
+        }
+      }}
     >
       {isUploading ? "Uploading..." : "Upload File"}
       <input
+        ref={ref}
+        id="upload-file-input"
         data-testid={TESTCAFE_ID_UPLOAD_INPUT}
         type="file"
         style={{ display: "none" }}
-        onClick={(e) => {
-          e.target.value = null;
-        }}
         onChange={onFileSelect}
       />
     </label>

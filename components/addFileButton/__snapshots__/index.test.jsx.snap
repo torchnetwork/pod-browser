@@ -4,10 +4,13 @@ exports[`AddFileButton Renders an add file button 1`] = `
 <DocumentFragment>
   <label
     data-testid="upload-file-button"
+    for="upload-file-input"
+    tabindex="0"
   >
     Upload File
     <input
       data-testid="upload-file-input"
+      id="upload-file-input"
       style="display: none;"
       type="file"
     />
