@@ -31,6 +31,8 @@ import {
 } from "@inrupt/prism-react-components";
 import { useSession } from "@inrupt/solid-ui-react";
 
+export const TESTCAFE_ID_ADD_AGENT_BUTTON = "add-agent-button";
+
 export function setupSubmitHandler(
   value,
   session,
@@ -70,6 +72,7 @@ export function setupOnBlurHandler(setDirtyWebIdField) {
 }
 
 export default function AgentSearchForm({
+  type,
   buttonText,
   children,
   dirtyForm,
@@ -84,6 +87,15 @@ export default function AgentSearchForm({
   const invalidWebIdField = !value && (dirtyForm || dirtyWebIdField);
   const [existingWebId, setExistingWebId] = useState(null);
   const [isPodOwner, setIsPodOwner] = useState(false);
+
+  const AGENT_TYPE_MAP = {
+    contacts: {
+      OWN_WEBID_ERROR_MESSAGE: "You cannot add yourself as a contact.",
+    },
+    permissions: {
+      OWN_WEBID_ERROR_MESSAGE: "You cannot overwrite your own permissions.",
+    },
+  };
 
   const handleSubmit = setupSubmitHandler(
     value,
@@ -108,7 +120,7 @@ export default function AgentSearchForm({
       )}
       {isPodOwner && (
         <Message variant="invalid">
-          You cannot overwrite your own permissions.
+          {AGENT_TYPE_MAP[type].OWN_WEBID_ERROR_MESSAGE}
         </Message>
       )}
       {existingWebId && (
@@ -130,7 +142,9 @@ export default function AgentSearchForm({
 
       {children}
 
-      <Button type="submit">{buttonText}</Button>
+      <Button type="submit" data-testid={TESTCAFE_ID_ADD_AGENT_BUTTON}>
+        {buttonText}
+      </Button>
     </Form>
   );
 }
@@ -143,6 +157,7 @@ AgentSearchForm.propTypes = {
   onSubmit: T.func,
   permissions: T.arrayOf(T.object),
   value: T.string,
+  type: T.string,
 };
 
 AgentSearchForm.defaultProps = {
@@ -153,4 +168,5 @@ AgentSearchForm.defaultProps = {
   onSubmit: () => {},
   permissions: [],
   value: "",
+  type: "permissions",
 };

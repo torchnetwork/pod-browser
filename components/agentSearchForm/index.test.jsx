@@ -25,6 +25,7 @@ import { useSession } from "@inrupt/solid-ui-react";
 import { renderWithTheme } from "../../__testUtils/withTheme";
 import mockSession from "../../__testUtils/mockSession";
 import AgentSearchForm, {
+  TESTCAFE_ID_ADD_AGENT_BUTTON,
   setupOnBlurHandler,
   setupOnChangeHandler,
   setupSubmitHandler,
@@ -138,6 +139,30 @@ describe("AgentSearchForm", () => {
     fireEvent.click(button);
     const errorMessage = wrapper.queryByText(
       "You cannot overwrite your own permissions."
+    );
+    expect(errorMessage).toBeTruthy();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+  test("renders correct error message when agent type is 'contacts'", () => {
+    const onSubmit = jest.fn();
+    const wrapper = render(
+      <AgentSearchForm
+        type="contacts"
+        onSubmit={onSubmit}
+        value="http://example.com/webId#me"
+        permissions={[
+          {
+            acl: { read: true, append: true, write: true, control: true },
+            alias: "Control",
+            webId: "http://example.com/webId#me",
+          },
+        ]}
+      />
+    );
+    const button = wrapper.getByTestId(TESTCAFE_ID_ADD_AGENT_BUTTON);
+    fireEvent.click(button);
+    const errorMessage = wrapper.queryByText(
+      "You cannot add yourself as a contact."
     );
     expect(errorMessage).toBeTruthy();
     expect(onSubmit).not.toHaveBeenCalled();

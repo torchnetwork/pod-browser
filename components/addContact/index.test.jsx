@@ -80,7 +80,7 @@ describe("handleSubmit", () => {
   let alertError;
   let alertSuccess;
   let setDirtyForm;
-  const fetch = "fetch";
+  let session;
 
   beforeEach(() => {
     setAgentId = jest.fn();
@@ -88,6 +88,7 @@ describe("handleSubmit", () => {
     alertError = jest.fn();
     alertSuccess = jest.fn();
     setDirtyForm = jest.fn();
+    session = mockSession();
   });
 
   afterEach(() => {
@@ -104,7 +105,7 @@ describe("handleSubmit", () => {
       setIsLoading,
       alertError,
       alertSuccess,
-      fetch,
+      session,
       setDirtyForm,
       people,
     });
@@ -118,7 +119,7 @@ describe("handleSubmit", () => {
     expect(addressBookFns.findContactInAddressBook).toHaveBeenCalledWith(
       people,
       aliceWebIdUrl,
-      fetch
+      session.fetch
     );
     expect(setAgentId).toHaveBeenCalledTimes(0);
     expect(setIsLoading).toHaveBeenCalledTimes(2);
@@ -134,7 +135,7 @@ describe("handleSubmit", () => {
       setIsLoading,
       alertError,
       alertSuccess,
-      fetch,
+      session,
       setDirtyForm,
     });
     jest.spyOn(profileHelperFns, "fetchProfile").mockResolvedValue(mockProfile);
@@ -155,7 +156,7 @@ describe("handleSubmit", () => {
       setIsLoading,
       alertError,
       alertSuccess,
-      fetch,
+      session,
       setDirtyForm,
     });
     jest
@@ -185,7 +186,7 @@ describe("handleSubmit", () => {
       setIsLoading,
       alertError,
       alertSuccess,
-      fetch,
+      session,
       setDirtyForm,
       people,
       peopleMutate,
@@ -215,7 +216,7 @@ describe("handleSubmit", () => {
       setIsLoading,
       alertError,
       alertSuccess,
-      fetch,
+      session,
       setDirtyForm,
     });
     jest.spyOn(profileHelperFns, "fetchProfile").mockResolvedValue(mockProfile);
