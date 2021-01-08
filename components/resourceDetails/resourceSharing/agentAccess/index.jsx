@@ -107,11 +107,7 @@ export function getDialogId(datasetIri) {
   return `change-agent-access-${datasetIri}`;
 }
 
-export default function AgentAccess({
-  onLoading,
-  permission: { acl, webId },
-  buttonClassName,
-}) {
+export default function AgentAccess({ onLoading, permission: { acl, webId } }) {
   let { data: profile, error: profileError } = useFetchProfile(webId);
   const classes = useStyles();
   const {
@@ -176,8 +172,13 @@ export default function AgentAccess({
     return (
       <div className={bem("alert-container")}>
         <Alert
-          classes={{ root: classes.alertBox, message: classes.alertMessage }}
-          severity="error"
+          classes={{
+            root: classes.alertBox,
+            message: classes.alertMessage,
+            action: classes.action,
+            icon: classes.alertIcon,
+          }}
+          severity="warning"
           action={
             // eslint-disable-next-line react/jsx-wrap-multilines
             isLoading ? (
@@ -188,18 +189,29 @@ export default function AgentAccess({
                 color="inherit"
               />
             ) : (
-              <Button
-                data-testid={TESTCAFE_ID_TRY_AGAIN_BUTTON}
-                className={bem("bold-button")}
-                color="inherit"
-                size="small"
-                onClick={() => {
-                  setIsLoading(true);
-                  setTimeout(handleRetryClick, 750);
-                }}
-              >
-                Try again
-              </Button>
+              <>
+                <Button
+                  data-testid={TESTCAFE_ID_TRY_AGAIN_BUTTON}
+                  className={bem("bold-button")}
+                  color="inherit"
+                  size="small"
+                  onClick={() => {
+                    setIsLoading(true);
+                    setTimeout(handleRetryClick, 750);
+                  }}
+                >
+                  Try again
+                </Button>
+                <Button
+                  className={bem("bold-button")}
+                  color="inherit"
+                  size="small"
+                  onClick={onDelete}
+                  data-testid={TESTCAFE_ID_REMOVE_BUTTON}
+                >
+                  Remove
+                </Button>
+              </>
             )
           }
         >
@@ -213,14 +225,18 @@ export default function AgentAccess({
           >
             {webId}
           </Typography>
-          <button
-            type="button"
-            className={buttonClassName}
-            onClick={onDelete}
-            data-testid={TESTCAFE_ID_REMOVE_BUTTON}
-          >
-            Remove
-          </button>
+          <Form onSubmit={onSubmit}>
+            <PermissionsForm
+              key={webId}
+              webId={webId}
+              acl={access}
+              onChange={setTempAccess}
+            >
+              <PrismButton onClick={onSubmit} type="submit">
+                Save
+              </PrismButton>
+            </PermissionsForm>
+          </Form>
         </div>
       </div>
     );
@@ -273,10 +289,8 @@ export default function AgentAccess({
 AgentAccess.propTypes = {
   permission: T.object.isRequired,
   onLoading: T.func,
-  buttonClassName: T.string,
 };
 
 AgentAccess.defaultProps = {
   onLoading: () => {},
-  buttonClassName: null,
 };

@@ -60,10 +60,7 @@ export default function ResourceSharing({ startLoading }) {
           Individual permissions
         </AccordionSummary>
         <AccordionDetails className={classes.details}>
-          <AgentAccessList
-            onLoading={setLoading}
-            buttonClassName={actionMenuBem("action-menu__trigger")}
-          />
+          <AgentAccessList onLoading={setLoading} />
         </AccordionDetails>
       </Accordion>
     </>

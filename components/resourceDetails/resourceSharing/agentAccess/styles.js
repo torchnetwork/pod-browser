@@ -19,7 +19,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-export default function styles() {
+export default function styles(theme) {
   return {
     avatar: {
       marginRight: "1rem",
@@ -32,23 +32,35 @@ export default function styles() {
     "alert-container": {
       maxWidth: "100%",
     },
+    action: {
+      margin: 0,
+      padding: 0,
+      paddingRight: "5px",
+    },
     alertBox: {
-      fontSize: "14px",
+      fontSize: "13px",
       width: "100%",
       overflowWrap: "break-word",
-      margin: "16px 0",
+      margin: "8px 0",
+      padding: "6px",
     },
     alertMessage: {
       maxWidth: "50%",
       overflowWrap: "break-word",
+    },
+    alertIcon: {
+      marginRight: "8px",
     },
     "avatar-container": {
       display: "flex",
       maxWidth: "100%",
       paddingRight: "16px",
       "& p": {
-        overflowWrap: "anywhere",
+        overflowWrap: "break-word",
         marginRight: "16px",
+        [theme.breakpoints.up("sm")]: {
+          overflowWrap: "anywhere",
+        },
       },
     },
     "bold-button": {
