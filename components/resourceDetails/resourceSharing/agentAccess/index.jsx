@@ -35,7 +35,7 @@ import { useBem } from "@solid/lit-prism-patterns";
 import { DatasetContext, useSession } from "@inrupt/solid-ui-react";
 import { getSourceUrl } from "@inrupt/solid-client";
 import { Form, Button as PrismButton } from "@inrupt/prism-react-components";
-import { Alert, Skeleton, TimelineSeparator } from "@material-ui/lab";
+import { Alert, Skeleton } from "@material-ui/lab";
 import PermissionsForm from "../../../permissionsForm";
 import styles from "./styles";
 import ConfirmationDialogContext from "../../../../src/contexts/confirmationDialogContext";
@@ -147,15 +147,6 @@ export default function AgentAccess({ onLoading, permission: { acl, webId } }) {
     dialogId,
     savePermissions,
     tempAccess
-  );
-
-  const onDelete = submitHandler(
-    authenticatedWebId,
-    webId,
-    setOpen,
-    dialogId,
-    savePermissions,
-    { read: false, write: false, append: false, control: false }
   );
 
   const handleRetryClick = async () => {
