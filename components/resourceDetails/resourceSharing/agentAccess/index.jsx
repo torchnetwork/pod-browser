@@ -53,8 +53,6 @@ const TESTCAFE_ID_AGENT_WEB_ID = "agent-web-id";
 const TESTCAFE_ID_TRY_AGAIN_BUTTON = "try-again-button";
 const TESTCAFE_ID_TRY_AGAIN_SPINNER = "try-again-spinner";
 
-const FAILED_PROFILE_MESSAGE = "Unable to load this profile";
-
 export function submitHandler(
   authenticatedWebId,
   webId,
@@ -160,7 +158,7 @@ export default function AgentAccess({ onLoading, permission: { acl, webId } }) {
   };
 
   if (profileError) {
-    const message = FAILED_PROFILE_MESSAGE;
+    const message = "Unable to load this profile";
     return (
       <div className={bem("alert-container")}>
         <Alert
