@@ -20,6 +20,8 @@
  */
 
 export default function styles(theme) {
+  const WARNING_BACKGROUND_COLOR = "#FFF4E5";
+  const SEPARATOR_COLOR = "#E1CAAA";
   return {
     avatar: {
       marginRight: "1rem",
@@ -31,33 +33,29 @@ export default function styles(theme) {
     },
     "alert-container": {
       maxWidth: "100%",
+      backgroundColor: WARNING_BACKGROUND_COLOR,
+      padding: theme.spacing(0.7, 1.4),
     },
     action: {
-      margin: 0,
       padding: 0,
-      paddingRight: "5px",
+      paddingRight: theme.spacing(0.5),
     },
     alertBox: {
-      fontSize: "13px",
       width: "100%",
       overflowWrap: "break-word",
-      margin: "8px 0",
-      padding: "6px",
+      padding: 0,
     },
     alertMessage: {
-      maxWidth: "50%",
       overflowWrap: "break-word",
-    },
-    alertIcon: {
-      marginRight: "8px",
+      fontSize: "14px",
     },
     "avatar-container": {
       display: "flex",
       maxWidth: "100%",
-      paddingRight: "16px",
+      padding: 0,
       "& p": {
         overflowWrap: "break-word",
-        marginRight: "16px",
+        marginRight: theme.spacing(0.7, 1.6, 1.4, 0.7),
         [theme.breakpoints.up("sm")]: {
           overflowWrap: "anywhere",
         },
@@ -65,9 +63,17 @@ export default function styles(theme) {
     },
     "bold-button": {
       fontWeight: "bold",
+      alignSelf: "right",
     },
     spinner: {
-      margin: "20px",
+      margin: theme.spacing(2),
+    },
+    separator: {
+      boxSizing: "border-box",
+      border: `1px solid ${SEPARATOR_COLOR}`,
+      margin: 0,
+      marginBottom: theme.spacing(0.8),
+      height: "1px",
     },
   };
 }

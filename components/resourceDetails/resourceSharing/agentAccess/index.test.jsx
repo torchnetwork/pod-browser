@@ -154,17 +154,6 @@ describe("AgentAccess", () => {
     await waitFor(() => expect(queryByTestId("try-again-spinner")).toBeFalsy());
   });
 
-  it("renders a 'remove' button if it's unable to load profile", () => {
-    useFetchProfile.mockReturnValue({ error: "error" });
-    const { asFragment, getByTestId } = renderWithTheme(
-      <DatasetProvider dataset={dataset}>
-        <AgentAccess permission={permission} />
-      </DatasetProvider>
-    );
-    expect(getByTestId("remove-button")).toBeTruthy();
-    expect(asFragment()).toMatchSnapshot();
-  });
-
   describe("user tries to change access for themselves", () => {
     it("checkboxes are disabled", () => {
       const session = mockSession();
@@ -188,7 +177,7 @@ describe("AgentAccess", () => {
         <AgentAccess permission={permission} onLoading={undefined} />
       </DatasetProvider>
     );
-    const button = getByTestId("remove-button");
+    const button = getByTestId("try-again-button");
     const { onLoading } = AgentAccess.defaultProps;
     userEvent.click(button);
 

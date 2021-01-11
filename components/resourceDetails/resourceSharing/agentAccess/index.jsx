@@ -35,7 +35,7 @@ import { useBem } from "@solid/lit-prism-patterns";
 import { DatasetContext, useSession } from "@inrupt/solid-ui-react";
 import { getSourceUrl } from "@inrupt/solid-client";
 import { Form, Button as PrismButton } from "@inrupt/prism-react-components";
-import { Alert, Skeleton } from "@material-ui/lab";
+import { Alert, Skeleton, TimelineSeparator } from "@material-ui/lab";
 import PermissionsForm from "../../../permissionsForm";
 import styles from "./styles";
 import ConfirmationDialogContext from "../../../../src/contexts/confirmationDialogContext";
@@ -51,8 +51,9 @@ const useStyles = makeStyles((theme) => createStyles(styles(theme)));
 
 const TESTCAFE_ID_AGENT_WEB_ID = "agent-web-id";
 const TESTCAFE_ID_TRY_AGAIN_BUTTON = "try-again-button";
-const TESTCAFE_ID_REMOVE_BUTTON = "remove-button";
 const TESTCAFE_ID_TRY_AGAIN_SPINNER = "try-again-spinner";
+
+const FAILED_PROFILE_MESSAGE = "Unable to load this profile";
 
 export function submitHandler(
   authenticatedWebId,
@@ -168,7 +169,7 @@ export default function AgentAccess({ onLoading, permission: { acl, webId } }) {
   };
 
   if (profileError) {
-    const message = `Unable to load ${webId}`;
+    const message = FAILED_PROFILE_MESSAGE;
     return (
       <div className={bem("alert-container")}>
         <Alert
@@ -176,7 +177,6 @@ export default function AgentAccess({ onLoading, permission: { acl, webId } }) {
             root: classes.alertBox,
             message: classes.alertMessage,
             action: classes.action,
-            icon: classes.alertIcon,
           }}
           severity="warning"
           action={
@@ -189,34 +189,24 @@ export default function AgentAccess({ onLoading, permission: { acl, webId } }) {
                 color="inherit"
               />
             ) : (
-              <>
-                <Button
-                  data-testid={TESTCAFE_ID_TRY_AGAIN_BUTTON}
-                  className={bem("bold-button")}
-                  color="inherit"
-                  size="small"
-                  onClick={() => {
-                    setIsLoading(true);
-                    setTimeout(handleRetryClick, 750);
-                  }}
-                >
-                  Try again
-                </Button>
-                <Button
-                  className={bem("bold-button")}
-                  color="inherit"
-                  size="small"
-                  onClick={onDelete}
-                  data-testid={TESTCAFE_ID_REMOVE_BUTTON}
-                >
-                  Remove
-                </Button>
-              </>
+              <Button
+                data-testid={TESTCAFE_ID_TRY_AGAIN_BUTTON}
+                className={bem("bold-button")}
+                color="inherit"
+                size="small"
+                onClick={() => {
+                  setIsLoading(true);
+                  setTimeout(handleRetryClick, 750);
+                }}
+              >
+                Try again
+              </Button>
             )
           }
         >
           {message}
         </Alert>
+        <div className={classes.separator} />
         <div className={bem("avatar-container")}>
           <Avatar className={classes.avatar} alt={webId} src={null} />
           <Typography
